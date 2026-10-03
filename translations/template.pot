@@ -23,10 +23,27 @@ msgid_plural "%1 changes waiting"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%1 task"
+msgid_plural "%1 tasks"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%1 task today"
 msgid_plural "%1 tasks today"
 msgstr[0] ""
 msgstr[1] ""
+
+msgctxt "view name with task count"
+msgid "%1%2 (%3)"
+msgstr ""
+
+msgid "%2 · %1 overdue"
+msgid_plural "%2 · %1 overdue"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "A pinned list (set from the list title menu)"
+msgstr ""
 
 msgid "API token:"
 msgstr ""
@@ -37,7 +54,13 @@ msgstr ""
 msgid "Account:"
 msgstr ""
 
+msgid "Add one below."
+msgstr ""
+
 msgid "Add task"
+msgstr ""
+
+msgid "Add task to this day"
 msgstr ""
 
 msgid "Added to %1"
@@ -45,6 +68,9 @@ msgstr ""
 
 msgctxt "task added: project · due date"
 msgid "Added to %1 · %2"
+msgstr ""
+
+msgid "Adding to %1"
 msgstr ""
 
 msgid "All done for today"
@@ -104,10 +130,19 @@ msgstr ""
 msgid "Disconnect"
 msgstr ""
 
+msgid "Don't set a date"
+msgstr ""
+
 msgid "Edit"
 msgstr ""
 
 msgid "Enjoy the rest of your day."
+msgstr ""
+
+msgid "Filter results need a connection"
+msgstr ""
+
+msgid "Filters"
 msgstr ""
 
 msgid "Hide token"
@@ -116,16 +151,31 @@ msgstr ""
 msgid "Inbox"
 msgstr ""
 
+msgid "Labels"
+msgstr ""
+
 msgid "Link copied"
 msgstr ""
 
 msgid "Loading your tasks…"
 msgstr ""
 
+msgid "Loading…"
+msgstr ""
+
 msgid "More actions"
 msgstr ""
 
 msgid "Move to"
+msgstr ""
+
+msgid "New task in %1"
+msgstr ""
+
+msgid "New task in Inbox"
+msgstr ""
+
+msgid "New task with @%1"
 msgstr ""
 
 msgid "New task, e.g. “Dentist tomorrow 3pm #Personal”"
@@ -140,6 +190,12 @@ msgstr ""
 
 msgctxt "next task: title time"
 msgid "Next: %1 %2"
+msgstr ""
+
+msgid "No badge"
+msgstr ""
+
+msgid "No tasks here"
 msgstr ""
 
 msgid "Not connected"
@@ -160,7 +216,16 @@ msgstr ""
 msgid "Open in Todoist"
 msgstr ""
 
+msgid "Open it in Todoist to check the query."
+msgstr ""
+
 msgid "Overdue"
+msgstr ""
+
+msgid "Overdue and today's tasks"
+msgstr ""
+
+msgid "Panel badge:"
 msgstr ""
 
 msgid "Paste your API token"
@@ -186,6 +251,9 @@ msgstr ""
 msgid "Priority 4"
 msgstr ""
 
+msgid "Projects"
+msgstr ""
+
 msgid "Reconnect"
 msgstr ""
 
@@ -195,13 +263,34 @@ msgstr ""
 msgid "Refresh now"
 msgstr ""
 
+msgid "Results from %1"
+msgstr ""
+
 msgid "Show token"
 msgstr ""
 
 msgid "Something went wrong (HTTP %1)."
 msgstr ""
 
+msgid "Start here in this widget"
+msgstr ""
+
+msgid "Start with:"
+msgstr ""
+
+msgid "Switch list: %1"
+msgstr ""
+
+msgid "Tasks in the current list"
+msgstr ""
+
+msgid "That list no longer exists in Todoist. Showing Today."
+msgstr ""
+
 msgid "That's too long. Keep it under 1000 characters."
+msgstr ""
+
+msgid "The list you used last"
 msgstr ""
 
 msgid "This token didn't work. Copy it again from Todoist settings."
@@ -213,12 +302,14 @@ msgstr ""
 msgid "Today"
 msgstr ""
 
-msgid "Today · %1 overdue"
-msgid_plural "Today · %1 overdue"
-msgstr[0] ""
-msgstr[1] ""
+msgctxt "day header: Today · weekday date"
+msgid "Today · %1"
+msgstr ""
 
 msgid "Todoist asked to slow down. Retrying soon…"
+msgstr ""
+
+msgid "Todoist couldn't run this filter"
 msgstr ""
 
 msgid "Todoist didn't accept your token"
@@ -245,10 +336,20 @@ msgstr ""
 msgid "Tomorrow"
 msgstr ""
 
+msgctxt "day header: Tomorrow · weekday date"
+msgid "Tomorrow · %1"
+msgstr ""
+
 msgid "Try again"
 msgstr ""
 
 msgid "Undo"
+msgstr ""
+
+msgid "Unpin"
+msgstr ""
+
+msgid "Upcoming"
 msgstr ""
 
 msgid "Updated %1 minute ago"

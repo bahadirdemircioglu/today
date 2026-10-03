@@ -1,7 +1,7 @@
 # Architecture Plan: todoist-plasma (v2 — esnek görünümler)
 
-**Status:** in progress
-**Revision:** 2
+**Status:** implemented (v2.0.0)
+**Revision:** 3
 **Önceki plan:** [todoist-today-plan.md](todoist-today-plan.md) (v1, uygulandı). Bu plan onun üzerine
 kurulur; v1'deki sync, kuyruk, durum makinesi, güvenlik ve i18n kararları aynen geçerlidir. Yalnızca
 değişenler burada.
@@ -199,3 +199,23 @@ Kapatıldı (kullanıcı kararları, Rev. 2):
 | V3 Ekleme bağlamı sonradan uuid'li komutla | Quick Add metnine `#proje`/tarih eklemek | Metne ekleme kullanıcının yazdığıyla çakışır ve dile bağlıdır; komutlar idempotent |
 | V4 Görünüm seçici başlıkta açılır menü | Yan menü (web gibi) | Popup 22 gu genişlikte; yan menü listeye yer bırakmaz |
 | V5 `computeToday` → `computeView` genellemesi | Görünüm başına ayrı modül | Overlay/sıralama kuralları tek yerde; v1 testleri eşdeğerliği korur |
+
+## Implementation Notes (Rev. 3)
+
+1. **Adım 0 (API doğrulama) yapılamadı:** geliştirme ortamında Todoist token'ı yok. Belirsiz noktalar
+   savunmacı uygulandı: `/tasks/filter` yanıtı hem `{results, next_cursor}` hem düz dizi olarak kabul edilir
+   (en fazla 5 sayfa); filtre isteği başarısız olursa sync döngüsü bozulmaz, liste "Todoist couldn't run this
+   filter" / son sonuç gösterir. A-v2-1…4 gerçek hesapla doğrulanmalı.
+2. **Filtre isteği sync döngüsünün içinde:** tek uçuş kuralı korunsun diye geçerli görünüm filtreyse
+   `/sync` başarısından sonra aynı döngüde istenir; görünüm değişince `SYNC_REQUESTED{view}` (5 sn kuralından muaf).
+3. **Bağlam kuyruktaki girdide:** `quick_add.context` kaydedilir; görev çevrimdışı eklenip sonra
+   gönderilse veya kullanıcı başka listeye geçse de doğru yere düşer. `due_today` girdisi `update`'e genellendi.
+4. **Görünüm geçişi animasyonsuz:** liste değişince model sıfırlanır (silme animasyonları boşluk bırakıyordu);
+   yalnız aynı liste içindeki değişiklikler animasyonlu.
+5. **Sabitleme widget'tan:** ayarlar sayfası applet verisine erişemediği için görünüm, başlık menüsündeki
+   "Start here in this widget" ile `pinnedView`'e yazılır; ayarlarda yalnız "Unpin" ve rozet kaynağı var.
+6. **Upcoming'de tekrarlayan görevler** yalnız bir sonraki tarihlerinde görünür (web her tekrarı gösterir) —
+   README "Known limitations".
+7. **Doğrulama:** 113 Node testi (ViewModel, ContextRules, store v2 dahil); QML offscreen duman testinde altı
+   görünümün hepsi (Inbox, Today, Upcoming, proje + bölüm + alt görev, etiket, filtre) uyarısız çizildi. Gerçek
+   Plasma oturumunda M-v2-1…6 henüz yapılmadı.

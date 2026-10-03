@@ -20,10 +20,27 @@ msgid_plural "%1 changes waiting"
 msgstr[0] "%1 değişiklik bekliyor"
 msgstr[1] "%1 değişiklik bekliyor"
 
+msgid "%1 task"
+msgid_plural "%1 tasks"
+msgstr[0] "%1 görev"
+msgstr[1] "%1 görev"
+
 msgid "%1 task today"
 msgid_plural "%1 tasks today"
 msgstr[0] "Bugün %1 görev"
 msgstr[1] "Bugün %1 görev"
+
+msgctxt "view name with task count"
+msgid "%1%2 (%3)"
+msgstr "%1%2 (%3)"
+
+msgid "%2 · %1 overdue"
+msgid_plural "%2 · %1 overdue"
+msgstr[0] "%2 · %1 gecikmiş"
+msgstr[1] "%2 · %1 gecikmiş"
+
+msgid "A pinned list (set from the list title menu)"
+msgstr "Sabitlenmiş liste (liste başlığı menüsünden ayarlanır)"
 
 msgid "API token:"
 msgstr "API token'ı:"
@@ -34,8 +51,14 @@ msgstr "Hesap"
 msgid "Account:"
 msgstr "Hesap:"
 
+msgid "Add one below."
+msgstr "Aşağıdan bir tane ekleyin."
+
 msgid "Add task"
 msgstr "Görev ekle"
+
+msgid "Add task to this day"
+msgstr "Bu güne görev ekle"
 
 msgid "Added to %1"
 msgstr "%1 projesine eklendi"
@@ -43,6 +66,9 @@ msgstr "%1 projesine eklendi"
 msgctxt "task added: project · due date"
 msgid "Added to %1 · %2"
 msgstr "%1 projesine eklendi · %2"
+
+msgid "Adding to %1"
+msgstr "%1 gününe ekleniyor"
 
 msgid "All done for today"
 msgstr "Bugünlük hepsi tamam"
@@ -101,11 +127,20 @@ msgstr "“%1” silindi"
 msgid "Disconnect"
 msgstr "Bağlantıyı kes"
 
+msgid "Don't set a date"
+msgstr "Tarih koyma"
+
 msgid "Edit"
 msgstr "Düzenle"
 
 msgid "Enjoy the rest of your day."
 msgstr "Günün geri kalanının tadını çıkarın."
+
+msgid "Filter results need a connection"
+msgstr "Filtre sonuçları için bağlantı gerekiyor"
+
+msgid "Filters"
+msgstr "Filtreler"
 
 msgid "Hide token"
 msgstr "Token'ı gizle"
@@ -113,17 +148,32 @@ msgstr "Token'ı gizle"
 msgid "Inbox"
 msgstr "Gelen Kutusu"
 
+msgid "Labels"
+msgstr "Etiketler"
+
 msgid "Link copied"
 msgstr "Bağlantı kopyalandı"
 
 msgid "Loading your tasks…"
 msgstr "Görevleriniz yükleniyor…"
 
+msgid "Loading…"
+msgstr "Yükleniyor…"
+
 msgid "More actions"
 msgstr "Diğer eylemler"
 
 msgid "Move to"
 msgstr "Taşı"
+
+msgid "New task in %1"
+msgstr "%1 içinde yeni görev"
+
+msgid "New task in Inbox"
+msgstr "Gelen Kutusu'nda yeni görev"
+
+msgid "New task with @%1"
+msgstr "@%1 etiketli yeni görev"
 
 msgid "New task, e.g. “Dentist tomorrow 3pm #Personal”"
 msgstr "Yeni görev, ör. “Dentist tomorrow 3pm #Personal”"
@@ -138,6 +188,12 @@ msgstr "Sıradaki: %1"
 msgctxt "next task: title time"
 msgid "Next: %1 %2"
 msgstr "Sıradaki: %1 %2"
+
+msgid "No badge"
+msgstr "Rozet yok"
+
+msgid "No tasks here"
+msgstr "Burada görev yok"
 
 msgid "Not connected"
 msgstr "Bağlı değil"
@@ -157,8 +213,17 @@ msgstr "Todoist ayarlarını aç"
 msgid "Open in Todoist"
 msgstr "Todoist'te aç"
 
+msgid "Open it in Todoist to check the query."
+msgstr "Sorguyu kontrol etmek için Todoist'te açın."
+
 msgid "Overdue"
 msgstr "Gecikmiş"
+
+msgid "Overdue and today's tasks"
+msgstr "Gecikmiş ve bugünkü görevler"
+
+msgid "Panel badge:"
+msgstr "Panel rozeti:"
 
 msgid "Paste your API token"
 msgstr "API token'ınızı yapıştırın"
@@ -185,6 +250,9 @@ msgstr "Öncelik 3"
 msgid "Priority 4"
 msgstr "Öncelik 4"
 
+msgid "Projects"
+msgstr "Projeler"
+
 msgid "Reconnect"
 msgstr "Yeniden bağlan"
 
@@ -194,14 +262,35 @@ msgstr "Tekrarlayan: Todoist'te yeniden planlayın"
 msgid "Refresh now"
 msgstr "Şimdi yenile"
 
+msgid "Results from %1"
+msgstr "%1 itibarıyla sonuçlar"
+
 msgid "Show token"
 msgstr "Token'ı göster"
 
 msgid "Something went wrong (HTTP %1)."
 msgstr "Bir şeyler ters gitti (HTTP %1)."
 
+msgid "Start here in this widget"
+msgstr "Bu widget burada başlasın"
+
+msgid "Start with:"
+msgstr "Başlangıç:"
+
+msgid "Switch list: %1"
+msgstr "Liste değiştir: %1"
+
+msgid "Tasks in the current list"
+msgstr "Geçerli listedeki görevler"
+
+msgid "That list no longer exists in Todoist. Showing Today."
+msgstr "Bu liste artık Todoist'te yok. Bugün gösteriliyor."
+
 msgid "That's too long. Keep it under 1000 characters."
 msgstr "Bu çok uzun. 1000 karakterin altında tutun."
+
+msgid "The list you used last"
+msgstr "En son kullandığınız liste"
 
 msgid "This token didn't work. Copy it again from Todoist settings."
 msgstr "Bu token çalışmadı. Todoist ayarlarından yeniden kopyalayın."
@@ -212,13 +301,15 @@ msgstr "Bu hafta sonu"
 msgid "Today"
 msgstr "Bugün"
 
-msgid "Today · %1 overdue"
-msgid_plural "Today · %1 overdue"
-msgstr[0] "Bugün · %1 gecikmiş"
-msgstr[1] "Bugün · %1 gecikmiş"
+msgctxt "day header: Today · weekday date"
+msgid "Today · %1"
+msgstr "Bugün · %1"
 
 msgid "Todoist asked to slow down. Retrying soon…"
 msgstr "Todoist yavaşlamamızı istedi. Birazdan yeniden denenecek…"
+
+msgid "Todoist couldn't run this filter"
+msgstr "Todoist bu filtreyi çalıştıramadı"
 
 msgid "Todoist didn't accept your token"
 msgstr "Todoist token'ınızı kabul etmedi"
@@ -245,11 +336,21 @@ msgstr "Token çalışıyor."
 msgid "Tomorrow"
 msgstr "Yarın"
 
+msgctxt "day header: Tomorrow · weekday date"
+msgid "Tomorrow · %1"
+msgstr "Yarın · %1"
+
 msgid "Try again"
 msgstr "Tekrar dene"
 
 msgid "Undo"
 msgstr "Geri al"
+
+msgid "Unpin"
+msgstr "Sabitlemeyi kaldır"
+
+msgid "Upcoming"
+msgstr "Yaklaşan"
 
 msgid "Updated %1 minute ago"
 msgid_plural "Updated %1 minutes ago"

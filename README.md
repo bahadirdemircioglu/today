@@ -1,12 +1,14 @@
-# Todoist Today
+# Todoist for Plasma
 
-Your Todoist **Today** view on the KDE Plasma 6 desktop and panel: overdue tasks first, then today's, timed tasks in time order. Complete tasks with one click and add new ones with Todoist's natural language. Works offline.
+Your Todoist tasks on the KDE Plasma 6 desktop and panel: **Inbox, Today, Upcoming, projects, labels and filters**, like the lists in Todoist's sidebar. Complete tasks with one click, add new ones with Todoist's natural language, and edit, reschedule, move or delete them from a task menu. Works offline.
 
 > Unofficial. Not created by, affiliated with, or supported by Doist.
 
-- **Panel:** an icon with a count badge (red when something is overdue). Click it to open the list.
-- **Desktop, small:** a big count and your next task.
-- **Desktop, large / popup:** the full list with round, priority-coloured check circles, a completion animation, a "New task" field and an "All done for today" state.
+- **Lists:** click the list title ("Today ▾") to switch between Inbox, Today, Upcoming (the next 7 days, day by day), your projects (with sections and indented sub-tasks), labels and saved filters. Each entry shows its task count.
+- **Pin a list to a widget:** in the list title menu choose *Start here in this widget*. For example, put a "Work" project widget and a Today widget side by side on the desktop. You can still switch lists in a pinned widget.
+- **Panel:** an icon with a count badge for Today (red when something is overdue). Click it to open the list. The badge can instead count the current list, or be turned off, in the settings.
+- **Desktop, small:** a big count and the next task of the list.
+- **Desktop, large / popup:** the full list with round, priority-coloured check circles, a completion animation, a "New task" field and an "All done" state.
 - **Follows your Plasma theme:** light/dark, accent colour, font size and animation speed. No hard-coded colours.
 - **Offline-first:** tasks are cached, and completions/additions made offline are queued. The queue survives Plasma restarts and is sent once you are back online.
 - **Task menu:** right-click a task (or use its ⋯ button) to edit it, reschedule it, change priority, move it to another project, copy its link, or delete it (with undo).
@@ -14,10 +16,12 @@ Your Todoist **Today** view on the KDE Plasma 6 desktop and panel: overdue tasks
 
 ## Install
 
-**From a release:** download `todoist-today-<version>.plasmoid` from [Releases](https://github.com/bahadirdemircioglu/today/releases), then either
+**From a release:** download `todoist-plasma-<version>.plasmoid` from [Releases](https://github.com/bahadirdemircioglu/today/releases), then either
 
 - right-click the desktop → *Enter Edit Mode* → *Add Widgets…* → *Get New Widgets* → *Install Widget From Local File…*, or
-- run `kpackagetool6 -t Plasma/Applet -i todoist-today-<version>.plasmoid` (use `-u` to upgrade).
+- run `kpackagetool6 -t Plasma/Applet -i todoist-plasma-<version>.plasmoid` (use `-u` to upgrade).
+
+Upgrading from 1.x ("Todoist Today"): 2.0 is a new widget with a new id. Remove the old widget, add *Todoist for Plasma* and paste your token again.
 
 **From source:**
 
@@ -46,7 +50,17 @@ Whatever you type goes to Todoist's [Quick Add](https://todoist.com/help/article
 | `Pay rent every 1st @home` | recurring, labelled |
 | `Buy milk // two litres` | due today (no date given), with a description |
 
-A task without a date is scheduled for **today**, like in Todoist's own Today view. Dates are parsed in the language your Todoist account uses. English always works; Todoist's date parser may not support every language (for example Turkish), while `#project`, `@label` and `p1`–`p4` work in any language.
+Where a new task lands depends on the list you add it from, like on the web. Anything you type yourself (a date, `#project`, `@label`) always wins:
+
+| List | A task typed without that information… |
+|---|---|
+| Today | is due today |
+| Upcoming | is due on the day whose **+** you clicked (otherwise today) |
+| A project | goes into that project |
+| Inbox | stays in the Inbox, undated |
+| A label | gets that label |
+
+Dates are parsed in the language your Todoist account uses. English always works; Todoist's date parser may not support every language (for example Turkish), while `#project`, `@label` and `p1`–`p4` work in any language.
 
 ## Security
 
@@ -59,11 +73,14 @@ A task without a date is scheduled for **today**, like in Todoist's own Today vi
 
 - **Time zones:** "today" follows your Todoist time zone. When your computer is in a *different* time zone than your Todoist account, a fixed-time-zone task can shift by an hour across a daylight-saving boundary (rarely enough to move it to another day), and the day can switch up to 5 minutes late at a DST change. When both zones match, which is the normal case, this does not apply.
 - **Offline Quick Add:** if the connection drops right after a new task was sent, the widget can't know whether Todoist created it. After the next sync it looks for a matching new task before sending it again. If no match is found, a duplicate is possible, though rare.
-- Sub-tasks due today are shown as plain rows, without hierarchy. Reordering, deadlines, reminders and rescheduling recurring tasks are not supported in the widget; use Todoist for those.
+- **Filters** are evaluated by Todoist, so a filter list needs a connection to refresh. Offline it shows the last results with their time.
+- **Upcoming** shows a recurring task once, on its next date (the web shows every occurrence).
+- In Today, Upcoming, label and filter lists sub-tasks are plain rows; the hierarchy is shown in project and Inbox lists.
+- Not supported in the widget (use Todoist for these): reordering, deadlines, reminders, rescheduling recurring tasks, creating or editing projects, sections, labels and filters, and completed-task history.
 
 ## Troubleshooting
 
-- Logs: `journalctl --user -f -t plasmashell | grep todoist-today`. Running `plasmoidviewer -a package` prints them to the terminal.
+- Logs: `journalctl --user -f -t plasmashell | grep todoist-plasma`. Running `plasmoidviewer -a package` prints them to the terminal.
 - After updating the package, restart Plasma if the old version keeps showing: `systemctl --user restart plasma-plasmashell`.
 - "Todoist didn't accept your token": the token was reset or revoked. Paste the current one from Todoist's settings.
 
@@ -76,7 +93,7 @@ plasmoidviewer -a package -l bottomedge -f horizontal   # panel
 LANGUAGE=tr LANG=tr_TR.UTF-8 plasmoidviewer -a package  # Turkish UI (run scripts/i18n-build.sh first)
 scripts/i18n-extract.sh                    # update translations/template.pot and *.po
 scripts/i18n-build.sh                      # compile .mo files into package/contents/locale
-scripts/package.sh                         # dist/todoist-today-<version>.plasmoid
+scripts/package.sh                         # dist/todoist-plasma-<version>.plasmoid
 ```
 
 All decision logic is plain JavaScript in `package/contents/ui/logic/` (`.pragma library` files, no QML or network dependencies), unit-tested in Node via `tests/helpers/load-qml-js.mjs`:
@@ -84,14 +101,16 @@ All decision logic is plain JavaScript in `package/contents/ui/logic/` (`.pragma
 | File | Role |
 |---|---|
 | `DateUtil.js` | time-zone offsets, day keys, Todoist `due` parsing |
-| `TaskStore.js` | merging `/sync` responses, computing and ordering the Today list |
-| `CommandQueue.js` | the persistent offline queue (`item_close` commands, Quick Adds) |
+| `TaskStore.js` | merging `/sync` responses (tasks, projects, sections, labels, filters), the offline overlay, the Today list |
+| `ViewModel.js` | Inbox, Upcoming, project, label and filter lists, list rows and the navigation list |
+| `ContextRules.js` | where a task added from a list lands (date, project, label) |
+| `CommandQueue.js` | the persistent offline queue (complete, update, move, delete commands; Quick Adds) |
 | `SyncMachine.js` | the sync state machine: debouncing, retries/backoff, recovery, account checks |
 | `TodoistClient.js` | HTTP via `XMLHttpRequest` and response classification |
 | `ModelSync.js` | minimal `ListModel` updates so only changed rows animate |
 | `Storage.js` | LocalStorage persistence (QML-only, not unit-tested) |
 
-`SyncController.qml` only executes the effects `SyncMachine` returns. The architecture plan is in [`docs/architecture/todoist-today-plan.md`](docs/architecture/todoist-today-plan.md), including the manual acceptance checklist (M1–M23) for a real Plasma session.
+`SyncController.qml` only executes the effects `SyncMachine` returns. The architecture plans are in [`docs/architecture/`](docs/architecture/INDEX.md): the v1 plan (sync, offline queue, state machine; manual checklist M1–M23) and the v2 plan (lists; checklist M-v2-1…6).
 
 Releases: bump `Version` in `package/metadata.json` and `package.json`, add a CHANGELOG section, then push a `vX.Y.Z` tag. CI builds the `.plasmoid` and attaches it to a GitHub Release.
 

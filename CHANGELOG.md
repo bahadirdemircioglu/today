@@ -6,14 +6,27 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-10-03
+
+Renamed to **Todoist for Plasma** (new plugin id `io.github.bahadirdemircioglu.todoistplasma`):
+remove the 1.x widget and add the new one.
+
 ### Added
+- Lists beyond Today: Inbox, Upcoming (7 days, day by day), projects (sections, indented
+  sub-tasks), labels and saved filters (evaluated by Todoist, last results kept offline).
+- List switcher in the title with task counts; "Start here in this widget" pins a list per widget.
+- New tasks land in the list they were added from (date, project, label); "+" on an Upcoming day.
 - Task menu (right click or the ⋯ button): edit title in place, reschedule (today, tomorrow,
   this weekend, next week), priority, move to project, copy link, open in Todoist, and delete
   with a 5-second undo. All changes are queued offline like completions.
+- Labels and the first description line are shown under a task.
+- Settings: panel badge source (Today, current list, none) and unpinning.
 
 ### Changed
-- Tasks added from the widget without a date are now scheduled for today (as in Todoist's Today
-  view) instead of silently landing in the Inbox and never appearing in the list.
+- All open tasks are cached (not only dated ones); the cache schema moves to v2 and is rebuilt
+  with one full sync.
+- Tasks added from the Today list without a date are scheduled for today instead of silently
+  landing in the Inbox.
 
 ## [1.0.0] - 2026-10-03
 
