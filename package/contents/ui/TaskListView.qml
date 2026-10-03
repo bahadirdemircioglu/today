@@ -25,6 +25,11 @@ ColumnLayout {
         id: taskModel
     }
 
+    TaskMenu {
+        id: taskMenu
+        controller: listRoot.controller
+    }
+
     Connections {
         target: listRoot.controller
         function onRowsChanged() {
@@ -95,8 +100,10 @@ ColumnLayout {
             reuseItems: false
 
             delegate: TaskRow {
+                id: taskRow
                 width: ListView.view.width
                 controller: listRoot.controller
+                onMenuRequested: anchor => taskMenu.openFor(taskRow, anchor)
             }
 
             add: Transition {

@@ -246,12 +246,30 @@ function computeToday(store, queue, nowMs, sysOffsetAt) {
     var nowMinutes = DateUtil.minutesOfDayAt(nowMs, offsetAt);
     var entries = queue && queue.entries ? queue.entries : [];
     var closing = {};
+    var patches = {};
     var pending = [];
     var i;
     for (i = 0; i < entries.length; i++) {
         var e = entries[i];
-        if (e.kind === "close") {
+        if (e.kind === "close" || e.kind === "delete") {
             closing[e.itemId] = true;
+        } else if (e.kind === "update" || e.kind === "move") {
+            // optimistic overlay, applied in queue order (later wins)
+            var patch = patches[e.itemId] || {};
+            if (e.kind === "move") {
+                patch.projectId = e.projectId;
+            } else {
+                if (e.args.content !== undefined) {
+                    patch.content = e.args.content;
+                }
+                if (e.args.priority !== undefined) {
+                    patch.priority = e.args.priority;
+                }
+                if (e.args.due !== undefined) {
+                    patch.due = e.args.due ? { date: e.args.due.date, isRecurring: false, string: "" } : null;
+                }
+            }
+            patches[e.itemId] = patch;
         } else if (e.kind === "quick_add") {
             pending.push({ localId: e.localId, text: e.text, state: e.state });
         }
@@ -266,6 +284,14 @@ function computeToday(store, queue, nowMs, sysOffsetAt) {
             continue;
         }
         var item = items[id];
+        if (patches[id]) {
+            item = copyMap(item);
+            for (var pk in patches[id]) {
+                if (Object.prototype.hasOwnProperty.call(patches[id], pk)) {
+                    item[pk] = patches[id][pk];
+                }
+            }
+        }
         var due = DateUtil.parseDue(item.due, offsetAt);
         if (!due) {
             if (item.due) {
@@ -280,6 +306,7 @@ function computeToday(store, queue, nowMs, sysOffsetAt) {
         var row = {
             id: item.id,
             title: plainTitle(item.content),
+            content: item.content,
             priority: item.priority,
             projectId: item.projectId,
             projectName: project && item.projectId !== st.inboxProjectId ? project.name : "",
@@ -341,6 +368,8 @@ function flattenRows(view) {
             kind: "task",
             itemId: r.id,
             title: r.title,
+            content: r.content || r.title,
+            projectId: r.projectId || "",
             priority: r.priority,
             projectName: r.projectName || "",
             dateKey: r.dateKey,
@@ -365,6 +394,8 @@ function flattenRows(view) {
             kind: "pending",
             itemId: "",
             title: p.text,
+            content: p.text,
+            projectId: "",
             priority: 1,
             projectName: "",
             dateKey: "",
@@ -376,6 +407,26 @@ function flattenRows(view) {
         });
     }
     return rows;
+}
+
+// Projects for a "Move to" menu: Inbox first, then by name. -> [{ id, name, isInbox }]
+function projectList(store) {
+    var out = [];
+    var projects = store && store.projects ? store.projects : {};
+    for (var id in projects) {
+        if (Object.prototype.hasOwnProperty.call(projects, id)) {
+            out.push({ id: id, name: projects[id].name, isInbox: id === store.inboxProjectId });
+        }
+    }
+    out.sort(function (a, b) {
+        if (a.isInbox !== b.isInbox) {
+            return a.isInbox ? -1 : 1;
+        }
+        var an = a.name.toLowerCase();
+        var bn = b.name.toLowerCase();
+        return an < bn ? -1 : (an > bn ? 1 : 0);
+    });
+    return out;
 }
 
 function serialize(store) {

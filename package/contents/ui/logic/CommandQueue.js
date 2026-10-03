@@ -3,7 +3,9 @@
 
 // Pure, persistent offline queue of user actions.
 //   { kind: "close", uuid, itemId, createdAt, attempts }                       -> sync item_close
-//   { kind: "due_today", uuid, itemId, date, createdAt, attempts }             -> sync item_update (due date)
+//   { kind: "update", uuid, itemId, args, createdAt, attempts }                -> sync item_update {id, ...args}
+//   { kind: "move", uuid, itemId, projectId, createdAt, attempts }             -> sync item_move
+//   { kind: "delete", uuid, itemId, sendAfter, createdAt, attempts }           -> sync item_delete (after an undo window)
 //   { kind: "quick_add", localId, text, createdAt, attempts, state, sentAt }   -> POST /tasks/quick
 // Every function returns a new queue; inputs are never mutated.
 
@@ -44,7 +46,16 @@ function uuid4(randomFn) {
 
 // Entries sent as /sync commands (uuid-idempotent).
 function isSyncCommand(e) {
-    return e.kind === "close" || e.kind === "due_today";
+    return e.kind === "close" || e.kind === "update" || e.kind === "move" || e.kind === "delete";
+}
+
+function hasDelete(queue, itemId) {
+    for (var i = 0; i < queue.entries.length; i++) {
+        if (queue.entries[i].kind === "delete" && queue.entries[i].itemId === itemId) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function hasClose(queue, itemId) {
@@ -70,9 +81,59 @@ function enqueueClose(queue, itemId, nowMs, uuidFn) {
 // A task added from the Today widget without a date is moved to today, like Todoist's own
 // Today view does. dateKey: "YYYY-MM-DD" in the user's reference zone.
 function enqueueDueToday(queue, itemId, dateKey, nowMs, uuidFn) {
+    return enqueueUpdate(queue, itemId, { due: { date: dateKey } }, nowMs, uuidFn);
+}
+
+// args: subset of { content, priority, due: { date } } (item_update arguments)
+function enqueueUpdate(queue, itemId, args, nowMs, uuidFn) {
     var entries = queue.entries.slice();
-    entries.push({ kind: "due_today", uuid: uuidFn(), itemId: String(itemId), date: dateKey, createdAt: nowMs, attempts: 0 });
+    entries.push({ kind: "update", uuid: uuidFn(), itemId: String(itemId), args: args, createdAt: nowMs, attempts: 0 });
     return withEntries(entries);
+}
+
+function enqueueMove(queue, itemId, projectId, nowMs, uuidFn) {
+    var entries = queue.entries.slice();
+    entries.push({ kind: "move", uuid: uuidFn(), itemId: String(itemId), projectId: String(projectId), createdAt: nowMs, attempts: 0 });
+    return withEntries(entries);
+}
+
+// The command is held back until sendAfter so the user can undo (cancelEntry) in the meantime.
+// -> { queue, uuid }
+function enqueueDelete(queue, itemId, nowMs, undoMs, uuidFn) {
+    var id = String(itemId);
+    if (hasDelete(queue, id)) {
+        return { queue: queue, uuid: null };
+    }
+    var uuid = uuidFn();
+    var entries = queue.entries.slice();
+    entries.push({ kind: "delete", uuid: uuid, itemId: id, sendAfter: nowMs + undoMs, createdAt: nowMs, attempts: 0 });
+    return { queue: withEntries(entries), uuid: uuid };
+}
+
+// Removes an entry that has not been sent yet (undo). -> new queue (unchanged if not found)
+function cancelEntry(queue, uuid) {
+    var entries = [];
+    var found = false;
+    for (var i = 0; i < queue.entries.length; i++) {
+        if (queue.entries[i].uuid === uuid) {
+            found = true;
+        } else {
+            entries.push(queue.entries[i]);
+        }
+    }
+    return found ? withEntries(entries) : queue;
+}
+
+// Earliest sendAfter still in the future, or 0.
+function nextHeldAt(queue, nowMs) {
+    var at = 0;
+    for (var i = 0; i < queue.entries.length; i++) {
+        var t = queue.entries[i].sendAfter;
+        if (typeof t === "number" && t > nowMs && (at === 0 || t < at)) {
+            at = t;
+        }
+    }
+    return at;
 }
 
 // -> { queue, error: null | "empty" | "too_long", localId }
@@ -90,18 +151,31 @@ function enqueueQuickAdd(queue, text, nowMs, uuidFn) {
     return { queue: withEntries(entries), error: null, localId: localId };
 }
 
-// -> [{ type: "item_close", uuid, args: { id } } | { type: "item_update", uuid, args: { id, due } }, ...]
-//    (at most `max`, queue order)
-function nextSyncBatch(queue, max) {
+// -> [{ type, uuid, args }, ...] at most `max`, in queue order. Held entries (sendAfter > nowMs)
+//    are skipped; nowMs omitted = nothing is held.
+function nextSyncBatch(queue, max, nowMs) {
     var limit = max || MAX_BATCH;
     var out = [];
     var entries = queue.entries;
     for (var i = 0; i < entries.length && out.length < limit; i++) {
         var e = entries[i];
+        if (typeof e.sendAfter === "number" && typeof nowMs === "number" && e.sendAfter > nowMs) {
+            continue;
+        }
         if (e.kind === "close") {
             out.push({ type: "item_close", uuid: e.uuid, args: { id: e.itemId } });
-        } else if (e.kind === "due_today") {
-            out.push({ type: "item_update", uuid: e.uuid, args: { id: e.itemId, due: { date: e.date } } });
+        } else if (e.kind === "update") {
+            var args = { id: e.itemId };
+            for (var k in e.args) {
+                if (Object.prototype.hasOwnProperty.call(e.args, k)) {
+                    args[k] = e.args[k];
+                }
+            }
+            out.push({ type: "item_update", uuid: e.uuid, args: args });
+        } else if (e.kind === "move") {
+            out.push({ type: "item_move", uuid: e.uuid, args: { id: e.itemId, project_id: e.projectId } });
+        } else if (e.kind === "delete") {
+            out.push({ type: "item_delete", uuid: e.uuid, args: { id: e.itemId } });
         }
     }
     return out;
@@ -400,8 +474,7 @@ function deserialize(str) {
     var entries = [];
     for (var i = 0; i < obj.entries.length; i++) {
         var e = obj.entries[i];
-        if (e && ((e.kind === "close" && e.uuid && e.itemId)
-                  || (e.kind === "due_today" && e.uuid && e.itemId && e.date)
+        if (e && ((isSyncCommand(e) && e.uuid && e.itemId)
                   || (e.kind === "quick_add" && e.localId && e.text))) {
             entries.push(e);
         }

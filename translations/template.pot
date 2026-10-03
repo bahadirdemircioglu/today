@@ -28,9 +28,6 @@ msgid_plural "%1 tasks today"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "A new task was added to Todoist but couldn't be moved to today."
-msgstr ""
-
 msgid "API token:"
 msgstr ""
 
@@ -80,6 +77,9 @@ msgstr ""
 msgid "Connected as %1 (%2)"
 msgstr ""
 
+msgid "Copy link to task"
+msgstr ""
+
 msgid "Couldn't add “%1”."
 msgstr ""
 
@@ -89,7 +89,22 @@ msgstr ""
 msgid "Couldn't complete “%1” — it may have been deleted."
 msgstr ""
 
+msgid "Couldn't save a change to a task — it may have been deleted."
+msgstr ""
+
+msgid "Couldn't save a change to “%1” — it may have been deleted."
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Deleted “%1”"
+msgstr ""
+
 msgid "Disconnect"
+msgstr ""
+
+msgid "Edit"
 msgstr ""
 
 msgid "Enjoy the rest of your day."
@@ -101,10 +116,22 @@ msgstr ""
 msgid "Inbox"
 msgstr ""
 
+msgid "Link copied"
+msgstr ""
+
 msgid "Loading your tasks…"
 msgstr ""
 
+msgid "More actions"
+msgstr ""
+
+msgid "Move to"
+msgstr ""
+
 msgid "New task, e.g. “Dentist tomorrow 3pm #Personal”"
+msgstr ""
+
+msgid "Next week"
 msgstr ""
 
 msgctxt "next task: title"
@@ -130,6 +157,9 @@ msgstr ""
 msgid "Open Todoist settings"
 msgstr ""
 
+msgid "Open in Todoist"
+msgstr ""
+
 msgid "Overdue"
 msgstr ""
 
@@ -141,7 +171,25 @@ msgid ""
 "here."
 msgstr ""
 
+msgid "Priority"
+msgstr ""
+
+msgid "Priority 1"
+msgstr ""
+
+msgid "Priority 2"
+msgstr ""
+
+msgid "Priority 3"
+msgstr ""
+
+msgid "Priority 4"
+msgstr ""
+
 msgid "Reconnect"
+msgstr ""
+
+msgid "Recurring: reschedule in Todoist"
 msgstr ""
 
 msgid "Refresh now"
@@ -157,6 +205,9 @@ msgid "That's too long. Keep it under 1000 characters."
 msgstr ""
 
 msgid "This token didn't work. Copy it again from Todoist settings."
+msgstr ""
+
+msgid "This weekend"
 msgstr ""
 
 msgid "Today"
@@ -191,7 +242,13 @@ msgstr ""
 msgid "Token works."
 msgstr ""
 
+msgid "Tomorrow"
+msgstr ""
+
 msgid "Try again"
+msgstr ""
+
+msgid "Undo"
 msgstr ""
 
 msgid "Updated %1 minute ago"

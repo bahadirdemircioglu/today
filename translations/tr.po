@@ -24,9 +24,6 @@ msgid_plural "%1 tasks today"
 msgstr[0] "Bugün %1 görev"
 msgstr[1] "Bugün %1 görev"
 
-msgid "A new task was added to Todoist but couldn't be moved to today."
-msgstr "Yeni görev Todoist'e eklendi ama bugüne taşınamadı."
-
 msgid "API token:"
 msgstr "API token'ı:"
 
@@ -76,6 +73,9 @@ msgstr "%1 olarak bağlı"
 msgid "Connected as %1 (%2)"
 msgstr "%1 olarak bağlı (%2)"
 
+msgid "Copy link to task"
+msgstr "Görev bağlantısını kopyala"
+
 msgid "Couldn't add “%1”."
 msgstr "“%1” eklenemedi."
 
@@ -85,8 +85,23 @@ msgstr "Bir görev tamamlanamadı — silinmiş olabilir."
 msgid "Couldn't complete “%1” — it may have been deleted."
 msgstr "“%1” tamamlanamadı — silinmiş olabilir."
 
+msgid "Couldn't save a change to a task — it may have been deleted."
+msgstr "Bir görevdeki değişiklik kaydedilemedi — silinmiş olabilir."
+
+msgid "Couldn't save a change to “%1” — it may have been deleted."
+msgstr "“%1” üzerindeki değişiklik kaydedilemedi — silinmiş olabilir."
+
+msgid "Delete"
+msgstr "Sil"
+
+msgid "Deleted “%1”"
+msgstr "“%1” silindi"
+
 msgid "Disconnect"
 msgstr "Bağlantıyı kes"
+
+msgid "Edit"
+msgstr "Düzenle"
 
 msgid "Enjoy the rest of your day."
 msgstr "Günün geri kalanının tadını çıkarın."
@@ -97,11 +112,23 @@ msgstr "Token'ı gizle"
 msgid "Inbox"
 msgstr "Gelen Kutusu"
 
+msgid "Link copied"
+msgstr "Bağlantı kopyalandı"
+
 msgid "Loading your tasks…"
 msgstr "Görevleriniz yükleniyor…"
 
+msgid "More actions"
+msgstr "Diğer eylemler"
+
+msgid "Move to"
+msgstr "Taşı"
+
 msgid "New task, e.g. “Dentist tomorrow 3pm #Personal”"
 msgstr "Yeni görev, ör. “Dentist tomorrow 3pm #Personal”"
+
+msgid "Next week"
+msgstr "Gelecek hafta"
 
 msgctxt "next task: title"
 msgid "Next: %1"
@@ -126,6 +153,9 @@ msgstr "Todoist'i aç"
 msgid "Open Todoist settings"
 msgstr "Todoist ayarlarını aç"
 
+msgid "Open in Todoist"
+msgstr "Todoist'te aç"
+
 msgid "Overdue"
 msgstr "Gecikmiş"
 
@@ -139,8 +169,26 @@ msgstr ""
 "Bugünkü görevlerinizi burada görmek için Todoist ayarlarındaki kişisel API "
 "token'ınızı yapıştırın."
 
+msgid "Priority"
+msgstr "Öncelik"
+
+msgid "Priority 1"
+msgstr "Öncelik 1"
+
+msgid "Priority 2"
+msgstr "Öncelik 2"
+
+msgid "Priority 3"
+msgstr "Öncelik 3"
+
+msgid "Priority 4"
+msgstr "Öncelik 4"
+
 msgid "Reconnect"
 msgstr "Yeniden bağlan"
+
+msgid "Recurring: reschedule in Todoist"
+msgstr "Tekrarlayan: Todoist'te yeniden planlayın"
 
 msgid "Refresh now"
 msgstr "Şimdi yenile"
@@ -156,6 +204,9 @@ msgstr "Bu çok uzun. 1000 karakterin altında tutun."
 
 msgid "This token didn't work. Copy it again from Todoist settings."
 msgstr "Bu token çalışmadı. Todoist ayarlarından yeniden kopyalayın."
+
+msgid "This weekend"
+msgstr "Bu hafta sonu"
 
 msgid "Today"
 msgstr "Bugün"
@@ -190,8 +241,14 @@ msgstr "Todoist'te bir sorun var. Yeniden deneniyor…"
 msgid "Token works."
 msgstr "Token çalışıyor."
 
+msgid "Tomorrow"
+msgstr "Yarın"
+
 msgid "Try again"
 msgstr "Tekrar dene"
+
+msgid "Undo"
+msgstr "Geri al"
 
 msgid "Updated %1 minute ago"
 msgid_plural "Updated %1 minutes ago"
@@ -213,3 +270,6 @@ msgid ""
 msgstr ""
 "Token'ınız Plasma yapılandırma dosyanızda şifrelenmeden saklanır. "
 "İstediğiniz zaman Todoist ayarlarından iptal edebilirsiniz."
+
+#~ msgid "A new task was added to Todoist but couldn't be moved to today."
+#~ msgstr "Yeni görev Todoist'e eklendi ama bugüne taşınamadı."

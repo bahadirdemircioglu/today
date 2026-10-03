@@ -172,3 +172,36 @@ function daysBetween(aKey, bKey) {
     }
     return Math.round((Date.UTC(b.y, b.m - 1, b.d) - Date.UTC(a.y, a.m - 1, a.d)) / 86400000);
 }
+
+function addDaysKey(key, n) {
+    var p = splitDateKey(key);
+    if (!p) {
+        return key;
+    }
+    var d = new Date(Date.UTC(p.y, p.m - 1, p.d + n));
+    return keyFromShiftedDate(d);
+}
+
+// 0 = Sunday ... 6 = Saturday
+function weekdayOfKey(key) {
+    var p = splitDateKey(key);
+    return p ? new Date(Date.UTC(p.y, p.m - 1, p.d)).getUTCDay() : 0;
+}
+
+// Quick reschedule targets, as in Todoist's task menu.
+// which: "today" | "tomorrow" | "weekend" (coming Saturday; on a weekend, next one) | "nextweek" (next Monday)
+function quickDate(todayKey, which) {
+    var wd = weekdayOfKey(todayKey);
+    switch (which) {
+    case "today":
+        return todayKey;
+    case "tomorrow":
+        return addDaysKey(todayKey, 1);
+    case "weekend":
+        return addDaysKey(todayKey, wd === 6 ? 7 : 6 - wd);
+    case "nextweek":
+        return addDaysKey(todayKey, ((8 - wd) % 7) || 7);
+    default:
+        return null;
+    }
+}

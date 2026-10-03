@@ -9,6 +9,7 @@ Your Todoist **Today** view on the KDE Plasma 6 desktop and panel: overdue tasks
 - **Desktop, large / popup:** the full list with round, priority-coloured check circles, a completion animation, a "New task" field and an "All done for today" state.
 - **Follows your Plasma theme:** light/dark, accent colour, font size and animation speed. No hard-coded colours.
 - **Offline-first:** tasks are cached, and completions/additions made offline are queued. The queue survives Plasma restarts and is sent once you are back online.
+- **Task menu:** right-click a task (or use its ⋯ button) to edit it, reschedule it, change priority, move it to another project, copy its link, or delete it (with undo).
 - **Sync:** every 5 minutes, when you open the popup or hover the desktop widget (if the data is older than 30 s), and about a second after you complete or add something.
 
 ## Install
@@ -58,7 +59,7 @@ A task without a date is scheduled for **today**, like in Todoist's own Today vi
 
 - **Time zones:** "today" follows your Todoist time zone. When your computer is in a *different* time zone than your Todoist account, a fixed-time-zone task can shift by an hour across a daylight-saving boundary (rarely enough to move it to another day), and the day can switch up to 5 minutes late at a DST change. When both zones match, which is the normal case, this does not apply.
 - **Offline Quick Add:** if the connection drops right after a new task was sent, the widget can't know whether Todoist created it. After the next sync it looks for a matching new task before sending it again. If no match is found, a duplicate is possible, though rare.
-- Sub-tasks due today are shown as plain rows, without hierarchy. Editing, rescheduling, deleting and reordering are not supported. Use Todoist for those.
+- Sub-tasks due today are shown as plain rows, without hierarchy. Reordering, deadlines, reminders and rescheduling recurring tasks are not supported in the widget; use Todoist for those.
 
 ## Troubleshooting
 

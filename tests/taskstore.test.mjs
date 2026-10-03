@@ -212,3 +212,29 @@ test("isValidId", () => {
   assert.equal(S.isValidId("6X7rM8997g3RQmvh"), true);
   assert.equal(S.isValidId("../x"), false);
 });
+
+test("queue overlay: update / move / delete are reflected immediately", () => {
+  const s = storeWith([
+    item({ id: "a", content: "Old", priority: 1, due: { date: "2026-10-03" } }),
+    item({ id: "b", due: { date: "2026-10-03" } }),
+    item({ id: "c", due: { date: "2026-10-03" } }),
+  ], { projects: [{ id: "P", name: "Work" }] });
+  const q = { v: 1, entries: [
+    { kind: "update", uuid: "1", itemId: "a", args: { content: "New **title**", priority: 4 } },
+    { kind: "move", uuid: "2", itemId: "a", projectId: "P" },
+    { kind: "update", uuid: "3", itemId: "b", args: { due: { date: "2026-10-04" } } },
+    { kind: "delete", uuid: "4", itemId: "c", sendAfter: 0 },
+  ] };
+  const v = S.computeToday(s, q, NOON, sys180);
+  assert.deepEqual(v.today.map((r) => r.id), ["a"]);
+  assert.equal(v.today[0].title, "New title");
+  assert.equal(v.today[0].content, "New **title**");
+  assert.equal(v.today[0].priority, 4);
+  assert.equal(v.today[0].projectName, "Work");
+  assert.equal(s.items.a.content, "Old");
+});
+
+test("projectList: Inbox first, then by name", () => {
+  const s = storeWith([], { projects: [{ id: "z", name: "zeta" }, { id: "inbox", name: "Inbox" }, { id: "a", name: "Alpha" }] });
+  assert.deepEqual(S.projectList(s).map((p) => p.id), ["inbox", "a", "z"]);
+});

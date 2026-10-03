@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Task menu (right click or the ⋯ button): edit title in place, reschedule (today, tomorrow,
+  this weekend, next week), priority, move to project, copy link, open in Todoist, and delete
+  with a 5-second undo. All changes are queued offline like completions.
+
 ### Changed
 - Tasks added from the widget without a date are now scheduled for today (as in Todoist's Today
   view) instead of silently landing in the Inbox and never appearing in the list.

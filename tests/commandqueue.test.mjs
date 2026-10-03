@@ -153,11 +153,29 @@ test("enqueueDueToday becomes an item_update with the date, in queue order", () 
   assert.deepEqual(batch[1].args, { id: "b", due: { date: "2026-10-03" } });
 });
 
-test("due_today entries follow the same sync_status rules as closes", () => {
+test("update entries follow the same sync_status rules as closes", () => {
   const q = Q.enqueueDueToday(Q.emptyQueue(), "b", "2026-10-03", 0, () => "d1");
   assert.equal(Q.applySyncStatus(q, ["d1"], { d1: "ok" }).queue.entries.length, 0);
   const r = Q.applySyncStatus(q, ["d1"], { d1: { http_code: 404, error_tag: "ITEM_NOT_FOUND" } });
-  assert.deepEqual(r.dropped, [{ kind: "due_today", itemId: "b", errorTag: "ITEM_NOT_FOUND", httpCode: 404 }]);
+  assert.deepEqual(r.dropped, [{ kind: "update", itemId: "b", errorTag: "ITEM_NOT_FOUND", httpCode: 404 }]);
   assert.equal(Q.dropByUuids(q, ["d1"]).queue.entries.length, 0);
+  assert.deepEqual(Q.deserialize(Q.serialize(q)), q);
+});
+
+test("update / move / delete commands", () => {
+  let q = Q.enqueueUpdate(Q.emptyQueue(), "a", { priority: 4 }, 0, () => "u1");
+  q = Q.enqueueMove(q, "a", "P2", 0, () => "u2");
+  const del = Q.enqueueDelete(q, "b", 1000, 5000, () => "u3");
+  q = del.queue;
+  assert.equal(del.uuid, "u3");
+  assert.equal(Q.enqueueDelete(q, "b", 1000, 5000, () => "u4").uuid, null);
+  assert.deepEqual(Q.nextSyncBatch(q, 100, 2000), [
+    { type: "item_update", uuid: "u1", args: { id: "a", priority: 4 } },
+    { type: "item_move", uuid: "u2", args: { id: "a", project_id: "P2" } },
+  ]);
+  assert.deepEqual(Q.nextSyncBatch(q, 100, 6000).at(-1), { type: "item_delete", uuid: "u3", args: { id: "b" } });
+  assert.equal(Q.nextHeldAt(q, 2000), 6000);
+  assert.equal(Q.nextHeldAt(q, 6000), 0);
+  assert.equal(Q.cancelEntry(q, "u3").entries.length, 2);
   assert.deepEqual(Q.deserialize(Q.serialize(q)), q);
 });

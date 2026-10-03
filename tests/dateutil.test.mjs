@@ -85,3 +85,15 @@ test("minutesOfDayAt and daysBetween", () => {
   assert.equal(D.minutesOfDayAt(Date.UTC(2026, 9, 3, 9, 15), 180), 735);
   assert.equal(D.daysBetween("2026-09-30", "2026-10-03"), 3);
 });
+
+test("quickDate: today, tomorrow, coming weekend, next Monday", () => {
+  // 2026-10-03 is a Saturday, 2026-10-05 a Monday
+  assert.equal(D.quickDate("2026-10-05", "today"), "2026-10-05");
+  assert.equal(D.quickDate("2026-10-05", "tomorrow"), "2026-10-06");
+  assert.equal(D.quickDate("2026-10-05", "weekend"), "2026-10-10");
+  assert.equal(D.quickDate("2026-10-05", "nextweek"), "2026-10-12");
+  assert.equal(D.quickDate("2026-10-03", "weekend"), "2026-10-10");
+  assert.equal(D.quickDate("2026-10-04", "weekend"), "2026-10-10");
+  assert.equal(D.quickDate("2026-10-04", "nextweek"), "2026-10-05");
+  assert.equal(D.quickDate("2026-12-31", "tomorrow"), "2027-01-01");
+});

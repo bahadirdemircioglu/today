@@ -36,6 +36,12 @@ Item {
     property double nowMs: Date.now()
     property string infoText: ""
     property bool infoIsError: false
+    property var projects: []
+    // pending delete that can still be undone
+    property string undoUuid: ""
+    property string undoText: ""
+
+    readonly property int undoMs: 5000
 
     signal accountVerified(string name)
 
@@ -94,6 +100,89 @@ Item {
         recompute();
         requestSync("action");
         return "";
+    }
+
+    function enqueueEdit(newQueue) {
+        queue = newQueue;
+        saveQueue();
+        recompute();
+        requestSync("action");
+    }
+
+    // which: "today" | "tomorrow" | "weekend" | "nextweek"
+    function reschedule(itemId, which) {
+        var date = DateUtil.quickDate(view.todayKey, which);
+        if (!TaskStore.isValidId(itemId) || !date) {
+            return;
+        }
+        enqueueEdit(CommandQueue.enqueueUpdate(queue, itemId, { due: { date: date } }, Date.now(), newUuid));
+    }
+
+    // priority: Todoist API value, 4 = p1 ... 1 = p4
+    function setPriority(itemId, priority) {
+        if (TaskStore.isValidId(itemId) && priority >= 1 && priority <= 4) {
+            enqueueEdit(CommandQueue.enqueueUpdate(queue, itemId, { priority: priority }, Date.now(), newUuid));
+        }
+    }
+
+    // -> "" | "empty" | "too_long"
+    function rename(itemId, text) {
+        var t = String(text || "").trim();
+        if (!t) {
+            return "empty";
+        }
+        if (t.length > CommandQueue.MAX_QUICK_ADD_LENGTH) {
+            return "too_long";
+        }
+        if (TaskStore.isValidId(itemId)) {
+            enqueueEdit(CommandQueue.enqueueUpdate(queue, itemId, { content: t }, Date.now(), newUuid));
+        }
+        return "";
+    }
+
+    function moveTo(itemId, projectId) {
+        if (TaskStore.isValidId(itemId) && TaskStore.isValidId(String(projectId))) {
+            enqueueEdit(CommandQueue.enqueueMove(queue, itemId, projectId, Date.now(), newUuid));
+        }
+    }
+
+    // Deleted from the list at once; sent to Todoist only after the undo window.
+    function remove(itemId, title) {
+        if (!TaskStore.isValidId(itemId)) {
+            return;
+        }
+        var r = CommandQueue.enqueueDelete(queue, itemId, Date.now(), undoMs, newUuid);
+        if (!r.uuid) {
+            return;
+        }
+        queue = r.queue;
+        saveQueue();
+        recompute();
+        undoUuid = r.uuid;
+        undoText = i18n("Deleted “%1”", title);
+        undoTimer.restart();
+    }
+
+    function undoDelete() {
+        if (!undoUuid) {
+            return;
+        }
+        queue = CommandQueue.cancelEntry(queue, undoUuid);
+        saveQueue();
+        recompute();
+        undoUuid = "";
+        undoTimer.stop();
+    }
+
+    function copyLink(itemId) {
+        if (!TaskStore.isValidId(itemId)) {
+            return;
+        }
+        clipboardHelper.text = "https://app.todoist.com/app/task/" + itemId;
+        clipboardHelper.selectAll();
+        clipboardHelper.copy();
+        clipboardHelper.text = "";
+        showInfo(i18n("Link copied"), false);
     }
 
     function showInfo(text, isError) {
@@ -271,7 +360,7 @@ Item {
     }
 
     function doSync(mode, moreQuickAdds) {
-        var commands = mode === "readOnlyFull" ? [] : CommandQueue.nextSyncBatch(queue, CommandQueue.MAX_BATCH);
+        var commands = mode === "readOnlyFull" ? [] : CommandQueue.nextSyncBatch(queue, CommandQueue.MAX_BATCH, Date.now());
         var uuids = [];
         for (var i = 0; i < commands.length; i++) {
             uuids.push(commands[i].uuid);
@@ -307,7 +396,7 @@ Item {
             reportDropped(dropped, titles);
             recompute();
             var more = moreQuickAdds || CommandQueue.nextQuickAdd(queue) !== null
-                || (commands.length >= CommandQueue.MAX_BATCH && CommandQueue.nextSyncBatch(queue, 1).length > 0);
+                || (commands.length >= CommandQueue.MAX_BATCH && CommandQueue.nextSyncBatch(queue, 1, Date.now()).length > 0);
             dispatch({ type: "REQUEST_DONE", kind: "ok", fullSync: !!json.full_sync, hadCommands: commands.length > 0, moreWork: more });
         });
     }
@@ -340,6 +429,7 @@ Item {
         }
         view = v;
         rows = TaskStore.flattenRows(v);
+        projects = TaskStore.projectList(store);
     }
 
     function saveStore() {
@@ -392,8 +482,10 @@ Item {
             warn("dropped", dropped[i].kind, dropped[i].errorTag || dropped[i].reason || "", dropped[i].itemId || "");
         }
         var d = dropped[0];
-        if (d.kind === "due_today") {
-            showInfo(i18n("A new task was added to Todoist but couldn't be moved to today."), true);
+        if (d.kind === "update" || d.kind === "move" || d.kind === "delete") {
+            var changed = titles[d.itemId] || "";
+            showInfo(changed ? i18n("Couldn't save a change to “%1” — it may have been deleted.", changed)
+                             : i18n("Couldn't save a change to a task — it may have been deleted."), true);
         } else if (d.kind === "close") {
             var title = titles[d.itemId] || "";
             showInfo(title ? i18n("Couldn't complete “%1” — it may have been deleted.", title)
@@ -441,6 +533,19 @@ Item {
         id: debounceTimer
         interval: 1000
         onTriggered: controller.dispatch({ type: "DEBOUNCE_FIRED" })
+    }
+    // Plain QML has no clipboard API; a hidden TextEdit can copy.
+    TextEdit {
+        id: clipboardHelper
+        visible: false
+    }
+    Timer {
+        id: undoTimer
+        interval: controller.undoMs + 200
+        onTriggered: {
+            controller.undoUuid = "";
+            controller.requestSync("action");
+        }
     }
     Timer {
         id: infoTimer

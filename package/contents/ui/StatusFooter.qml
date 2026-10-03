@@ -10,12 +10,15 @@ RowLayout {
 
     property var controller
 
-    readonly property bool isError: !!controller && (controller.infoText !== "" ? controller.infoIsError
+    readonly property bool isError: !!controller && controller.undoUuid === "" && (controller.infoText !== "" ? controller.infoIsError
                                                                                : controller.phase === "ERROR")
     readonly property string message: {
         var c = controller;
         if (!c) {
             return "";
+        }
+        if (c.undoUuid !== "") {
+            return c.undoText;
         }
         if (c.infoText !== "") {
             return c.infoText;
@@ -61,5 +64,12 @@ RowLayout {
         font.pointSize: Kirigami.Theme.smallFont.pointSize
         color: footer.isError ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.textColor
         opacity: footer.isError ? 1 : 0.7
+    }
+
+    PlasmaComponents3.ToolButton {
+        visible: !!footer.controller && footer.controller.undoUuid !== ""
+        text: i18n("Undo")
+        icon.name: "edit-undo"
+        onClicked: footer.controller.undoDelete()
     }
 }
