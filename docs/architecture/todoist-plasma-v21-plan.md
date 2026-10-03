@@ -1,7 +1,7 @@
 # Architecture Plan: todoist-plasma v2.1 (kullanım kolaylıkları)
 
-**Status:** in progress
-**Revision:** 1
+**Status:** implemented (v2.1.0)
+**Revision:** 2
 **Temel:** [v1 planı](todoist-today-plan.md) (sync, kuyruk, durum makinesi) ve [v2 planı](todoist-plasma-v2-plan.md)
 (listeler). Bu plan yalnız eklemeleri anlatır; önceki kararlar geçerlidir.
 
@@ -45,3 +45,18 @@ plan, F5 bildirim eylemleri, F10 uç nokta, F11 KRunner — manuel kabul listesi
 - M-v21-6 Klavye: ↓↓ Space, E, T, 2, Delete, Q.
 - M-v21-7 Ayarlara `today & p1` yaz → "Custom filter" listesi web ile aynı.
 - M-v21-8 KRunner: `todo Süt al yarın` → görev eklenir; `todo ?süt` → bulunur, Enter tamamlar.
+
+## Implementation Notes (Rev. 2)
+
+1. **Ortam kısıtı:** bu geliştirme ortamından `api.todoist.com`'a çıkış kapalı (ağ politikası). F5'teki
+   KNotification QML API'si, F10'daki `/tasks/completed/stats` yanıtı, F11'deki `/tasks/filter?query=search:`
+   ve `/tasks/{id}/close` gerçek hesapla doğrulanmadı; hepsi başarısızlıkta sessizce devre dışı kalacak şekilde
+   yazıldı (bildirim: Loader; halka: gizli; runner: boş sonuç + bildirim).
+2. **F11 D-Bus arayüzü** özel bir oturum veri yolunda `dbus-send` ile denendi: `Match` (ekleme eşleşmesi,
+   başka sorguda boş liste), `Actions`; arama ağ engelinde boş sonuç döndü, çökmedi.
+3. **F3** yalnız token paylaşır (karar tablosundaki gerekçe); bağlantıyı kesen örnek paylaşılan kaydı da siler.
+4. **F7** gerçek tuş olaylarıyla duman testinde denendi (↓↓, 2, Space).
+5. **Sync sonrası adımlar** (`afterSyncSteps`): filtre/özel sorgu ve 15 dk'da bir istatistik aynı döngüde,
+   tek istek uçuşta kuralıyla sırayla çalışır.
+6. Testler: 125 Node + 6 Python birim testi; QML offscreen duman testi (undo, hesap paylaşımı, katlama,
+   özel sorgu, klavye, hatırlatma + Notifier taklidi, hedef halkası).

@@ -6,6 +6,24 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-10-03
+
+### Added
+- Reminders: Plasma notifications before timed tasks (configurable lead time) with Complete and
+  "Remind me in 10 minutes"; panel and desktop widgets never notify twice.
+- Undo for completions (4 seconds), like deletions.
+- Keyboard navigation in the list, and the widget's global shortcut focuses New task.
+- Daily goal ring (Todoist productivity stats) in the Today header and the small desktop view.
+- Custom filter query in the settings, shown as its own list.
+- Fold sub-tasks in project lists; full task descriptions on click or from the task menu.
+- Deadlines shown under tasks.
+- Other widget instances offer the already connected account in their setup screen.
+- Background can be switched off in edit mode.
+- Optional KRunner plugin (`krunner/`): `todo <text>` adds a task, `todo ?<word>` finds one.
+
+### Changed
+- The settings category is now "General".
+
 ## [2.0.0] - 2026-10-03
 
 Renamed to **Todoist for Plasma** (new plugin id `io.github.bahadirdemircioglu.todoistplasma`):

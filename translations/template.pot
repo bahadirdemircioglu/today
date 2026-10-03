@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plasma_applet_io.github.bahadirdemircioglu.todoistplasma "
-"2.0.0\n"
+"2.1.0\n"
 "Report-Msgid-Bugs-To: https://github.com/bahadirdemircioglu/today/issues\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
@@ -20,6 +20,14 @@ msgstr ""
 
 msgid "%1 change waiting"
 msgid_plural "%1 changes waiting"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "%1 of %2 tasks done today"
+msgstr ""
+
+msgid "%1 sub-task"
+msgid_plural "%1 sub-tasks"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -42,13 +50,25 @@ msgid_plural "%2 · %1 overdue"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "1 hour before"
+msgstr ""
+
+msgid "10 minutes before"
+msgstr ""
+
+msgid "15 minutes before"
+msgstr ""
+
+msgid "30 minutes before"
+msgstr ""
+
+msgid "5 minutes before"
+msgstr ""
+
 msgid "A pinned list (set from the list title menu)"
 msgstr ""
 
 msgid "API token:"
-msgstr ""
-
-msgid "Account"
 msgstr ""
 
 msgid "Account:"
@@ -76,6 +96,14 @@ msgstr ""
 msgid "All done for today"
 msgstr ""
 
+msgid ""
+"Any Todoist filter query, without saving it in Todoist. It appears in the "
+"list menu."
+msgstr ""
+
+msgid "At the task's time"
+msgstr ""
+
 msgid "Can't reach Todoist"
 msgstr ""
 
@@ -85,7 +113,16 @@ msgstr ""
 msgid "Checking…"
 msgstr ""
 
+msgid "Complete"
+msgstr ""
+
 msgid "Complete “%1”"
+msgstr ""
+
+msgid "Completed"
+msgstr ""
+
+msgid "Completed “%1”"
 msgstr ""
 
 msgid "Connect to Todoist"
@@ -121,6 +158,22 @@ msgstr ""
 msgid "Couldn't save a change to “%1” — it may have been deleted."
 msgstr ""
 
+msgid "Custom filter"
+msgstr ""
+
+msgid "Custom filter:"
+msgstr ""
+
+msgid "Daily goal reached: %1 of %2 tasks"
+msgstr ""
+
+msgid "Daily goal:"
+msgstr ""
+
+msgctxt "deadline date"
+msgid "Deadline %1"
+msgstr ""
+
 msgid "Delete"
 msgstr ""
 
@@ -145,8 +198,22 @@ msgstr ""
 msgid "Filters"
 msgstr ""
 
+msgid "General"
+msgstr ""
+
+msgid "Hide details"
+msgstr ""
+
+msgid "Hide sub-tasks"
+msgstr ""
+
 msgid "Hide token"
 msgstr ""
+
+msgid "In %1 minute · %2"
+msgid_plural "In %1 minutes · %2"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Inbox"
 msgstr ""
@@ -202,6 +269,12 @@ msgid "Not connected"
 msgstr ""
 
 msgid "Not connected to Todoist"
+msgstr ""
+
+msgid "Now · %1"
+msgstr ""
+
+msgid "Off"
 msgstr ""
 
 msgid "Offline. Showing saved tasks."
@@ -263,10 +336,30 @@ msgstr ""
 msgid "Refresh now"
 msgstr ""
 
+msgid "Remind me in 10 minutes"
+msgstr ""
+
+msgid "Reminders:"
+msgstr ""
+
 msgid "Results from %1"
 msgstr ""
 
+msgid "Show %1 sub-task"
+msgid_plural "Show %1 sub-tasks"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Show details"
+msgstr ""
+
+msgid "Show progress towards my Todoist daily goal"
+msgstr ""
+
 msgid "Show token"
+msgstr ""
+
+msgid "Shown as:"
 msgstr ""
 
 msgid "Something went wrong (HTTP %1)."
@@ -357,6 +450,12 @@ msgid_plural "Updated %1 minutes ago"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Use the connected account"
+msgstr ""
+
+msgid "Use the connected account (%1)"
+msgstr ""
+
 msgid "Waiting to sync"
 msgstr ""
 
@@ -369,4 +468,10 @@ msgstr ""
 msgid ""
 "Your token is stored unencrypted in your Plasma config file. You can revoke "
 "it any time in Todoist's settings."
+msgstr ""
+
+msgid "e.g. today & #Work"
+msgstr ""
+
+msgid "or connect a different account:"
 msgstr ""

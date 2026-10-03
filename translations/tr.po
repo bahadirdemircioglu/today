@@ -20,6 +20,14 @@ msgid_plural "%1 changes waiting"
 msgstr[0] "%1 değişiklik bekliyor"
 msgstr[1] "%1 değişiklik bekliyor"
 
+msgid "%1 of %2 tasks done today"
+msgstr "Bugün %2 görevden %1 tanesi tamamlandı"
+
+msgid "%1 sub-task"
+msgid_plural "%1 sub-tasks"
+msgstr[0] "%1 alt görev"
+msgstr[1] "%1 alt görev"
+
 msgid "%1 task"
 msgid_plural "%1 tasks"
 msgstr[0] "%1 görev"
@@ -39,14 +47,26 @@ msgid_plural "%2 · %1 overdue"
 msgstr[0] "%2 · %1 gecikmiş"
 msgstr[1] "%2 · %1 gecikmiş"
 
+msgid "1 hour before"
+msgstr "1 saat önce"
+
+msgid "10 minutes before"
+msgstr "10 dakika önce"
+
+msgid "15 minutes before"
+msgstr "15 dakika önce"
+
+msgid "30 minutes before"
+msgstr "30 dakika önce"
+
+msgid "5 minutes before"
+msgstr "5 dakika önce"
+
 msgid "A pinned list (set from the list title menu)"
 msgstr "Sabitlenmiş liste (liste başlığı menüsünden ayarlanır)"
 
 msgid "API token:"
 msgstr "API token'ı:"
-
-msgid "Account"
-msgstr "Hesap"
 
 msgid "Account:"
 msgstr "Hesap:"
@@ -73,6 +93,14 @@ msgstr "%1 gününe ekleniyor"
 msgid "All done for today"
 msgstr "Bugünlük hepsi tamam"
 
+msgid ""
+"Any Todoist filter query, without saving it in Todoist. It appears in the "
+"list menu."
+msgstr "Todoist'te kaydetmeden herhangi bir filtre sorgusu. Liste menüsünde görünür."
+
+msgid "At the task's time"
+msgstr "Görevin saatinde"
+
 msgid "Can't reach Todoist"
 msgstr "Todoist'e ulaşılamıyor"
 
@@ -82,8 +110,17 @@ msgstr "Todoist'e ulaşılamıyor. Bağlantınızı kontrol edin."
 msgid "Checking…"
 msgstr "Kontrol ediliyor…"
 
+msgid "Complete"
+msgstr "Tamamla"
+
 msgid "Complete “%1”"
 msgstr "“%1” görevini tamamla"
+
+msgid "Completed"
+msgstr "Tamamlandı"
+
+msgid "Completed “%1”"
+msgstr "“%1” tamamlandı"
 
 msgid "Connect to Todoist"
 msgstr "Todoist'e bağlan"
@@ -118,6 +155,22 @@ msgstr "Bir görevdeki değişiklik kaydedilemedi — silinmiş olabilir."
 msgid "Couldn't save a change to “%1” — it may have been deleted."
 msgstr "“%1” üzerindeki değişiklik kaydedilemedi — silinmiş olabilir."
 
+msgid "Custom filter"
+msgstr "Özel filtre"
+
+msgid "Custom filter:"
+msgstr "Özel filtre:"
+
+msgid "Daily goal reached: %1 of %2 tasks"
+msgstr "Günlük hedefe ulaşıldı: %2 görevden %1"
+
+msgid "Daily goal:"
+msgstr "Günlük hedef:"
+
+msgctxt "deadline date"
+msgid "Deadline %1"
+msgstr "Son tarih %1"
+
 msgid "Delete"
 msgstr "Sil"
 
@@ -142,8 +195,22 @@ msgstr "Filtre sonuçları için bağlantı gerekiyor"
 msgid "Filters"
 msgstr "Filtreler"
 
+msgid "General"
+msgstr "Genel"
+
+msgid "Hide details"
+msgstr "Ayrıntıları gizle"
+
+msgid "Hide sub-tasks"
+msgstr "Alt görevleri gizle"
+
 msgid "Hide token"
 msgstr "Token'ı gizle"
+
+msgid "In %1 minute · %2"
+msgid_plural "In %1 minutes · %2"
+msgstr[0] "%1 dakika sonra · %2"
+msgstr[1] "%1 dakika sonra · %2"
 
 msgid "Inbox"
 msgstr "Gelen Kutusu"
@@ -200,6 +267,12 @@ msgstr "Bağlı değil"
 
 msgid "Not connected to Todoist"
 msgstr "Todoist'e bağlı değil"
+
+msgid "Now · %1"
+msgstr "Şimdi · %1"
+
+msgid "Off"
+msgstr "Kapalı"
 
 msgid "Offline. Showing saved tasks."
 msgstr "Çevrimdışı. Kayıtlı görevler gösteriliyor."
@@ -262,11 +335,31 @@ msgstr "Tekrarlayan: Todoist'te yeniden planlayın"
 msgid "Refresh now"
 msgstr "Şimdi yenile"
 
+msgid "Remind me in 10 minutes"
+msgstr "10 dakika sonra hatırlat"
+
+msgid "Reminders:"
+msgstr "Hatırlatmalar:"
+
 msgid "Results from %1"
 msgstr "%1 itibarıyla sonuçlar"
 
+msgid "Show %1 sub-task"
+msgid_plural "Show %1 sub-tasks"
+msgstr[0] "%1 alt görevi göster"
+msgstr[1] "%1 alt görevi göster"
+
+msgid "Show details"
+msgstr "Ayrıntıları göster"
+
+msgid "Show progress towards my Todoist daily goal"
+msgstr "Todoist günlük hedefime ilerlemeyi göster"
+
 msgid "Show token"
 msgstr "Token'ı göster"
+
+msgid "Shown as:"
+msgstr "Görünen ad:"
 
 msgid "Something went wrong (HTTP %1)."
 msgstr "Bir şeyler ters gitti (HTTP %1)."
@@ -357,6 +450,12 @@ msgid_plural "Updated %1 minutes ago"
 msgstr[0] "%1 dakika önce güncellendi"
 msgstr[1] "%1 dakika önce güncellendi"
 
+msgid "Use the connected account"
+msgstr "Bağlı hesabı kullan"
+
+msgid "Use the connected account (%1)"
+msgstr "Bağlı hesabı kullan (%1)"
+
 msgid "Waiting to sync"
 msgstr "Eşitlenmeyi bekliyor"
 
@@ -373,5 +472,14 @@ msgstr ""
 "Token'ınız Plasma yapılandırma dosyanızda şifrelenmeden saklanır. "
 "İstediğiniz zaman Todoist ayarlarından iptal edebilirsiniz."
 
+msgid "e.g. today & #Work"
+msgstr "ör. today & #İş"
+
+msgid "or connect a different account:"
+msgstr "ya da başka bir hesap bağlayın:"
+
 #~ msgid "A new task was added to Todoist but couldn't be moved to today."
 #~ msgstr "Yeni görev Todoist'e eklendi ama bugüne taşınamadı."
+
+#~ msgid "Account"
+#~ msgstr "Hesap"

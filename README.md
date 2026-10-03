@@ -17,7 +17,11 @@ Your Todoist tasks on the KDE Plasma 6 desktop and panel: **Inbox, Today, Upcomi
 - **Desktop, large / popup:** the full list with round, priority-coloured check circles, a completion animation, a "New task" field and an "All done" state.
 - **Follows your Plasma theme:** light/dark, accent colour, font size and animation speed. No hard-coded colours.
 - **Offline-first:** tasks are cached, and completions/additions made offline are queued. The queue survives Plasma restarts and is sent once you are back online.
-- **Task menu:** right-click a task (or use its ⋯ button) to edit it, reschedule it, change priority, move it to another project, copy its link, or delete it (with undo).
+- **Task menu:** right-click a task (or use its ⋯ button) to edit it, reschedule it, change priority, move it to another project, copy its link, show its full description, or delete it. Completing and deleting can be undone for a few seconds.
+- **Details at a glance:** labels, deadlines (red when due), the first line of the description (click it for the rest), and sub-tasks you can fold away in projects.
+- **Reminders:** a Plasma notification before a timed task (10 minutes by default), with *Complete* and *Remind me in 10 minutes*.
+- **Daily goal:** a small ring shows how close you are to your Todoist daily goal.
+- **Keyboard:** see [Keyboard](#keyboard). Assign a global shortcut to add a task from anywhere.
 - **Sync:** every 5 minutes, when you open the popup or hover the desktop widget (if the data is older than 30 s), and about a second after you complete or add something.
 
 ## Screenshots
@@ -34,6 +38,33 @@ Your Todoist tasks on the KDE Plasma 6 desktop and panel: **Inbox, Today, Upcomi
 </p>
 
 <sub>Rendered from the design mockups. On your desktop the widget uses your Plasma theme, fonts and icons.</sub>
+
+## Keyboard
+
+- **Add a task from anywhere:** right-click the widget → *Configure…* → *Keyboard Shortcuts*, and pick a shortcut (for example Meta+T). Pressing it opens the widget with the cursor in *New task*, like Todoist's global Quick Add.
+- **In the list:** ↑/↓ move, Space completes, E or F2 edits, T opens the task menu, 1–4 set the priority, Delete deletes, Enter opens the task in Todoist, Q or / jumps to *New task*, Esc leaves the list.
+
+## More options
+
+- **Background:** in edit mode the widget's toolbar can switch its background off, for a frameless list on the wallpaper.
+- **Several widgets:** once one widget is connected, the next one offers *Use the connected account*, so you don't paste the token again. (Each widget keeps its own cache.)
+- **Custom filter:** in the settings, enter any Todoist filter query (for example `today & #Work`) without saving it in Todoist. It appears in the list menu.
+- **Settings → General:** panel badge, reminder time, daily goal ring, start list.
+
+## KRunner (optional)
+
+`krunner/` contains a small, separate KRunner plugin (Python, D-Bus). It isn't part of the widget package.
+
+```sh
+krunner/install.sh      # needs python-dbus and python-gobject (Debian/Ubuntu: python3-dbus python3-gi)
+```
+
+Then in KRunner (Alt+Space):
+
+- `todo Buy milk tomorrow #Home`: adds the task with Todoist Quick Add.
+- `todo ?milk`: finds open tasks. Enter opens one in Todoist; the *Complete task* action completes it.
+
+It uses the token of your Todoist for Plasma widget (or `TODOIST_TOKEN`, or `token=` under `[General]` in `~/.config/todoist-plasma-runnerrc`). Remove it with `krunner/uninstall.sh`.
 
 ## Install
 
@@ -94,7 +125,10 @@ Dates are parsed in the language your Todoist account uses. English always works
 
 - **Time zones:** "today" follows your Todoist time zone. When your computer is in a *different* time zone than your Todoist account, a fixed-time-zone task can shift by an hour across a daylight-saving boundary (rarely enough to move it to another day), and the day can switch up to 5 minutes late at a DST change. When both zones match, which is the normal case, this does not apply.
 - **Offline Quick Add:** if the connection drops right after a new task was sent, the widget can't know whether Todoist created it. After the next sync it looks for a matching new task before sending it again. If no match is found, a duplicate is possible, though rare.
-- **Filters** are evaluated by Todoist, so a filter list needs a connection to refresh. Offline it shows the last results with their time.
+- **Filters** (saved or custom) are evaluated by Todoist, so a filter list needs a connection to refresh. Offline it shows the last results with their time.
+- A completion reaches Todoist a few seconds later than before, because it can be undone first.
+- The **daily goal** ring uses Todoist's productivity stats. If they can't be read, the ring stays hidden.
+- **Reminders** look at a task's time, not at Todoist's own reminders. Two widgets never show the same reminder twice.
 - **Upcoming** shows a recurring task once, on its next date (the web shows every occurrence).
 - In Today, Upcoming, label and filter lists sub-tasks are plain rows; the hierarchy is shown in project and Inbox lists.
 - Not supported in the widget (use Todoist for these): reordering, deadlines, reminders, rescheduling recurring tasks, creating or editing projects, sections, labels and filters, and completed-task history.
@@ -125,13 +159,15 @@ All decision logic is plain JavaScript in `package/contents/ui/logic/` (`.pragma
 | `TaskStore.js` | merging `/sync` responses (tasks, projects, sections, labels, filters), the offline overlay, the Today list |
 | `ViewModel.js` | Inbox, Upcoming, project, label and filter lists, list rows and the navigation list |
 | `ContextRules.js` | where a task added from a list lands (date, project, label) |
+| `Reminders.js` | which timed tasks to notify about, snoozes |
+| `Goals.js` | daily goal progress from Todoist's productivity stats |
 | `CommandQueue.js` | the persistent offline queue (complete, update, move, delete commands; Quick Adds) |
 | `SyncMachine.js` | the sync state machine: debouncing, retries/backoff, recovery, account checks |
 | `TodoistClient.js` | HTTP via `XMLHttpRequest` and response classification |
 | `ModelSync.js` | minimal `ListModel` updates so only changed rows animate |
 | `Storage.js` | LocalStorage persistence (QML-only, not unit-tested) |
 
-`SyncController.qml` only executes the effects `SyncMachine` returns. The architecture plans are in [`docs/architecture/`](docs/architecture/INDEX.md): the v1 plan (sync, offline queue, state machine; manual checklist M1–M23) and the v2 plan (lists; checklist M-v2-1…6).
+`SyncController.qml` only executes the effects `SyncMachine` returns. The KRunner plugin's helpers are tested with `python3 -m unittest discover -s krunner/tests`. The architecture plans are in [`docs/architecture/`](docs/architecture/INDEX.md): v1 (sync, offline queue, state machine; checklist M1–M23), v2 (lists; M-v2-1…6) and v2.1 (the features above; M-v21-1…8).
 
 Releases: bump `Version` in `package/metadata.json` and `package.json`, add a CHANGELOG section, then push a `vX.Y.Z` tag. CI builds the `.plasmoid` and attaches it to a GitHub Release.
 
