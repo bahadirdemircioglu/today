@@ -37,6 +37,20 @@ Your Todoist tasks on the KDE Plasma 6 desktop and panel: **Inbox, Today, Upcomi
   <img src="docs/screenshots/panel.png" width="640" alt="Panel icon with a count badge, a red badge when something is overdue, and a warning when not connected">
 </p>
 
+| | |
+|:---:|:---:|
+| <img src="docs/screenshots/today-v21.png" width="250" alt="Today with the daily goal ring, a deadline, the keyboard-selected row and the Undo bar"> | <img src="docs/screenshots/settings.png" width="375" alt="Settings, General page: account, badge, daily goal, reminders, custom filter, start list"> |
+| Daily goal, deadline, keyboard selection, undo | Settings → General |
+
+<p align="center">
+  <img src="docs/screenshots/reminder.png" width="400" alt="Reminder notification: Dentist in 10 minutes, with Complete and Remind me in 10 minutes buttons"><br>
+  <sub>Reminder before a timed task</sub>
+</p>
+<p align="center">
+  <img src="docs/screenshots/krunner.png" width="560" alt="KRunner with todo Buy milk tomorrow #Home and the Add to Todoist result"><br>
+  <sub>Optional KRunner plugin</sub>
+</p>
+
 <sub>Rendered from the design mockups. On your desktop the widget uses your Plasma theme, fonts and icons.</sub>
 
 ## Keyboard
