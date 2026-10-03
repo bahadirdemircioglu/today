@@ -4,6 +4,12 @@ Your Todoist tasks on the KDE Plasma 6 desktop and panel: **Inbox, Today, Upcomi
 
 > Unofficial. Not created by, affiliated with, or supported by Doist.
 
+<p align="center">
+  <img src="docs/screenshots/today.png" width="260" alt="Today list in Breeze light: overdue and today's tasks with priority-coloured circles">
+  <img src="docs/screenshots/today-dark.png" width="260" alt="The same Today list in Breeze Dark">
+  <img src="docs/screenshots/upcoming.png" width="260" alt="Upcoming list grouped by day, with a + button on each day">
+</p>
+
 - **Lists:** click the list title ("Today ▾") to switch between Inbox, Today, Upcoming (the next 7 days, day by day), your projects (with sections and indented sub-tasks), labels and saved filters. Each entry shows its task count.
 - **Pin a list to a widget:** in the list title menu choose *Start here in this widget*. For example, put a "Work" project widget and a Today widget side by side on the desktop. You can still switch lists in a pinned widget.
 - **Panel:** an icon with a count badge for Today (red when something is overdue). Click it to open the list. The badge can instead count the current list, or be turned off, in the settings.
@@ -13,6 +19,21 @@ Your Todoist tasks on the KDE Plasma 6 desktop and panel: **Inbox, Today, Upcomi
 - **Offline-first:** tasks are cached, and completions/additions made offline are queued. The queue survives Plasma restarts and is sent once you are back online.
 - **Task menu:** right-click a task (or use its ⋯ button) to edit it, reschedule it, change priority, move it to another project, copy its link, or delete it (with undo).
 - **Sync:** every 5 minutes, when you open the popup or hover the desktop widget (if the data is older than 30 s), and about a second after you complete or add something.
+
+## Screenshots
+
+| | | |
+|:---:|:---:|:---:|
+| <img src="docs/screenshots/switcher.png" width="250" alt="List switcher open on Projects, showing task counts"> | <img src="docs/screenshots/project.png" width="250" alt="A project with sections and an indented sub-task"> | <img src="docs/screenshots/task-menu.png" width="250" alt="Task menu with reschedule, priority, move, copy link and delete"> |
+| Switch lists from the title | Projects: sections and sub-tasks | Task menu, delete with undo |
+| <img src="docs/screenshots/offline.png" width="250" alt="Offline: saved tasks with a waiting-to-sync task and a status line"> | <img src="docs/screenshots/setup.png" width="250" alt="Setup screen: open Todoist settings and paste the API token"> | <img src="docs/screenshots/desktop-small.png" width="250" alt="Small desktop widget: big task count and the next task"> |
+| Offline, changes waiting | One-screen setup | Small desktop size |
+
+<p align="center">
+  <img src="docs/screenshots/panel.png" width="640" alt="Panel icon with a count badge, a red badge when something is overdue, and a warning when not connected">
+</p>
+
+<sub>Rendered from the design mockups. On your desktop the widget uses your Plasma theme, fonts and icons.</sub>
 
 ## Install
 
