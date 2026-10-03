@@ -488,6 +488,9 @@ Item {
                 log("full sync");
             }
             store = TaskStore.applySyncResponse(store, json, Date.now(), DateUtil.systemOffsetAt);
+            if (store.accountId) {
+                shareAccount(store.accountId, store.accountName);
+            }
             queue = CommandQueue.resolveUncertain(queue, store);
             saveStore();
             saveQueue();
@@ -555,6 +558,7 @@ Item {
                 var userId = String(res.json.id);
                 var same = store.accountId !== null && store.accountId === userId;
                 accountVerified(res.json.full_name || res.json.email || "");
+                shareAccount(userId, res.json.full_name || res.json.email || "");
                 dispatch({ type: "ACCOUNT_VERIFIED", sameAccount: same });
                 return;
             }
@@ -585,6 +589,19 @@ Item {
         rows = ViewModel.flattenView(v);
         nav = ViewModel.navList(store, queue, nowMs, DateUtil.systemOffsetAt, filterResults);
         projects = TaskStore.projectList(store);
+    }
+
+    // Lets other widget instances offer this account in their setup screen (token reuse only:
+    // caches and queues stay per instance, see the v2.1 plan F3).
+    function shareAccount(userId, name) {
+        if (!priv.activeToken || !userId) {
+            return;
+        }
+        var current = Storage.loadShared("account");
+        if (current && current.token === priv.activeToken && current.userId === userId && current.name === name) {
+            return;
+        }
+        Storage.saveShared("account", { token: priv.activeToken, userId: userId, name: name });
     }
 
     function saveStore() {
@@ -746,8 +763,14 @@ Item {
         if (t === priv.activeToken) {
             return;
         }
+        var previous = priv.activeToken;
         priv.activeToken = t;
         if (!t) {
+            // disconnecting here also withdraws the offer to other instances
+            var shared = Storage.loadShared("account");
+            if (shared && shared.token === previous) {
+                Storage.saveShared("account", null);
+            }
             dispatch({ type: "TOKEN_CLEARED" });
         } else {
             dispatch({ type: "TOKEN_SET", hasCache: TaskStore.hasData(store) });

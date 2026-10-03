@@ -58,3 +58,34 @@ function clear(appletId) {
         console.warn("[todoist-plasma] storage clear failed:", e);
     }
 }
+
+// Rows shared by every widget instance (applet id "_shared"): the connected account, so other
+// instances can reuse it, and the keys of reminders already shown, so panel + desktop never
+// notify twice.
+var SHARED = "_shared";
+
+function loadShared(key) {
+    var raw = load(SHARED, key);
+    if (!raw) {
+        return null;
+    }
+    try {
+        return JSON.parse(raw);
+    } catch (e) {
+        return null;
+    }
+}
+
+function saveShared(key, value) {
+    if (value === null || value === undefined) {
+        try {
+            open().transaction(function (tx) {
+                tx.executeSql("DELETE FROM kv WHERE applet_id = ? AND key = ?", [SHARED, key]);
+            });
+        } catch (e) {
+            console.warn("[todoist-plasma] storage delete failed:", e);
+        }
+        return true;
+    }
+    return save(SHARED, key, JSON.stringify(value));
+}

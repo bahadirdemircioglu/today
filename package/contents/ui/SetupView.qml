@@ -6,6 +6,7 @@ import org.kde.plasma.components as PlasmaComponents3
 import org.kde.kirigami as Kirigami
 
 import "logic/TodoistClient.js" as TodoistClient
+import "logic/Storage.js" as Storage
 
 // In-widget, one-screen setup: open Todoist settings, paste the token, done.
 // It only writes Plasmoid.configuration (the single source of truth); main.qml's
@@ -24,6 +25,18 @@ Item {
     property bool connected: false
     property int generation: 0
     property var xhr: null
+    // an account another widget instance is already connected to
+    property var sharedAccount: null
+
+    Component.onCompleted: {
+        var shared = Storage.loadShared("account");
+        sharedAccount = shared && shared.token && !authFailed ? shared : null;
+    }
+
+    function useSharedAccount() {
+        Plasmoid.configuration.accountName = sharedAccount.name || "";
+        Plasmoid.configuration.apiToken = sharedAccount.token;
+    }
 
     function tokenEdited() {
         status = "";
@@ -123,6 +136,25 @@ Item {
             text: setup.authFailed
                 ? i18n("Todoist didn't accept your token. Paste a new one to reconnect.")
                 : i18n("Paste your personal API token from Todoist's settings to see today's tasks here.")
+        }
+
+        PlasmaComponents3.Button {
+            Layout.alignment: Qt.AlignHCenter
+            visible: setup.sharedAccount !== null
+            icon.name: "user-identity"
+            text: setup.sharedAccount ? (setup.sharedAccount.name ? i18n("Use the connected account (%1)", setup.sharedAccount.name)
+                                                                   : i18n("Use the connected account"))
+                                      : ""
+            onClicked: setup.useSharedAccount()
+        }
+
+        PlasmaComponents3.Label {
+            Layout.fillWidth: true
+            visible: setup.sharedAccount !== null
+            horizontalAlignment: Text.AlignHCenter
+            font.pointSize: Kirigami.Theme.smallFont.pointSize
+            opacity: 0.7
+            text: i18n("or connect a different account:")
         }
 
         PlasmaComponents3.Button {
