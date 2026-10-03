@@ -1,0 +1,211 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the plasma_applet_io.github.bahadirdemircioglu.todoisttoday package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: plasma_applet_io.github.bahadirdemircioglu.todoisttoday "
+"1.0.0\n"
+"Report-Msgid-Bugs-To: https://github.com/bahadirdemircioglu/today/issues\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+msgid "%1 change waiting"
+msgid_plural "%1 changes waiting"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "%1 task today"
+msgid_plural "%1 tasks today"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "API token:"
+msgstr ""
+
+msgid "Account"
+msgstr ""
+
+msgid "Account:"
+msgstr ""
+
+msgid "Add task"
+msgstr ""
+
+msgid "Added to %1"
+msgstr ""
+
+msgctxt "task added: project · due date"
+msgid "Added to %1 · %2"
+msgstr ""
+
+msgid "All done for today"
+msgstr ""
+
+msgid "Can't reach Todoist"
+msgstr ""
+
+msgid "Can't reach Todoist. Check your connection."
+msgstr ""
+
+msgid "Checking…"
+msgstr ""
+
+msgid "Complete “%1”"
+msgstr ""
+
+msgid "Connect to Todoist"
+msgstr ""
+
+msgid "Connect to Todoist…"
+msgstr ""
+
+msgid "Connected"
+msgstr ""
+
+msgid "Connected as %1"
+msgstr ""
+
+msgid "Connected as %1 (%2)"
+msgstr ""
+
+msgid "Couldn't add “%1”."
+msgstr ""
+
+msgid "Couldn't complete a task — it may have been deleted."
+msgstr ""
+
+msgid "Couldn't complete “%1” — it may have been deleted."
+msgstr ""
+
+msgid "Disconnect"
+msgstr ""
+
+msgid "Enjoy the rest of your day."
+msgstr ""
+
+msgid "Hide token"
+msgstr ""
+
+msgid "Inbox"
+msgstr ""
+
+msgid "Loading your tasks…"
+msgstr ""
+
+msgid "New task, e.g. “Dentist tomorrow 3pm #Personal”"
+msgstr ""
+
+msgctxt "next task: title"
+msgid "Next: %1"
+msgstr ""
+
+msgctxt "next task: title time"
+msgid "Next: %1 %2"
+msgstr ""
+
+msgid "Not connected"
+msgstr ""
+
+msgid "Not connected to Todoist"
+msgstr ""
+
+msgid "Offline. Showing saved tasks."
+msgstr ""
+
+msgid "Open Todoist"
+msgstr ""
+
+msgid "Open Todoist settings"
+msgstr ""
+
+msgid "Overdue"
+msgstr ""
+
+msgid "Paste your API token"
+msgstr ""
+
+msgid ""
+"Paste your personal API token from Todoist's settings to see today's tasks "
+"here."
+msgstr ""
+
+msgid "Reconnect"
+msgstr ""
+
+msgid "Refresh now"
+msgstr ""
+
+msgid "Show token"
+msgstr ""
+
+msgid "Something went wrong (HTTP %1)."
+msgstr ""
+
+msgid "That's too long. Keep it under 1000 characters."
+msgstr ""
+
+msgid "This token didn't work. Copy it again from Todoist settings."
+msgstr ""
+
+msgid "Today"
+msgstr ""
+
+msgid "Today · %1 overdue"
+msgid_plural "Today · %1 overdue"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Todoist Today"
+msgstr ""
+
+msgid "Todoist asked to slow down. Retrying soon…"
+msgstr ""
+
+msgid "Todoist didn't accept your token"
+msgstr ""
+
+msgid "Todoist didn't accept your token."
+msgstr ""
+
+msgid "Todoist didn't accept your token. Paste a new one to reconnect."
+msgstr ""
+
+msgid "Todoist is having trouble"
+msgstr ""
+
+msgid "Todoist is having trouble. Retrying…"
+msgstr ""
+
+msgid "Token works."
+msgstr ""
+
+msgid "Try again"
+msgstr ""
+
+msgid "Updated %1 minute ago"
+msgid_plural "Updated %1 minutes ago"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Waiting to sync"
+msgstr ""
+
+msgid "Yesterday"
+msgstr ""
+
+msgid "Your token is stored unencrypted in your Plasma config file."
+msgstr ""
+
+msgid ""
+"Your token is stored unencrypted in your Plasma config file. You can revoke "
+"it any time in Todoist's settings."
+msgstr ""

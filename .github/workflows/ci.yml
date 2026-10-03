@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Unit tests
+        run: npm test
+      - name: Validate metadata.json
+        run: |
+          node -e '
+            const m = require("./package/metadata.json");
+            const p = m.KPlugin || {};
+            for (const [k, v] of Object.entries({ "KPlugin.Id": p.Id, "KPlugin.Version": p.Version,
+                 "X-Plasma-API-Minimum-Version": m["X-Plasma-API-Minimum-Version"] })) {
+              if (!v) { console.error("missing " + k); process.exit(1); }
+            }
+            if (m.KPackageStructure !== "Plasma/Applet") { console.error("KPackageStructure must be Plasma/Applet"); process.exit(1); }
+            if (require("./package.json").version !== p.Version) { console.error("package.json version != metadata.json version"); process.exit(1); }
+            console.log("metadata ok:", p.Id, p.Version);'
+      - name: Install gettext and libxml2-utils
+        run: sudo apt-get update && sudo apt-get install -y gettext libxml2-utils
+      - name: Validate KConfig schema
+        run: xmllint --noout package/contents/config/main.xml
+      - name: Translations are up to date and build
+        run: |
+          scripts/i18n-extract.sh
+          git diff --exit-code -- translations/ || { echo "::error::run scripts/i18n-extract.sh and commit translations/"; exit 1; }
+          scripts/i18n-build.sh
+      - name: Package smoke test
+        run: |
+          scripts/package.sh
+          unzip -l dist/*.plasmoid | grep -q ' metadata.json$'

@@ -1,0 +1,18 @@
+{
+  "sync_token": "Zx9-incremental-token",
+  "full_sync": false,
+  "items": [
+    { "id": "6X7rM8997g3RQmvh", "content": "Dentist", "project_id": "6Jf8VQXxpwv56VQ7", "priority": 4,
+      "child_order": 1, "day_order": 1, "checked": true, "is_deleted": false,
+      "added_at": "2026-10-01T10:00:00.000000Z",
+      "due": { "date": "2026-10-03T15:00:00", "timezone": null, "string": "today 15:00", "lang": "en", "is_recurring": false } },
+    { "id": "6X7rNEWITEM00001", "content": "Call **Ann** about [docs](https://example.com)", "project_id": "6Jf8VQXxpwv56VQ8",
+      "priority": 2, "child_order": 4, "day_order": -1, "checked": false, "is_deleted": false,
+      "added_at": "2026-10-03T09:00:00.000000Z",
+      "due": { "date": "2026-10-03", "timezone": null, "string": "today", "lang": "en", "is_recurring": false } }
+  ],
+  "projects": [],
+  "user_item_orders": [],
+  "sync_status": { "0f2c7c0e-4b4e-4c1e-9a7a-3d3a1f6e8b11": "ok" },
+  "temp_id_mapping": {}
+}

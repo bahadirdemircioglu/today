@@ -1,0 +1,46 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Tag must match metadata.json version
+        run: |
+          VERSION=$(node -e 'process.stdout.write(require("./package/metadata.json").KPlugin.Version)')
+          TAG="${GITHUB_REF_NAME#v}"
+          # pre-release tags (v1.0.0-rc1) must start with the metadata version
+          case "$TAG" in
+            "$VERSION"|"$VERSION"-*) echo "version ok: $VERSION ($GITHUB_REF_NAME)" ;;
+            *) echo "::error::tag $GITHUB_REF_NAME does not match metadata.json version $VERSION"; exit 1 ;;
+          esac
+      - name: Unit tests
+        run: npm test
+      - name: Install gettext
+        run: sudo apt-get update && sudo apt-get install -y gettext
+      - name: Build .plasmoid
+        run: scripts/package.sh
+      - name: Release notes from CHANGELOG
+        run: |
+          VERSION=$(node -e 'process.stdout.write(require("./package/metadata.json").KPlugin.Version)')
+          awk -v v="$VERSION" '
+            $0 ~ "^## \\[" v "\\]" { on = 1; next }
+            on && /^## \[/ { exit }
+            on { print }' CHANGELOG.md > release-notes.md
+          test -s release-notes.md || echo "See CHANGELOG.md" > release-notes.md
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.plasmoid
+          body_path: release-notes.md
+          prerelease: ${{ contains(github.ref_name, '-') }}

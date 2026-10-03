@@ -1,0 +1,26 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "Bahadir Demircioglu"
+            }
+        ],
+        "BugReportUrl": "https://github.com/bahadirdemircioglu/today/issues",
+        "Category": "Online Services",
+        "Description": "Your Todoist Today view on the Plasma desktop and panel (unofficial)",
+        "Description[tr]": "Todoist Bugün görünümü Plasma masaüstü ve panelinde (resmi değil)",
+        "FormFactors": [
+            "desktop",
+            "panel"
+        ],
+        "Icon": "view-calendar-tasks",
+        "Id": "io.github.bahadirdemircioglu.todoisttoday",
+        "License": "GPL-3.0-or-later",
+        "Name": "Todoist Today",
+        "Name[tr]": "Todoist Bugün",
+        "Version": "1.0.0",
+        "Website": "https://github.com/bahadirdemircioglu/today"
+    },
+    "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

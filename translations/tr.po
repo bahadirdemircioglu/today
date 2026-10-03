@@ -1,0 +1,203 @@
+# Turkish translation of Todoist Today.
+# This file is distributed under the same license as the Todoist Today package (GPL-3.0-or-later).
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: plasma_applet_io.github.bahadirdemircioglu.todoisttoday\n"
+"Report-Msgid-Bugs-To: https://github.com/bahadirdemircioglu/today/issues\n"
+"PO-Revision-Date: 2026-10-03 12:00+0300\n"
+"Last-Translator: Bahadir Demircioglu\n"
+"Language-Team: Turkish\n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "%1 change waiting"
+msgid_plural "%1 changes waiting"
+msgstr[0] "%1 değişiklik bekliyor"
+msgstr[1] "%1 değişiklik bekliyor"
+
+msgid "%1 task today"
+msgid_plural "%1 tasks today"
+msgstr[0] "Bugün %1 görev"
+msgstr[1] "Bugün %1 görev"
+
+msgid "API token:"
+msgstr "API token'ı:"
+
+msgid "Account"
+msgstr "Hesap"
+
+msgid "Account:"
+msgstr "Hesap:"
+
+msgid "Add task"
+msgstr "Görev ekle"
+
+msgid "Added to %1"
+msgstr "%1 projesine eklendi"
+
+msgctxt "task added: project · due date"
+msgid "Added to %1 · %2"
+msgstr "%1 projesine eklendi · %2"
+
+msgid "All done for today"
+msgstr "Bugünlük hepsi tamam"
+
+msgid "Can't reach Todoist"
+msgstr "Todoist'e ulaşılamıyor"
+
+msgid "Can't reach Todoist. Check your connection."
+msgstr "Todoist'e ulaşılamıyor. Bağlantınızı kontrol edin."
+
+msgid "Checking…"
+msgstr "Kontrol ediliyor…"
+
+msgid "Complete “%1”"
+msgstr "“%1” görevini tamamla"
+
+msgid "Connect to Todoist"
+msgstr "Todoist'e bağlan"
+
+msgid "Connect to Todoist…"
+msgstr "Todoist'e bağlan…"
+
+msgid "Connected"
+msgstr "Bağlı"
+
+msgid "Connected as %1"
+msgstr "%1 olarak bağlı"
+
+msgid "Connected as %1 (%2)"
+msgstr "%1 olarak bağlı (%2)"
+
+msgid "Couldn't add “%1”."
+msgstr "“%1” eklenemedi."
+
+msgid "Couldn't complete a task — it may have been deleted."
+msgstr "Bir görev tamamlanamadı — silinmiş olabilir."
+
+msgid "Couldn't complete “%1” — it may have been deleted."
+msgstr "“%1” tamamlanamadı — silinmiş olabilir."
+
+msgid "Disconnect"
+msgstr "Bağlantıyı kes"
+
+msgid "Enjoy the rest of your day."
+msgstr "Günün geri kalanının tadını çıkarın."
+
+msgid "Hide token"
+msgstr "Token'ı gizle"
+
+msgid "Inbox"
+msgstr "Gelen Kutusu"
+
+msgid "Loading your tasks…"
+msgstr "Görevleriniz yükleniyor…"
+
+msgid "New task, e.g. “Dentist tomorrow 3pm #Personal”"
+msgstr "Yeni görev, ör. “Dentist tomorrow 3pm #Personal”"
+
+msgctxt "next task: title"
+msgid "Next: %1"
+msgstr "Sıradaki: %1"
+
+msgctxt "next task: title time"
+msgid "Next: %1 %2"
+msgstr "Sıradaki: %1 %2"
+
+msgid "Not connected"
+msgstr "Bağlı değil"
+
+msgid "Not connected to Todoist"
+msgstr "Todoist'e bağlı değil"
+
+msgid "Offline. Showing saved tasks."
+msgstr "Çevrimdışı. Kayıtlı görevler gösteriliyor."
+
+msgid "Open Todoist"
+msgstr "Todoist'i aç"
+
+msgid "Open Todoist settings"
+msgstr "Todoist ayarlarını aç"
+
+msgid "Overdue"
+msgstr "Gecikmiş"
+
+msgid "Paste your API token"
+msgstr "API token'ınızı yapıştırın"
+
+msgid "Paste your personal API token from Todoist's settings to see today's tasks here."
+msgstr "Bugünkü görevlerinizi burada görmek için Todoist ayarlarındaki kişisel API token'ınızı yapıştırın."
+
+msgid "Reconnect"
+msgstr "Yeniden bağlan"
+
+msgid "Refresh now"
+msgstr "Şimdi yenile"
+
+msgid "Show token"
+msgstr "Token'ı göster"
+
+msgid "Something went wrong (HTTP %1)."
+msgstr "Bir şeyler ters gitti (HTTP %1)."
+
+msgid "That's too long. Keep it under 1000 characters."
+msgstr "Bu çok uzun. 1000 karakterin altında tutun."
+
+msgid "This token didn't work. Copy it again from Todoist settings."
+msgstr "Bu token çalışmadı. Todoist ayarlarından yeniden kopyalayın."
+
+msgid "Today"
+msgstr "Bugün"
+
+msgid "Today · %1 overdue"
+msgid_plural "Today · %1 overdue"
+msgstr[0] "Bugün · %1 gecikmiş"
+msgstr[1] "Bugün · %1 gecikmiş"
+
+msgid "Todoist Today"
+msgstr "Todoist Bugün"
+
+msgid "Todoist asked to slow down. Retrying soon…"
+msgstr "Todoist yavaşlamamızı istedi. Birazdan yeniden denenecek…"
+
+msgid "Todoist didn't accept your token"
+msgstr "Todoist token'ınızı kabul etmedi"
+
+msgid "Todoist didn't accept your token."
+msgstr "Todoist token'ınızı kabul etmedi."
+
+msgid "Todoist didn't accept your token. Paste a new one to reconnect."
+msgstr "Todoist token'ınızı kabul etmedi. Yeniden bağlanmak için yenisini yapıştırın."
+
+msgid "Todoist is having trouble"
+msgstr "Todoist'te bir sorun var"
+
+msgid "Todoist is having trouble. Retrying…"
+msgstr "Todoist'te bir sorun var. Yeniden deneniyor…"
+
+msgid "Token works."
+msgstr "Token çalışıyor."
+
+msgid "Try again"
+msgstr "Tekrar dene"
+
+msgid "Updated %1 minute ago"
+msgid_plural "Updated %1 minutes ago"
+msgstr[0] "%1 dakika önce güncellendi"
+msgstr[1] "%1 dakika önce güncellendi"
+
+msgid "Waiting to sync"
+msgstr "Eşitlenmeyi bekliyor"
+
+msgid "Yesterday"
+msgstr "Dün"
+
+msgid "Your token is stored unencrypted in your Plasma config file."
+msgstr "Token'ınız Plasma yapılandırma dosyanızda şifrelenmeden saklanır."
+
+msgid "Your token is stored unencrypted in your Plasma config file. You can revoke it any time in Todoist's settings."
+msgstr "Token'ınız Plasma yapılandırma dosyanızda şifrelenmeden saklanır. İstediğiniz zaman Todoist ayarlarından iptal edebilirsiniz."
