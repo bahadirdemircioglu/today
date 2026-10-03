@@ -179,3 +179,9 @@ test("update / move / delete commands", () => {
   assert.equal(Q.cancelEntry(q, "u3").entries.length, 2);
   assert.deepEqual(Q.deserialize(Q.serialize(q)), q);
 });
+
+test("enqueueQuickAdd keeps the view context", () => {
+  const r = Q.enqueueQuickAdd(Q.emptyQueue(), "x", 0, uuidFn, { kind: "project", projectId: "w" });
+  assert.deepEqual(r.queue.entries[0].context, { kind: "project", projectId: "w" });
+  assert.equal(Q.enqueueQuickAdd(Q.emptyQueue(), "x", 0, uuidFn).queue.entries[0].context, null);
+});

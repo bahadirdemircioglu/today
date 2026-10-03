@@ -257,3 +257,11 @@ test("projectList: Inbox first, then by name", () => {
   const s = storeWith([], { projects: [{ id: "z", name: "zeta" }, { id: "inbox", name: "Inbox" }, { id: "a", name: "Alpha" }] });
   assert.deepEqual(S.projectList(s).map((p) => p.id), ["inbox", "a", "z"]);
 });
+
+test("mergeTasks adds REST tasks without touching the sync token", () => {
+  const s0 = storeWith([]);
+  const s = S.mergeTasks(s0, [item({ id: "r1", due: null }), item({ id: "r2", checked: true })]);
+  assert.ok(s.items.r1);
+  assert.equal(s.items.r2, undefined);
+  assert.equal(s.syncToken, s0.syncToken);
+});

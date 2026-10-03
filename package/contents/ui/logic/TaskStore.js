@@ -190,6 +190,9 @@ function applySyncResponse(store, resp, nowMs, sysOffsetAt) {
         if (typeof user.full_name === "string") {
             s.accountName = user.full_name;
         }
+        if (typeof user.lang === "string") {
+            s.lang = user.lang;
+        }
         if (user.inbox_project_id !== undefined && user.inbox_project_id !== null) {
             s.inboxProjectId = String(user.inbox_project_id);
         }
@@ -253,6 +256,20 @@ function mergeNamed(map, list, isGone, normalize) {
             map[String(x.id)] = normalize(x);
         }
     }
+}
+
+// Merges task objects from a REST response (same field names as sync items) without touching
+// the sync token or other resources. Used for filter results not yet in the cache.
+function mergeTasks(store, tasks) {
+    var s = copyStore(store || emptyStore());
+    for (var i = 0; i < (tasks || []).length; i++) {
+        var raw = tasks[i];
+        if (!raw || raw.id === undefined || raw.id === null || raw.checked || raw.is_deleted) {
+            continue;
+        }
+        s.items[String(raw.id)] = normalizeItem(raw);
+    }
+    return s;
 }
 
 function sortableDayOrder(v) {

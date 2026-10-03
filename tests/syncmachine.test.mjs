@@ -235,3 +235,9 @@ test("reduce never mutates the input state", () => {
   M.reduce(s0, { type: "REQUEST_DONE", kind: "network", now: T0 }, rnd);
   assert.equal(JSON.stringify(s0), copy);
 });
+
+test("a view switch syncs at once, ignoring the 5 s gap but not AUTH_INVALID", () => {
+  const r = run(ready({ lastRequestAt: T0 - 1000, lastSyncAt: T0 - 1000 }), { type: "SYNC_REQUESTED", reason: "view", now: T0 });
+  assert.ok(r.types.includes("startRequest"));
+  assert.deepEqual(run(ready({ phase: "AUTH_INVALID" }), { type: "SYNC_REQUESTED", reason: "view", now: T0 }).types, []);
+});

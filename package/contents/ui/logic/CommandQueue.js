@@ -137,7 +137,8 @@ function nextHeldAt(queue, nowMs) {
 }
 
 // -> { queue, error: null | "empty" | "too_long", localId }
-function enqueueQuickAdd(queue, text, nowMs, uuidFn) {
+// context: ContextRules context of the view the task was added from (optional)
+function enqueueQuickAdd(queue, text, nowMs, uuidFn, context) {
     var t = String(text === undefined || text === null ? "" : text).trim();
     if (!t) {
         return { queue: queue, error: "empty", localId: null };
@@ -147,7 +148,8 @@ function enqueueQuickAdd(queue, text, nowMs, uuidFn) {
     }
     var localId = uuidFn();
     var entries = queue.entries.slice();
-    entries.push({ kind: "quick_add", localId: localId, text: t, createdAt: nowMs, attempts: 0, state: "pending", sentAt: null });
+    entries.push({ kind: "quick_add", localId: localId, text: t, createdAt: nowMs, attempts: 0, state: "pending", sentAt: null,
+                   context: context || null });
     return { queue: withEntries(entries), error: null, localId: localId };
 }
 

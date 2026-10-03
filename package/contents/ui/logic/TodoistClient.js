@@ -114,3 +114,27 @@ function getUser(token, cb) {
 function quickAdd(token, text, cb) {
     return request("POST", "/tasks/quick", token, JSON.stringify({ text: text, meta: false }), "application/json", cb);
 }
+
+// Saved-filter results evaluated by Todoist (the query language is not interpreted locally).
+// Paginated: { results: [task...], next_cursor }; a plain array is accepted as well.
+function filterTasks(token, query, lang, cursor, cb) {
+    var qs = "?query=" + encodeURIComponent(query) + "&limit=200";
+    if (lang) {
+        qs += "&lang=" + encodeURIComponent(lang);
+    }
+    if (cursor) {
+        qs += "&cursor=" + encodeURIComponent(cursor);
+    }
+    return request("GET", "/tasks/filter" + qs, token, null, null, cb);
+}
+
+// -> { tasks: [...], nextCursor: string|null }
+function filterPage(json) {
+    if (Array.isArray(json)) {
+        return { tasks: json, nextCursor: null };
+    }
+    if (json && Array.isArray(json.results)) {
+        return { tasks: json.results, nextCursor: json.next_cursor || null };
+    }
+    return { tasks: [], nextCursor: null };
+}

@@ -6,7 +6,7 @@
 //
 // Events (every event carries `now` in ms):
 //   INIT{hasToken, hasCache}            TOKEN_SET{hasCache}        TOKEN_CLEARED
-//   SYNC_REQUESTED{reason}              reason: periodic|expanded|hover|action|dayChanged|manual|retry|followUp
+//   SYNC_REQUESTED{reason}              reason: periodic|expanded|hover|action|dayChanged|manual|retry|followUp|view
 //   DEBOUNCE_FIRED                      RETRY_FIRED
 //   REQUEST_DONE{kind, retryAfterSec, hadCommands, fullSync, moreWork}
 //   QUICK_ADD_DONE{kind, retryAfterSec} (a Quick Add failure that ends the cycle)
@@ -232,7 +232,8 @@ function reduce(state, ev, randomFn) {
         if (reason === "manual") {
             s.backoffStep = 0;
         }
-        requestSync(s, now, effects, reason === "retry" || reason === "followUp");
+        // "view": the user switched to a view that needs fresh server data (a filter)
+        requestSync(s, now, effects, reason === "retry" || reason === "followUp" || reason === "view");
         break;
     }
 

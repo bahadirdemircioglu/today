@@ -75,3 +75,16 @@ test("results never contain the token", () => {
   const r = call((cb) => C.getUser("secret-token", cb), 401, '{"error":"x"}');
   assert.equal(JSON.stringify(r).includes("secret-token"), false);
 });
+
+test("filterTasks: GET with encoded query, lang and cursor; page parsing", () => {
+  call((cb) => C.filterTasks("t", "today & #Work", "en", "abc", cb), 200, '{"results":[{"id":"1"}],"next_cursor":"n"}');
+  const u = new URL(FakeXHR.last.url);
+  assert.equal(FakeXHR.last.method, "GET");
+  assert.equal(u.pathname, "/api/v1/tasks/filter");
+  assert.equal(u.searchParams.get("query"), "today & #Work");
+  assert.equal(u.searchParams.get("lang"), "en");
+  assert.equal(u.searchParams.get("cursor"), "abc");
+  assert.deepEqual(C.filterPage({ results: [{ id: "1" }], next_cursor: "n" }), { tasks: [{ id: "1" }], nextCursor: "n" });
+  assert.deepEqual(C.filterPage([{ id: "2" }]), { tasks: [{ id: "2" }], nextCursor: null });
+  assert.deepEqual(C.filterPage(null), { tasks: [], nextCursor: null });
+});
