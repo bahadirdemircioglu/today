@@ -35,7 +35,7 @@ test("#1 sync request shape; commands omitted when empty", () => {
   assert.equal(x.headers["Content-Type"], "application/x-www-form-urlencoded");
   const form = new URLSearchParams(x.body);
   assert.equal(form.get("sync_token"), "abc");
-  assert.deepEqual(JSON.parse(form.get("resource_types")), ["items", "projects", "user", "user_item_orders"]);
+  assert.deepEqual(JSON.parse(form.get("resource_types")), ["items", "projects", "sections", "labels", "filters", "user", "user_item_orders"]);
   assert.equal(form.has("commands"), false);
 
   const cmds = [{ type: "item_close", uuid: "u", args: { id: "1" } }];

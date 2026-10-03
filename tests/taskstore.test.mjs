@@ -24,9 +24,20 @@ function item(fields) {
     child_order: n, day_order: -1, checked: false, is_deleted: false, added_at: "2026-09-01T00:00:00Z", ...fields };
 }
 
-test("#1 full sync keeps only open items with a due date", () => {
+test("#1 full sync keeps every open item (dated or not) and the v2 resources", () => {
   const s = S.applySyncResponse(S.emptyStore(), fixture("full-sync"), NOON, sys180);
-  assert.deepEqual(Object.keys(s.items).sort(), ["6X7rM8997g3RQmvh", "6X7rfFVPjhvv84XG"]);
+  assert.deepEqual(Object.keys(s.items).sort(), ["6X7rM8997g3RQmvh", "6X7rfEVP8hvv25ZQ", "6X7rfFVPjhvv84XG"]);
+  assert.equal(s.items["6X7rfEVP8hvv25ZQ"].sectionId, "S1");
+  assert.equal(s.items["6X7rfEVP8hvv25ZQ"].description, "Line one");
+  assert.deepEqual(s.items["6X7rM8997g3RQmvh"].labels, ["health"]);
+  assert.deepEqual(Object.keys(s.sections), ["S1"]);
+  assert.deepEqual(s.sections.S1, { name: "Ideas", projectId: "6Jf8VQXxpwv56VQ7", order: 1 });
+  assert.deepEqual(s.labels.L1, { name: "health", color: "red", order: 0 });
+  assert.deepEqual(s.filters.F1, { name: "Urgent", query: "today & p1", color: "red", order: 0 });
+  assert.equal(s.projects["6Jf8VQXxpwv56VQ7"].isInbox, true);
+  assert.equal(s.projects["6Jf8VQXxpwv56VQ8"].order, 2);
+  // undated items never enter Today
+  assert.equal(S.computeToday(s, emptyQ, NOON, sys180).unparsable, 0);
   assert.equal(s.syncToken, fixture("full-sync").sync_token);
   assert.equal(s.accountId, "2671355");
   assert.equal(s.accountName, "Ada Lovelace");
@@ -154,9 +165,17 @@ test("#15 plainTitle strips markdown", () => {
   assert.equal(S.plainTitle("<b>not html</b>"), "<b>not html</b>");
 });
 
+test("v2 resources: deletions in incremental syncs", () => {
+  let s = S.applySyncResponse(S.emptyStore(), fixture("full-sync"), NOON, sys180);
+  s = S.applySyncResponse(s, { sections: [{ id: "S1", is_deleted: true }], labels: [{ id: "L1", is_deleted: true }],
+    filters: [{ id: "F1", is_deleted: true }] }, NOON, sys180);
+  assert.deepEqual([Object.keys(s.sections), Object.keys(s.labels), Object.keys(s.filters)], [[], [], []]);
+});
+
 test("#16 deserialize rejects garbage and other versions", () => {
   assert.deepEqual(S.deserialize("bozuk"), S.emptyStore());
   assert.deepEqual(S.deserialize(JSON.stringify({ v: 99 })), S.emptyStore());
+  assert.deepEqual(S.deserialize(JSON.stringify({ v: 1, items: {} })), S.emptyStore());
   const s = storeWith([item({ id: "a", due: { date: "2026-10-03" } })]);
   assert.deepEqual(S.deserialize(S.serialize(s)), s);
 });
@@ -180,7 +199,7 @@ test("inbox project name is not shown", () => {
 
 test("recently added items without a due date are remembered for Quick Add matching", () => {
   const s = storeWith([item({ id: "nodue", content: "Buy milk", due: null, added_at: "2026-10-03T08:58:00Z" })]);
-  assert.equal(s.items.nodue, undefined);
+  assert.equal(s.items.nodue.due, null);
   assert.equal(s.recent.nodue.content, "Buy milk");
   const later = S.applySyncResponse(s, { items: [] }, NOON + 31 * 60 * 1000, sys180);
   assert.equal(later.recent.nodue, undefined);

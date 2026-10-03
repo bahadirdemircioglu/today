@@ -1,10 +1,11 @@
 .pragma library
 .import "DateUtil.js" as DateUtil
 
-// Pure task cache: merges Todoist v1 /sync responses and derives the "Today" view.
+// Pure task cache: merges Todoist v1 /sync responses (all open tasks, projects, sections,
+// labels, filters) and derives the Today view. Other views live in ViewModel.js.
 // Never mutates its inputs; every function returns new objects.
 
-var SCHEMA_VERSION = 1;
+var SCHEMA_VERSION = 2;
 
 // Items added this recently are remembered (id/content/addedAt only) even if they have no
 // due date, so CommandQueue.resolveUncertain can recognise a Quick Add the server already
@@ -22,10 +23,15 @@ function emptyStore() {
         inboxProjectId: null,
         items: {},
         projects: {},
+        sections: {},
+        labels: {},
+        filters: {},
         orderKeys: {},
         recent: {}
     };
 }
+
+var MAP_KEYS = ["items", "projects", "sections", "labels", "filters", "orderKeys", "recent"];
 
 function copyMap(m) {
     var out = {};
@@ -44,10 +50,9 @@ function copyStore(store) {
             s[k] = store[k];
         }
     }
-    s.items = copyMap(store.items || {});
-    s.projects = copyMap(store.projects || {});
-    s.orderKeys = copyMap(store.orderKeys || {});
-    s.recent = copyMap(store.recent || {});
+    for (var i = 0; i < MAP_KEYS.length; i++) {
+        s[MAP_KEYS[i]] = copyMap(store[MAP_KEYS[i]] || {});
+    }
     return s;
 }
 
@@ -83,6 +88,9 @@ function normalizeItem(raw) {
         parentId: raw.parent_id !== undefined && raw.parent_id !== null ? String(raw.parent_id) : null,
         priority: typeof raw.priority === "number" ? raw.priority : 1,
         due: due,
+        sectionId: raw.section_id !== undefined && raw.section_id !== null ? String(raw.section_id) : null,
+        labels: Array.isArray(raw.labels) ? raw.labels.slice() : [],
+        description: typeof raw.description === "string" ? raw.description.split("\n")[0].slice(0, 200) : "",
         dayOrder: typeof raw.day_order === "number" ? raw.day_order : -1,
         childOrder: typeof raw.child_order === "number" ? raw.child_order : 0,
         addedAt: DateUtil.parseIsoUtc(raw.added_at)
@@ -100,6 +108,9 @@ function applySyncResponse(store, resp, nowMs, sysOffsetAt) {
     if (resp.full_sync) {
         s.items = {};
         s.projects = {};
+        s.sections = {};
+        s.labels = {};
+        s.filters = {};
         s.orderKeys = {};
     }
 
@@ -114,7 +125,7 @@ function applySyncResponse(store, resp, nowMs, sysOffsetAt) {
         if (addedAt !== null && nowMs - addedAt <= RECENT_WINDOW_MS && !raw.is_deleted) {
             s.recent[id] = { content: raw.content || "", addedAt: addedAt };
         }
-        if (raw.checked || raw.is_deleted || !raw.due) {
+        if (raw.checked || raw.is_deleted) {
             delete s.items[id];
         } else {
             s.items[id] = normalizeItem(raw);
@@ -136,9 +147,40 @@ function applySyncResponse(store, resp, nowMs, sysOffsetAt) {
         if (p.is_deleted || p.is_archived) {
             delete s.projects[String(p.id)];
         } else {
-            s.projects[String(p.id)] = { name: p.name || "", color: p.color || "" };
+            s.projects[String(p.id)] = {
+                name: p.name || "",
+                color: p.color || "",
+                order: typeof p.child_order === "number" ? p.child_order : 0,
+                parentId: p.parent_id !== undefined && p.parent_id !== null ? String(p.parent_id) : null,
+                isInbox: !!p.inbox_project
+            };
         }
     }
+
+    mergeNamed(s.sections, resp.sections, function (x) {
+        return x.is_deleted || x.is_archived;
+    }, function (x) {
+        return {
+            name: x.name || "",
+            projectId: x.project_id !== undefined && x.project_id !== null ? String(x.project_id) : null,
+            order: typeof x.section_order === "number" ? x.section_order : 0
+        };
+    });
+    mergeNamed(s.labels, resp.labels, function (x) {
+        return x.is_deleted;
+    }, function (x) {
+        return { name: x.name || "", color: x.color || "", order: typeof x.item_order === "number" ? x.item_order : 0 };
+    });
+    mergeNamed(s.filters, resp.filters, function (x) {
+        return x.is_deleted;
+    }, function (x) {
+        return {
+            name: x.name || "",
+            query: x.query || "",
+            color: x.color || "",
+            order: typeof x.item_order === "number" ? x.item_order : 0
+        };
+    });
 
     var user = resp.user;
     if (user) {
@@ -193,6 +235,24 @@ function applySyncResponse(store, resp, nowMs, sysOffsetAt) {
     }
     s.lastSyncAt = nowMs;
     return s;
+}
+
+// map: target object (mutated; it is already a fresh copy). list: resource array from /sync.
+function mergeNamed(map, list, isGone, normalize) {
+    if (!Array.isArray(list)) {
+        return;
+    }
+    for (var i = 0; i < list.length; i++) {
+        var x = list[i];
+        if (!x || x.id === undefined || x.id === null) {
+            continue;
+        }
+        if (isGone(x)) {
+            delete map[String(x.id)];
+        } else {
+            map[String(x.id)] = normalize(x);
+        }
+    }
 }
 
 function sortableDayOrder(v) {
@@ -449,10 +509,10 @@ function deserialize(str) {
             base[k] = obj[k];
         }
     }
-    base.items = base.items && typeof base.items === "object" ? base.items : {};
-    base.projects = base.projects && typeof base.projects === "object" ? base.projects : {};
-    base.orderKeys = base.orderKeys && typeof base.orderKeys === "object" ? base.orderKeys : {};
-    base.recent = base.recent && typeof base.recent === "object" ? base.recent : {};
+    for (var i = 0; i < MAP_KEYS.length; i++) {
+        var key = MAP_KEYS[i];
+        base[key] = base[key] && typeof base[key] === "object" ? base[key] : {};
+    }
     if (typeof base.syncToken !== "string" || !base.syncToken) {
         base.syncToken = "*";
     }

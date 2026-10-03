@@ -4,43 +4,172 @@
   "full_sync_date_utc": "2026-10-03T08:00:00Z",
   "items": [
     {
-      "id": "6X7rM8997g3RQmvh", "user_id": "2671355", "project_id": "6Jf8VQXxpwv56VQ7",
-      "section_id": null, "parent_id": null, "content": "Dentist", "description": "",
-      "priority": 4, "child_order": 1, "day_order": 1, "is_collapsed": false, "labels": [],
-      "added_by_uid": "2671355", "assigned_by_uid": null, "responsible_uid": null,
-      "checked": false, "is_deleted": false, "added_at": "2026-10-01T10:00:00.000000Z",
-      "updated_at": "2026-10-01T10:00:00.000000Z", "completed_at": null, "duration": null, "deadline": null,
-      "due": { "date": "2026-10-03T15:00:00", "timezone": null, "string": "today 15:00", "lang": "en", "is_recurring": false }
+      "id": "6X7rM8997g3RQmvh",
+      "user_id": "2671355",
+      "project_id": "6Jf8VQXxpwv56VQ7",
+      "section_id": null,
+      "parent_id": null,
+      "content": "Dentist",
+      "description": "",
+      "priority": 4,
+      "child_order": 1,
+      "day_order": 1,
+      "is_collapsed": false,
+      "labels": [
+        "health"
+      ],
+      "added_by_uid": "2671355",
+      "assigned_by_uid": null,
+      "responsible_uid": null,
+      "checked": false,
+      "is_deleted": false,
+      "added_at": "2026-10-01T10:00:00.000000Z",
+      "updated_at": "2026-10-01T10:00:00.000000Z",
+      "completed_at": null,
+      "duration": null,
+      "deadline": null,
+      "due": {
+        "date": "2026-10-03T15:00:00",
+        "timezone": null,
+        "string": "today 15:00",
+        "lang": "en",
+        "is_recurring": false
+      }
     },
     {
-      "id": "6X7rfFVPjhvv84XG", "user_id": "2671355", "project_id": "6Jf8VQXxpwv56VQ8",
-      "section_id": null, "parent_id": null, "content": "Water the plants", "description": "",
-      "priority": 1, "child_order": 2, "day_order": -1, "is_collapsed": false, "labels": [],
-      "checked": false, "is_deleted": false, "added_at": "2026-09-20T10:00:00.000000Z",
-      "updated_at": "2026-09-20T10:00:00.000000Z", "completed_at": null, "duration": null, "deadline": null,
-      "due": { "date": "2026-10-02", "timezone": null, "string": "every day", "lang": "en", "is_recurring": true }
+      "id": "6X7rfFVPjhvv84XG",
+      "user_id": "2671355",
+      "project_id": "6Jf8VQXxpwv56VQ8",
+      "section_id": null,
+      "parent_id": null,
+      "content": "Water the plants",
+      "description": "",
+      "priority": 1,
+      "child_order": 2,
+      "day_order": -1,
+      "is_collapsed": false,
+      "labels": [],
+      "checked": false,
+      "is_deleted": false,
+      "added_at": "2026-09-20T10:00:00.000000Z",
+      "updated_at": "2026-09-20T10:00:00.000000Z",
+      "completed_at": null,
+      "duration": null,
+      "deadline": null,
+      "due": {
+        "date": "2026-10-02",
+        "timezone": null,
+        "string": "every day",
+        "lang": "en",
+        "is_recurring": true
+      }
     },
     {
-      "id": "6X7rfEVP8hvv25ZQ", "user_id": "2671355", "project_id": "6Jf8VQXxpwv56VQ7",
-      "section_id": null, "parent_id": null, "content": "Someday idea", "description": "",
-      "priority": 1, "child_order": 3, "day_order": -1, "is_collapsed": false, "labels": [],
-      "checked": false, "is_deleted": false, "added_at": "2026-09-20T10:00:00.000000Z",
-      "updated_at": "2026-09-20T10:00:00.000000Z", "completed_at": null, "duration": null, "deadline": null,
+      "id": "6X7rfEVP8hvv25ZQ",
+      "user_id": "2671355",
+      "project_id": "6Jf8VQXxpwv56VQ7",
+      "section_id": "S1",
+      "parent_id": null,
+      "content": "Someday idea",
+      "description": "Line one\nline two",
+      "priority": 1,
+      "child_order": 3,
+      "day_order": -1,
+      "is_collapsed": false,
+      "labels": [],
+      "checked": false,
+      "is_deleted": false,
+      "added_at": "2026-09-20T10:00:00.000000Z",
+      "updated_at": "2026-09-20T10:00:00.000000Z",
+      "completed_at": null,
+      "duration": null,
+      "deadline": null,
       "due": null
     }
   ],
   "projects": [
-    { "id": "6Jf8VQXxpwv56VQ7", "name": "Inbox", "color": "grey", "inbox_project": true, "is_deleted": false, "is_archived": false },
-    { "id": "6Jf8VQXxpwv56VQ8", "name": "Home", "color": "green", "is_deleted": false, "is_archived": false }
+    {
+      "id": "6Jf8VQXxpwv56VQ7",
+      "name": "Inbox",
+      "color": "grey",
+      "inbox_project": true,
+      "is_deleted": false,
+      "is_archived": false,
+      "child_order": 0
+    },
+    {
+      "id": "6Jf8VQXxpwv56VQ8",
+      "name": "Home",
+      "color": "green",
+      "is_deleted": false,
+      "is_archived": false,
+      "child_order": 2
+    }
   ],
   "user": {
-    "id": "2671355", "full_name": "Ada Lovelace", "email": "ada@example.com",
-    "inbox_project_id": "6Jf8VQXxpwv56VQ7", "lang": "en", "time_format": 0,
-    "tz_info": { "timezone": "Europe/Istanbul", "gmt_string": "+03:00", "hours": 3, "minutes": 0, "is_dst": 0 }
+    "id": "2671355",
+    "full_name": "Ada Lovelace",
+    "email": "ada@example.com",
+    "inbox_project_id": "6Jf8VQXxpwv56VQ7",
+    "lang": "en",
+    "time_format": 0,
+    "tz_info": {
+      "timezone": "Europe/Istanbul",
+      "gmt_string": "+03:00",
+      "hours": 3,
+      "minutes": 0,
+      "is_dst": 0
+    }
   },
   "user_item_orders": [
-    { "item_id": "6X7rfFVPjhvv84XG", "scope": "day", "scope_id": 0, "order_key": "a1", "is_deleted": false }
+    {
+      "item_id": "6X7rfFVPjhvv84XG",
+      "scope": "day",
+      "scope_id": 0,
+      "order_key": "a1",
+      "is_deleted": false
+    }
   ],
   "sync_status": {},
-  "temp_id_mapping": {}
+  "temp_id_mapping": {},
+  "sections": [
+    {
+      "id": "S1",
+      "name": "Ideas",
+      "project_id": "6Jf8VQXxpwv56VQ7",
+      "section_order": 1,
+      "is_deleted": false,
+      "is_archived": false,
+      "is_collapsed": false
+    },
+    {
+      "id": "S0",
+      "name": "Old",
+      "project_id": "6Jf8VQXxpwv56VQ7",
+      "section_order": 0,
+      "is_deleted": false,
+      "is_archived": true
+    }
+  ],
+  "labels": [
+    {
+      "id": "L1",
+      "name": "health",
+      "color": "red",
+      "item_order": 0,
+      "is_deleted": false,
+      "is_favorite": false
+    }
+  ],
+  "filters": [
+    {
+      "id": "F1",
+      "name": "Urgent",
+      "query": "today & p1",
+      "color": "red",
+      "item_order": 0,
+      "is_deleted": false,
+      "is_favorite": true
+    }
+  ]
 }

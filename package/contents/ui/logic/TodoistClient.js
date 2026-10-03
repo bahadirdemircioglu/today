@@ -6,7 +6,7 @@
 // The token is never logged or put into results.
 
 var BASE_URL = "https://api.todoist.com/api/v1";
-var RESOURCE_TYPES = ["items", "projects", "user", "user_item_orders"];
+var RESOURCE_TYPES = ["items", "projects", "sections", "labels", "filters", "user", "user_item_orders"];
 var DEFAULT_RATE_WAIT_SEC = 60;
 
 function parseRetryAfter(header) {
