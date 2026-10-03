@@ -1,8 +1,11 @@
 # Architecture Plan: todoist-today
 
-**Status:** draft
-**Revision:** 3
-**Revision:** 0  <!-- bumped by .vibecode/scripts/deepseek-debate.js each debate round -->
+**Status:** implemented (v1.0.0)
+**Revision:** 4
+
+> Revizyon 4: tartışma (`debates/todoist-today.md`) 3. turda tüm maddeler kapanarak bitti; açık sorular
+> kapatıldı (bkz. Open Questions) ve uygulama sırasında yapılan düzeltmeler "Implementation Notes"
+> bölümüne işlendi. Tartışma script'leri (DeepSeek eleştiri aracı) bu reponun parçası değildir.
 
 ## Overview & Goals
 
@@ -47,10 +50,10 @@ saf QML + JavaScript plasmoid. Todoist'in "Today" görünümünü panelde ve mas
 
 ## Directory Structure Changes
 
-Proje kökü `/home/bahdem/Dev/kde_widget` (şu an boş). Oluşturulacak yapı:
+Proje kökü = bu repo (`github.com/bahadirdemircioglu/today`). Yapı:
 
 ```
-kde_widget/
+today/
 ├── package/                              # .plasmoid zip'inin kökü (kpackagetool6 bunu kurar)
 │   ├── metadata.json
 │   └── contents/
@@ -76,6 +79,7 @@ kde_widget/
 │       │       ├── CommandQueue.js       # .pragma library — saf: kuyruk işlemleri, sync_status işleme
 │       │       ├── SyncMachine.js        # .pragma library — saf: state reducer (state, event) → {state, effects}
 │       │       ├── TodoistClient.js      # .pragma library — sadece HTTP (XMLHttpRequest), sınıflandırma
+│       │       ├── ModelSync.js          # .pragma library — ListModel'i satır listesine minimal işlemle eşitler
 │       │       └── Storage.js            # QML-only: QtQuick.LocalStorage sarmalayıcı (Node'da test edilmez)
 │       └── locale/                       # ÜRETİLİR (scripts/i18n-build.sh), git'e girmez, release'te pakete girer
 ├── translations/
@@ -92,6 +96,8 @@ kde_widget/
 │   ├── taskstore.test.mjs
 │   ├── commandqueue.test.mjs
 │   ├── syncmachine.test.mjs
+│   ├── modelsync.test.mjs
+│   ├── loader.test.mjs
 │   └── todoistclient.test.mjs            # sahte XMLHttpRequest ile
 ├── .github/workflows/
 │   ├── ci.yml                            # push/PR: node --test + metadata/xml doğrulama + i18n build smoke
@@ -111,7 +117,7 @@ olarak representation dosyaları `CompactRepresentation.qml` / `FullRepresentati
   ```json
   {
     "KPlugin": {
-      "Id": "<plugin-id — bkz. Open Questions>",
+      "Id": "io.github.bahadirdemircioglu.todoisttoday",
       "Name": "Todoist Today", "Name[tr]": "Todoist Bugün",
       "Description": "Your Todoist Today view on the Plasma desktop and panel (unofficial)",
       "Description[tr]": "Todoist Bugün görünümü Plasma masaüstü ve panelinde (resmi değil)",
@@ -119,9 +125,9 @@ olarak representation dosyaları `CompactRepresentation.qml` / `FullRepresentati
       "Category": "Online Services",
       "License": "GPL-3.0-or-later",
       "Version": "1.0.0",
-      "Authors": [{ "Name": "…", "Email": "…" }],
-      "Website": "https://github.com/<user>/todoist-today",
-      "BugReportUrl": "https://github.com/<user>/todoist-today/issues",
+      "Authors": [{ "Name": "Bahadir Demircioglu" }],
+      "Website": "https://github.com/bahadirdemircioglu/today",
+      "BugReportUrl": "https://github.com/bahadirdemircioglu/today/issues",
       "FormFactors": ["desktop", "panel"]
     },
     "KPackageStructure": "Plasma/Applet",
@@ -158,22 +164,25 @@ olarak representation dosyaları `CompactRepresentation.qml` / `FullRepresentati
   `Kirigami.Units.cornerRadius` (yoksa `smallSpacing`).
 - `CompactRepresentation`: `Kirigami.Icon { source: Plasmoid.icon }` + sağ altta rozet (sayı =
   overdue + today; overdue > 0 ise `Kirigami.Theme.negativeTextColor` zemin, değilse
-  `highlightColor`). Rozet bileşeni: `org.kde.plasma.workspace.components` `BadgeOverlay` (görev
-  yöneticisinin kullandığı) — uygulama adımında mevcudiyeti doğrulanır; yoksa kendi
-  `Rectangle { radius: height/2 }`. Sayı 0 → rozet yok. SETUP/AUTH_INVALID → küçük uyarı amblemi.
+  `highlightColor`). Rozet bileşeni: kendi `Rectangle { radius: height/2 }` — `BadgeOverlay`
+  (`org.kde.plasma.workspace.components`) üçüncü parti plasmoid için kararlı API olmadığından
+  kullanılmadı (A8). Sayı 0 → rozet yok. SETUP/AUTH_INVALID → küçük uyarı amblemi.
 - `TaskRow`: `RoundCheck` (çember rengi önceliğe göre: p1 `negativeTextColor`, p2 `neutralTextColor`,
   p3 `linkColor`, p4 `disabledTextColor`; API'de `priority` 4 = p1) + başlık (tek satır, elide) +
   ikinci satırda soluk metin: saat (varsa) · proje adı (Inbox dışındaysa). Saati geçmiş bugünkü
   görevin saati `negativeTextColor`. Başlığa tıklama → `https://app.todoist.com/app/task/<id>`.
 - Tamamlama animasyonu: çember dolar + `checkmark` ikonu ölçeklenir (≈`Kirigami.Units.shortDuration`),
-  başlık üstü çizilir ve soluklaşır, ~`longDuration` sonra satır `ListView.remove` geçişiyle
-  yüksekliği 0'a çöker. Süreler `Kirigami.Units`'ten → sistem "animasyon hızı / animasyonları kapat"
+  başlık üstü çizilir ve soluklaşır, ~2×`longDuration` sonra satır listeden çıkar
+  (`ListView` `remove` solma + küçülme, `displaced` geçişleri; model `ModelSync.sync()` ile minimal
+  işlemle güncellendiğinden yalnız değişen satır animasyon alır). Süreler `Kirigami.Units`'ten → sistem "animasyon hızı / animasyonları kapat"
   ayarına uyar.
 - Boş durum: `Kirigami.PlaceholderMessage { icon.name: "checkmark"; text: i18n("All done for today");
   explanation: i18n("Enjoy the rest of your day ✨") }` — emoji yerine tercihen ikon; metin kesinleşmesi
   uygulamada.
-- Liste başlığı: büyük "Today" + yerel uzun tarih (`Qt.formatDate(now, Qt.locale(), "dddd, d MMMM")`).
-  Overdue bölümü yalnızca öğe varsa, küçük bölüm başlığıyla.
+- Liste başlığı: büyük "Today" + yerel uzun tarih (`Qt.formatDate(now, "dddd, d MMMM")`).
+  Overdue bölümü yalnızca öğe varsa, küçük bölüm başlığıyla. Bölüm başlıkları `ListView.section`
+  ile değil, bölümün ilk satırının içinde çizilir (`flattenRows` → `header` rolü): `section`
+  delegate'leri add/remove/displaced geçişleriyle üst üste biniyordu (duman testinde görüldü).
 - Saat biçimi: sistem yerel ayarı (`Qt.locale().timeFormat(Locale.ShortFormat)`) — platforma yerli;
   Todoist'in `time_format` alanı kullanılmaz.
 - İçerik her zaman `textFormat: Text.PlainText`; markdown/link sözdizimi `TaskStore.plainTitle()`
@@ -208,7 +217,8 @@ Sorun: `.pragma library` ve `.import "X.js" as X` satırları geçerli JavaScrip
    - `TaskStore`, `CommandQueue`, `DateUtil`, `SyncMachine` ağdan ve QML'den habersiz.
      `TodoistClient` yalnızca global `XMLHttpRequest` kullanır (Node'da sahte nesne sandbox'a verilir).
 4. Test koşucusu: Node ≥ 20 yerleşik `node:test` + `node:assert/strict`; `npm test` =
-   `node --test tests/`. Sıfır npm bağımlılığı.
+   `node --test tests/*.test.mjs` (Node 22'de dizin argümanı modül olarak çözülmeye çalışıldığından
+   glob kullanılır). Sıfır npm bağımlılığı.
 
 ### T4. HTTP katmanı (`TodoistClient.js`)
 
@@ -596,8 +606,9 @@ Yeni proje; uygulama sırası küçük, test edilebilir adımlar. Executor rolle
 (`engineer` = Sonnet, `mechanic` = Haiku, `opus`). Her kod adımı = sözleşme-spec (dosya, sözleşme,
 kabul vakaları, YAPMA). Mantık adımlarında önce kabul vakaları test olarak yazılır.
 
-**Ön koşul:** Q1 (repo görünürlüğü) ve Q2 (`KPlugin.Id`, GitHub kullanıcı adı) kapanmadan Adım 0
-başlamaz — Id yayından sonra değişemez ve i18n domain'i, Website/BugReportUrl ona bağlıdır.
+**Ön koşul (karşılandı):** Q1 ve Q2 kapatıldı — `KPlugin.Id` = `io.github.bahadirdemircioglu.todoisttoday`,
+repo `github.com/bahadirdemircioglu/today`. Id yayından sonra değişemez; i18n domain'i
+`plasma_applet_io.github.bahadirdemircioglu.todoisttoday`.
 
 **Adım 0 — İskele (mechanic + manuel doğrulama)**
 `LICENSE` (GPL-3.0 tam metin), `.gitignore` (`dist/`, `package/contents/locale/`, `node_modules/`),
@@ -760,11 +771,11 @@ KDE Store sayfası (kullanıcı yükler).
 - M16 Sistem "animasyonları kapat" → tamamlama animasyonsuz ama çalışır.
 - M17 Yeni kurulum: token yapıştır → < 1 dk'da liste (başarı ölçütü 3).
 - M18 Geçersiz token → anlaşılır hata, liste yok.
-- M22 Ayarlar penceresinden (ConfigAccount) token gir → Apply → widget `SETUP`'tan çıkıp listeyi yükler; geçersiz token Apply edilirse `AUTH_INVALID` banner'ı.
-- M23 Masaüstünde 1 dk bekle, telefonda görev ekle, fareyi widget'a getir → ≤ 2 sn'de görünür.
 - M19 Ayarlar → Disconnect → `SETUP`, önbellek silinmiş.
 - M20 `LANGUAGE=tr` ile tüm metinler Türkçe; çoğul biçimler doğru.
 - M21 Release `.plasmoid` → "Install from local file" ile temiz kullanıcıda kurulur, çalışır.
+- M22 Ayarlar penceresinden (ConfigAccount) token gir → Apply → widget `SETUP`'tan çıkıp listeyi yükler; geçersiz token Apply edilirse `AUTH_INVALID` banner'ı.
+- M23 Masaüstünde 1 dk bekle, telefonda görev ekle, fareyi widget'a getir → ≤ 2 sn'de görünür.
 
 ## Assumptions
 
@@ -777,9 +788,9 @@ KDE Store sayfası (kullanıcı yükler).
 | A5 | Today sıralaması (saatliler önce saate göre, sonra order_key/day_order) Todoist uygulamasının varsayılan Today sırasıyla örtüşür | M1'de telefonla karşılaştır; farklıysa yalnız sıralama fonksiyonu + testleri güncellenir |
 | A6 | Referans saat dilimi = Todoist `tz_info` (eşitse her an için sistem ofseti; farklıysa T7'deki iki bilinen sınır kabul edilir ve README'de yazılır) | M9, ve farklı sistem dilimiyle bir test (`TZ=America/New_York plasmoidviewer …`) |
 | A7 | `QtQuick.LocalStorage` plasmashell içinde (Arch `qt6-declarative`) kullanılabilir | Adım 7 başında küçük deneme |
-| A8 | `BadgeOverlay` (`org.kde.plasma.workspace.components`) üçüncü parti plasmoid'den import edilebilir | Adım 8; olmazsa kendi Rectangle rozeti |
+| A8 | ~~`BadgeOverlay` üçüncü parti plasmoid'den import edilebilir~~ | Kapatıldı: kendi Rectangle rozeti kullanılıyor (T2) |
 | A9 | Kişisel API token'ı `/api/v1` uçlarının hepsinde Bearer ile çalışır (v1 dokümanı örnekleri öyle) | Adım 6 curl |
-| A10 | Proje kökü `~/Dev/kde_widget`; Node ≥ 20 geliştirme makinesinde mevcut | Adım 0 |
+| A10 | Proje kökü = bu repo; Node ≥ 20 geliştirme makinesinde mevcut | Adım 0 |
 | A11 | Tek token tek widget örneğine aittir (panel + masaüstü = iki kez yapıştırma) | Open Q3 |
 
 ## Decision Log
@@ -805,9 +816,47 @@ KDE Store sayfası (kullanıcı yükler).
 
 ## Open Questions
 
-- [ ] **Q1** Repo baştan public mi, önce private mi? (Öneri: v0.x geliştirme private, 1.0 + README hazır olunca public; CI her iki durumda çalışır.)
-- [ ] **Q2** `KPlugin.Id` ve GitHub kullanıcı adı: önerim `io.github.<kullanıcı>.todoisttoday` — yayından sonra değiştirilemez; adım 0'dan önce kesinleşmeli. (i18n domain'i: `plasma_applet_<Id>`.)
-- [ ] **Q3** Panel + masaüstü iki örnek varsa token iki kez mi yapıştırılsın (v1 önerisi, basit), yoksa ikinci örnek LocalStorage'daki mevcut hesabı "Use connected account (Ad)" tek tıkla mı devralsın (token ikinci bir yerde de saklanır)?
-- [ ] **Q4** Todoist'in tarih ayrıştırması Türkçeyi desteklemiyorsa (A3): sadece README notu mu, yoksa "+ New task" alanında İngilizce örnek placeholder ("Dentist tomorrow 3pm #Personal") mi gösterilsin? (Öneri: ikisi birden.)
-- [ ] **Q5** Tamamlamadan sonra kısa "Undo" (yalnızca 1 sn debounce penceresinde, komut henüz gönderilmemişken kuyruktan silme) v1'e alınsın mı? Maliyet düşük; onaylı anlayışta geçmediği için şimdilik Non-Goals'ta.
-- [ ] **Q6** Bilgi: Todoist v1 dokümanı artık `client_secret`'sız public client'lar için PKCE + "client ID metadata document" OAuth akışını anlatıyor. v1 kapsamı değişmez (OAuth yok); v2'de token yapıştırma yerine OAuth değerlendirilebilir.
+Tümü kapatıldı (Revizyon 4):
+
+- [x] **Q1** Repo görünürlüğü: repo `bahadirdemircioglu/today` olarak oluşturuldu; görünürlük GitHub
+  ayarından yönetilir, CI her iki durumda çalışır. KDE Store yüklemesi 1.0 README'si ile.
+- [x] **Q2** `KPlugin.Id` = `io.github.bahadirdemircioglu.todoisttoday`; Website/BugReportUrl
+  `github.com/bahadirdemircioglu/today`.
+- [x] **Q3** v1: her örnek için token ayrı yapıştırılır (basit; token tek yerde). Devralma v2'ye ertelendi.
+- [x] **Q4** İkisi birden: README notu ("dates follow your Todoist language; English always works") +
+  "New task" alanında İngilizce örnek placeholder.
+- [x] **Q5** Undo v1'e alınmadı (Non-Goals'ta kalıyor).
+- [x] **Q6** Bilgi notu; v1 kapsamı değişmez (OAuth yok).
+
+## Implementation Notes (Revizyon 4)
+
+Uygulama sırasında plandan sapmalar / plana eklenen düzeltmeler:
+
+1. **Tarihsiz Quick Add çift kayıt riski (hata düzeltmesi):** Store budama kuralı `due === null`
+   item'ları sildiğinden, tarihsiz bir Quick Add ("Buy milk") `uncertain` kaldığında
+   `resolveUncertain` onu store'da asla bulamaz ve yeniden gönderirdi → kesin çift görev. Çözüm:
+   store'a `recent` haritası eklendi: son 30 dk'da eklenen her item (vadesi olmasa da) `{content, addedAt}`
+   olarak tutulur; `resolveUncertain` hem `items` hem `recent` üzerinde arar. Şema sürümü değişmedi
+   (`deserialize` eksik `recent`'i boş harita yapar).
+2. **SyncMachine olayları:** `ACCOUNT_VERIFIED{sameAccount}` (karşılaştırmayı controller yapar, makine
+   önbellek hesabını bilmez); `RETRY_FIRED` olayı (doğrulanmamış hesapta yeniden doğrulama, aksi halde
+   sync); `cancelRetry` ve `abortRequest` effect'leri. `action` nedenli ve takip (follow-up/retry)
+   istekleri 5 sn aralık kuralından muaf (debounce zaten birleştiriyor; başarı ölçütü 2).
+3. **Komutsuz istek de `client` dönerse** (geçersiz `sync_token` olasılığı) aynı izolasyon yolu
+   (`readOnlyFull`) kullanılır.
+4. **Quick Add sonuçları:** `ok` → bugünün değilse "Added to <Proje> · <due.string>" bilgisi;
+   `server`/`auth`/`rate` 20 denemeden sonra da düşürülür (zehirli girdi koruması).
+5. **i18n:** `logic/*.js` metin içermez (kod döner, QML çevirir); `i18n-extract.sh` yalnız `.qml`
+   tarar. `template.pot`'ta zaman damgası satırı silinir → CI "çeviriler güncel mi" kontrolü yapar.
+6. **CI:** metadata/`package.json` sürüm eşitliği, `main.xml` doğrulaması, çeviri güncelliği,
+   `.plasmoid` paketleme smoke testi. `release.yml` `v1.0.0-rc1` gibi ön sürüm etiketlerini
+   prerelease olarak yayınlar.
+7. **Doğrulama durumu:** mantık katmanı Node'da test edildi (Adım 1–6 tabloları + ek vakalar).
+   QML; Qt 6 `qmllint`/`qmlformat` ile sözdizimi açısından ve KDE modüllerinin stub'larıyla offscreen
+   duman testinde (liste, küçük görünüm, rozet, kurulum ekranı, tamamlama, çevrimdışı kuyruk) çalıştırıldı.
+   Gerçek Plasma 6 oturumunda manuel kabul listesi (M1–M23) ve Adım 6 sonundaki gerçek token ile API
+   doğrulaması (A2, A3, A9) henüz yapılmadı.
+8. **Yeniden başlatmada uçuştaki Quick Add (hata düzeltmesi):** `markQuickAddSent` gönderimden önce
+   kalıcı yazıldığından, istek yoldayken plasmashell kapanırsa girdi `pending` + `sentAt` ile kalıyordu
+   ve körlemesine yeniden gönderilirdi. `CommandQueue.recoverAfterRestart()` yüklemede bu girdileri
+   `uncertain` yapar; ilk başarılı sync'te `resolveUncertain` karar verir.
