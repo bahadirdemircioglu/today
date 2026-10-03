@@ -21,6 +21,12 @@ Item {
     property string appletId: ""
     property string pinnedView: ""          // config: view this widget starts with ("" = last used)
     property string badgeSource: "today"    // config: "today" | "view" | "none"
+    property string customQuery: ""         // config: unsaved filter query shown as its own list
+    property string customQueryName: ""
+    readonly property var customQueryOption: customQuery.trim() !== ""
+        ? { name: customQueryName.trim() || i18n("Custom filter"), query: customQuery.trim() } : null
+    // parents whose sub-tasks are folded away (per instance, persisted)
+    property var collapsed: ({})
 
     // state for the views
     property var machine: SyncMachine.initialState()
@@ -53,6 +59,7 @@ Item {
         case "project":
         case "label":
         case "filter":
+        case "query":
             return view.title || "";
         default:
             return i18n("Today");
@@ -149,9 +156,23 @@ Item {
             }
             recompute();
         }
-        if (spec.kind === "filter") {
+        if (spec.kind === "filter" || spec.kind === "query") {
             requestSync("view");
         }
+    }
+
+    function toggleCollapsed(itemId) {
+        var c = Object.assign({}, collapsed);
+        if (c[itemId]) {
+            delete c[itemId];
+        } else {
+            c[itemId] = true;
+        }
+        collapsed = c;
+        if (appletId) {
+            Storage.save(appletId, "collapsed", JSON.stringify(c));
+        }
+        recompute();
     }
 
     // -> "" on success, otherwise "empty" | "too_long". date: "YYYY-MM-DD" when adding to a day in Upcoming.
@@ -501,20 +522,40 @@ Item {
             var done = function () {
                 dispatch({ type: "REQUEST_DONE", kind: "ok", fullSync: !!json.full_sync, hadCommands: commands.length > 0, moreWork: more });
             };
-            // the current filter view is refreshed inside the same cycle (one request in flight at a time)
-            if (mode !== "readOnlyFull" && viewSpec.kind === "filter" && store.filters[viewSpec.id]) {
-                fetchFilter(viewSpec.id, null, [], 0, done);
-            } else {
+            if (mode === "readOnlyFull") {
                 done();
+            } else {
+                runSteps(afterSyncSteps(), done);
             }
         });
     }
 
-    // Saved filters are evaluated by Todoist; failures never fail the sync cycle.
-    function fetchFilter(filterId, cursor, ids, pages, done) {
-        var filter = store.filters[filterId];
+    // Extra reads done inside the same sync cycle (one request in flight at a time).
+    function afterSyncSteps() {
+        var steps = [];
+        if (viewSpec.kind === "filter" && store.filters[viewSpec.id]) {
+            var fid = viewSpec.id;
+            steps.push(function (next) { fetchFilter(fid, store.filters[fid].query, null, [], 0, next); });
+        } else if (viewSpec.kind === "query" && customQueryOption) {
+            var q = customQueryOption.query;
+            steps.push(function (next) { fetchFilter(ViewModel.QUERY_RESULT_KEY, q, null, [], 0, next); });
+        }
+        return steps;
+    }
+
+    function runSteps(steps, done) {
+        if (!steps.length) {
+            done();
+            return;
+        }
+        steps[0](function () { runSteps(steps.slice(1), done); });
+    }
+
+    // Saved filters and the custom query are evaluated by Todoist; failures never fail the sync cycle.
+    // resultKey: filter id or ViewModel.QUERY_RESULT_KEY
+    function fetchFilter(filterId, query, cursor, ids, pages, done) {
         send(function (cb) {
-            return TodoistClient.filterTasks(priv.activeToken, filter.query, store.lang || "", cursor, cb);
+            return TodoistClient.filterTasks(priv.activeToken, query, store.lang || "", cursor, cb);
         }, function (res) {
             var errors = Object.assign({}, filterErrors);
             if (res.kind !== "ok") {
@@ -533,7 +574,7 @@ Item {
             }
             store = TaskStore.mergeTasks(store, page.tasks);
             if (page.nextCursor && pages < 4) {
-                fetchFilter(filterId, page.nextCursor, all, pages + 1, done);
+                fetchFilter(filterId, query, page.nextCursor, all, pages + 1, done);
                 return;
             }
             delete errors[filterId];
@@ -578,16 +619,17 @@ Item {
             }
         }
         todayView = t;
-        var v = ViewModel.computeView(store, queue, viewSpec, nowMs, DateUtil.systemOffsetAt, filterResults);
+        var options = { collapsed: collapsed, customQuery: customQueryOption };
+        var v = ViewModel.computeView(store, queue, viewSpec, nowMs, DateUtil.systemOffsetAt, filterResults, options);
         if (!v.exists && TaskStore.hasData(store)) {
             // the project/label/filter was deleted or archived in Todoist
             viewKey = "today";
             showInfo(i18n("That list no longer exists in Todoist. Showing Today."), false);
-            v = ViewModel.computeView(store, queue, viewSpec, nowMs, DateUtil.systemOffsetAt, filterResults);
+            v = ViewModel.computeView(store, queue, viewSpec, nowMs, DateUtil.systemOffsetAt, filterResults, options);
         }
         view = v;
         rows = ViewModel.flattenView(v);
-        nav = ViewModel.navList(store, queue, nowMs, DateUtil.systemOffsetAt, filterResults);
+        nav = ViewModel.navList(store, queue, nowMs, DateUtil.systemOffsetAt, filterResults, options);
         projects = TaskStore.projectList(store);
     }
 
@@ -749,6 +791,20 @@ Item {
         }
     }
 
+    onCustomQueryChanged: {
+        if (!priv.started) {
+            return;
+        }
+        var results = Object.assign({}, filterResults);
+        delete results[ViewModel.QUERY_RESULT_KEY];
+        filterResults = results;
+        recompute();
+        if (viewSpec.kind === "query") {
+            requestSync("view");
+        }
+    }
+    onCustomQueryNameChanged: if (priv.started) recompute()
+
     onPinnedViewChanged: {
         if (priv.started && pinnedView) {
             setView(pinnedView);
@@ -788,6 +844,12 @@ Item {
                 filterResults = f && typeof f === "object" ? f : {};
             } catch (err) {
                 filterResults = {};
+            }
+            try {
+                var c = JSON.parse(Storage.load(appletId, "collapsed") || "{}");
+                collapsed = c && typeof c === "object" ? c : {};
+            } catch (err2) {
+                collapsed = {};
             }
             // a pinned view is the starting point; otherwise continue where the user left off
             viewKey = ViewModel.specKey(ViewModel.parseSpec(pinnedView || Storage.load(appletId, "lastView") || "today"));

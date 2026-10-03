@@ -86,6 +86,17 @@ PlasmaComponents3.AbstractButton {
             onTriggered: selector.controller.setView("upcoming")
         }
 
+        PlasmaComponents3.MenuItem {
+            readonly property var entry: selector.controller ? selector.controller.nav.filter(function (e) { return e.kind === "query"; })[0] : undefined
+            visible: entry !== undefined
+            height: visible ? implicitHeight : 0
+            text: entry ? selector.entryText(entry.name, entry.count, 0) : ""
+            icon.name: "view-filter"
+            checkable: true
+            checked: selector.controller && selector.controller.viewKey === "query"
+            onTriggered: selector.controller.setView("query")
+        }
+
         PlasmaComponents3.MenuSeparator {}
 
         PlasmaComponents3.Menu {

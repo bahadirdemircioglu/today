@@ -29,6 +29,8 @@ Item {
     required property bool isOverdue
     required property bool showDate
     required property int depth
+    required property int childCount
+    required property bool collapsed
     required property string labelsText
     required property string description
     required property string descriptionFull
@@ -45,6 +47,9 @@ Item {
     readonly property bool headerOnly: kind === "header"
     property bool completing: false
     property bool editing: false
+    // full description shown under the title
+    property bool detailsOpen: false
+    readonly property bool hasDetails: descriptionFull !== ""
 
     // anchor: the ⋯ button, or null to open at the mouse position
     signal menuRequested(Item anchor)
@@ -204,6 +209,23 @@ Item {
             anchors.rightMargin: Kirigami.Units.smallSpacing
             spacing: Kirigami.Units.largeSpacing
 
+            PlasmaComponents3.ToolButton {
+                Layout.alignment: Qt.AlignVCenter
+                visible: row.childCount > 0
+                implicitWidth: Kirigami.Units.iconSizes.small + Kirigami.Units.smallSpacing * 2
+                implicitHeight: implicitWidth
+                icon.name: row.collapsed ? "arrow-right" : "arrow-down"
+                icon.width: Kirigami.Units.iconSizes.small
+                icon.height: Kirigami.Units.iconSizes.small
+                text: row.collapsed ? i18np("Show %1 sub-task", "Show %1 sub-tasks", row.childCount)
+                                    : i18n("Hide sub-tasks")
+                display: PlasmaComponents3.AbstractButton.IconOnly
+                onClicked: row.controller.toggleCollapsed(row.itemId)
+                PlasmaComponents3.ToolTip.text: text
+                PlasmaComponents3.ToolTip.visible: hovered
+                PlasmaComponents3.ToolTip.delay: Kirigami.Units.toolTipDelay
+            }
+
             RoundCheck {
                 Layout.alignment: Qt.AlignVCenter
                 priority: row.priority
@@ -259,11 +281,26 @@ Item {
 
                 PlasmaComponents3.Label {
                     Layout.fillWidth: true
-                    visible: row.description !== "" && !row.editing
-                    text: row.description
+                    visible: row.hasDetails && !row.editing
+                    text: row.detailsOpen ? row.descriptionFull : row.description
                     textFormat: Text.PlainText
-                    elide: Text.ElideRight
-                    maximumLineCount: 1
+                    wrapMode: row.detailsOpen ? Text.Wrap : Text.NoWrap
+                    elide: row.detailsOpen ? Text.ElideNone : Text.ElideRight
+                    maximumLineCount: row.detailsOpen ? 40 : 1
+                    font.pointSize: Kirigami.Theme.smallFont.pointSize
+                    opacity: row.detailsOpen ? 0.85 : 0.6
+
+                    HoverHandler {
+                        cursorShape: Qt.PointingHandCursor
+                    }
+                    TapHandler {
+                        onTapped: row.detailsOpen = !row.detailsOpen
+                    }
+                }
+                PlasmaComponents3.Label {
+                    visible: row.collapsed
+                    text: i18np("%1 sub-task", "%1 sub-tasks", row.childCount)
+                    textFormat: Text.PlainText
                     font.pointSize: Kirigami.Theme.smallFont.pointSize
                     opacity: 0.6
                 }

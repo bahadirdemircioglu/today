@@ -9,10 +9,13 @@
 var UPCOMING_DAYS = 7;
 var MAX_DEPTH = 4;
 
-// "today" | "upcoming" | "inbox" | "project:<id>" | "label:<id>" | "filter:<id>"
+// Key under which the custom (unsaved) filter query's server results are kept.
+var QUERY_RESULT_KEY = "__query";
+
+// "today" | "upcoming" | "inbox" | "query" | "project:<id>" | "label:<id>" | "filter:<id>"
 function parseSpec(key) {
     var s = String(key || "");
-    if (s === "today" || s === "upcoming" || s === "inbox") {
+    if (s === "today" || s === "upcoming" || s === "inbox" || s === "query") {
         return { kind: s, id: "" };
     }
     var m = /^(project|label|filter):([A-Za-z0-9]+)$/.exec(s);
@@ -84,7 +87,7 @@ function byDateThenPriority(a, b) {
 
 // Project tree: rows grouped by section (no-section group first), sub-tasks under their
 // parent with increasing depth.
-function projectGroups(ctx, items, projectId) {
+function projectGroups(ctx, items, projectId, collapsed) {
     var inProject = {};
     var id;
     for (id in items) {
@@ -108,9 +111,14 @@ function projectGroups(ctx, items, projectId) {
 
     function walk(item, depth, out) {
         var row = rowFor(ctx, item);
-        row.depth = Math.min(depth, MAX_DEPTH);
-        out.push(row);
         var kids = (children[item.id] || []).slice().sort(byChildOrder);
+        row.depth = Math.min(depth, MAX_DEPTH);
+        row.childCount = kids.length;
+        row.collapsed = kids.length > 0 && !!(collapsed && collapsed[item.id]);
+        out.push(row);
+        if (row.collapsed) {
+            return;
+        }
         for (var k = 0; k < kids.length; k++) {
             walk(kids[k], depth + 1, out);
         }
@@ -180,8 +188,10 @@ function upcomingGroups(ctx, items) {
     return groups;
 }
 
-// filterResults: { "<filterId>": { ids: [...], fetchedAt } }
-function computeView(store, queue, spec, nowMs, sysOffsetAt, filterResults) {
+// filterResults: { "<filterId>" | QUERY_RESULT_KEY: { ids: [...], fetchedAt } }
+// options: { collapsed: { "<itemId>": true }, customQuery: { name, query } }
+function computeView(store, queue, spec, nowMs, sysOffsetAt, filterResults, options) {
+    var opts = options || {};
     var ctx = context(store, nowMs, sysOffsetAt);
     var ov = TaskStore.applyOverlay(ctx.st, queue);
     var groups = [];
@@ -211,7 +221,7 @@ function computeView(store, queue, spec, nowMs, sysOffsetAt, filterResults) {
         exists = !!project;
         title = project && spec.kind === "project" ? project.name : "";
         if (exists) {
-            groups = projectGroups(ctx, ov.items, pid);
+            groups = projectGroups(ctx, ov.items, pid, opts.collapsed);
         }
         break;
     }
@@ -233,11 +243,13 @@ function computeView(store, queue, spec, nowMs, sysOffsetAt, filterResults) {
         }
         break;
     }
-    case "filter": {
-        var filter = ctx.st.filters[spec.id];
+    case "filter":
+    case "query": {
+        var isQuery = spec.kind === "query";
+        var filter = isQuery ? (opts.customQuery && opts.customQuery.query ? opts.customQuery : null) : ctx.st.filters[spec.id];
         exists = !!filter;
-        title = filter ? filter.name : "";
-        var res = filterResults && filterResults[spec.id];
+        title = filter ? filter.name || "" : "";
+        var res = filterResults && filterResults[isQuery ? QUERY_RESULT_KEY : spec.id];
         var frows = [];
         if (res) {
             fetchedAt = res.fetchedAt || 0;
@@ -278,7 +290,8 @@ function computeView(store, queue, spec, nowMs, sysOffsetAt, filterResults) {
         nowMinutes: ctx.nowMinutes,
         filterFetchedAt: fetchedAt,
         filterMissing: missing,
-        hasFilterResult: spec.kind !== "filter" || !!(filterResults && filterResults[spec.id])
+        hasFilterResult: spec.kind === "query" ? !!(filterResults && filterResults[QUERY_RESULT_KEY])
+                         : (spec.kind !== "filter" || !!(filterResults && filterResults[spec.id]))
     };
 }
 
@@ -336,6 +349,8 @@ function flattenView(view) {
                 isOverdue: !!r.isOverdue,
                 showDate: showDate && group.kind !== "day",
                 depth: r.depth || 0,
+                childCount: r.childCount || 0,
+                collapsed: !!r.collapsed,
                 labelsText: (r.labels || []).join(", "),
                 description: (r.description || "").split("\n")[0].slice(0, 200),
                 descriptionFull: r.description || "",
@@ -363,7 +378,7 @@ function blank(key, header, headerText, headerDate) {
     return {
         key: key, kind: "header", itemId: "", title: "", content: "", projectId: "", priority: 1,
         projectName: "", dateKey: "", minutes: -1, isLate: false, isRecurring: false, isOverdue: false,
-        showDate: false, depth: 0, labelsText: "", description: "", descriptionFull: "", deadlineKey: "",
+        showDate: false, depth: 0, childCount: 0, collapsed: false, labelsText: "", description: "", descriptionFull: "", deadlineKey: "",
         deadlineDue: false, section: header,
         header: header, headerText: headerText, headerDate: headerDate
     };
@@ -371,7 +386,8 @@ function blank(key, header, headerText, headerDate) {
 
 // Navigation entries with counts. filterResults as in computeView.
 // -> [{ key, kind, id, name, count, depth }]  (count -1 = unknown)
-function navList(store, queue, nowMs, sysOffsetAt, filterResults) {
+function navList(store, queue, nowMs, sysOffsetAt, filterResults, options) {
+    var opts = options || {};
     var ctx = context(store, nowMs, sysOffsetAt);
     var ov = TaskStore.applyOverlay(ctx.st, queue);
     var perProject = {};
@@ -402,6 +418,19 @@ function navList(store, queue, nowMs, sysOffsetAt, filterResults) {
         { key: "today", kind: "today", id: "", name: "", count: todayCount, depth: 0 },
         { key: "upcoming", kind: "upcoming", id: "", name: "", count: upcomingCount, depth: 0 }
     ];
+    if (opts.customQuery && opts.customQuery.query) {
+        var qres = filterResults && filterResults[QUERY_RESULT_KEY];
+        var qcount = -1;
+        if (qres) {
+            qcount = 0;
+            for (var qi = 0; qi < qres.ids.length; qi++) {
+                if (ov.items[qres.ids[qi]]) {
+                    qcount++;
+                }
+            }
+        }
+        out.push({ key: "query", kind: "query", id: "", name: opts.customQuery.name || "", count: qcount, depth: 0 });
+    }
 
     // projects as a tree (sub-projects indented), Inbox excluded
     var projects = byOrderThenName(ctx.st.projects);

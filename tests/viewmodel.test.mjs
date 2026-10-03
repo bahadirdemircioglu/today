@@ -37,7 +37,7 @@ const view = (st, key, q = emptyQ, fr) => V.computeView(st, q, V.parseSpec(key),
 const ids = (v) => v.groups.map((g) => [g.key, g.rows.map((r) => r.id)]);
 
 test("parseSpec / specKey round trip and fallback", () => {
-  for (const k of ["today", "upcoming", "inbox", "project:abc", "label:L1", "filter:F1"]) {
+  for (const k of ["today", "upcoming", "inbox", "query", "project:abc", "label:L1", "filter:F1"]) {
     assert.equal(V.specKey(V.parseSpec(k)), k);
   }
   assert.deepEqual(V.parseSpec("project:../x"), { kind: "today", id: "" });
@@ -184,4 +184,35 @@ test("deadline and description roles", () => {
   assert.deepEqual([d.deadlineKey, d.deadlineDue, d.description, d.descriptionFull],
     ["2026-10-03", true, "First line", "First line\nSecond line"]);
   assert.deepEqual([e.deadlineKey, e.deadlineDue], ["2026-10-20", false]);
+});
+
+test("collapsed parents hide their sub-tasks and report childCount", () => {
+  const st = store([
+    item({ id: "p", project_id: "work", child_order: 1 }),
+    item({ id: "c1", project_id: "work", parent_id: "p", child_order: 1 }),
+    item({ id: "c2", project_id: "work", parent_id: "p", child_order: 2 }),
+  ]);
+  const open = V.computeView(st, emptyQ, V.parseSpec("project:work"), NOON, sys180, {}, {});
+  assert.deepEqual(ids(open), [["s:none", ["p", "c1", "c2"]]]);
+  assert.equal(open.groups[0].rows[0].childCount, 2);
+  assert.equal(open.groups[0].rows[0].collapsed, false);
+  const closed = V.computeView(st, emptyQ, V.parseSpec("project:work"), NOON, sys180, {}, { collapsed: { p: true } });
+  assert.deepEqual(ids(closed), [["s:none", ["p"]]]);
+  const row = V.flattenView(closed)[0];
+  assert.deepEqual([row.childCount, row.collapsed], [2, true]);
+});
+
+test("custom query view and nav entry", () => {
+  const st = store([item({ id: "a" }), item({ id: "b" })]);
+  const opts = { customQuery: { name: "Focus", query: "today & p1" } };
+  const results = { __query: { ids: ["b", "a"], fetchedAt: 9 } };
+  const v = V.computeView(st, emptyQ, V.parseSpec("query"), NOON, sys180, results, opts);
+  assert.equal(v.title, "Focus");
+  assert.equal(v.exists, true);
+  assert.deepEqual(ids(v), [["all", ["b", "a"]]]);
+  assert.equal(V.computeView(st, emptyQ, V.parseSpec("query"), NOON, sys180, {}, opts).hasFilterResult, false);
+  assert.equal(V.computeView(st, emptyQ, V.parseSpec("query"), NOON, sys180, results, {}).exists, false);
+  const nav = V.navList(st, emptyQ, NOON, sys180, results, opts);
+  assert.deepEqual(nav[3], { key: "query", kind: "query", id: "", name: "Focus", count: 2, depth: 0 });
+  assert.equal(V.navList(st, emptyQ, NOON, sys180, results, {}).some((e) => e.kind === "query"), false);
 });

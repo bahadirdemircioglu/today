@@ -87,6 +87,8 @@ PlasmoidItem {
         appletId: String(Plasmoid.id)
         pinnedView: Plasmoid.configuration.pinnedView
         badgeSource: Plasmoid.configuration.badgeSource
+        customQuery: Plasmoid.configuration.customQuery
+        customQueryName: Plasmoid.configuration.customQueryName
         onAccountVerified: name => {
             if (name && Plasmoid.configuration.accountName !== name) {
                 Plasmoid.configuration.accountName = name;

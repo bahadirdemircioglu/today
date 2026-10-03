@@ -16,6 +16,13 @@
     <entry name="pinnedView" type="String">
       <default></default>
     </entry>
+    <!-- Unsaved filter query (Todoist filter syntax) shown as its own list, and its name -->
+    <entry name="customQuery" type="String">
+      <default></default>
+    </entry>
+    <entry name="customQueryName" type="String">
+      <default></default>
+    </entry>
     <!-- Panel badge: today (overdue + today), view (current view), none -->
     <entry name="badgeSource" type="String">
       <default>today</default>

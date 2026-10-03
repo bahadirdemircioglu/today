@@ -30,6 +30,13 @@ PlasmaComponents3.Menu {
         icon.name: "document-edit"
         onTriggered: menu.row.startEditing()
     }
+    PlasmaComponents3.MenuItem {
+        visible: menu.row !== null && menu.row.hasDetails
+        height: visible ? implicitHeight : 0
+        text: menu.row && menu.row.detailsOpen ? i18n("Hide details") : i18n("Show details")
+        icon.name: "documentinfo"
+        onTriggered: menu.row.detailsOpen = !menu.row.detailsOpen
+    }
 
     PlasmaComponents3.MenuSeparator {}
 

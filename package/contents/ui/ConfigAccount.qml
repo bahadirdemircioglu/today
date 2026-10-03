@@ -20,6 +20,10 @@ KCM.SimpleKCM {
     property string cfg_pinnedViewDefault: ""
     property string cfg_badgeSource
     property string cfg_badgeSourceDefault: "today"
+    property string cfg_customQuery
+    property string cfg_customQueryDefault: ""
+    property string cfg_customQueryName
+    property string cfg_customQueryNameDefault: ""
 
     readonly property string tokenUrl: "https://app.todoist.com/app/settings/integrations/developer"
 
@@ -168,6 +172,30 @@ KCM.SimpleKCM {
             ]
             Component.onCompleted: currentIndex = Math.max(0, indexOfValue(page.cfg_badgeSource))
             onActivated: page.cfg_badgeSource = currentValue
+        }
+
+        QQC2.TextField {
+            id: queryField
+            Kirigami.FormData.label: i18n("Custom filter:")
+            Layout.minimumWidth: Kirigami.Units.gridUnit * 16
+            placeholderText: i18n("e.g. today & #Work")
+            Component.onCompleted: text = page.cfg_customQuery
+            onTextEdited: page.cfg_customQuery = text
+        }
+        QQC2.TextField {
+            Kirigami.FormData.label: i18n("Shown as:")
+            Layout.minimumWidth: Kirigami.Units.gridUnit * 16
+            enabled: queryField.text.trim() !== ""
+            placeholderText: i18n("Custom filter")
+            Component.onCompleted: text = page.cfg_customQueryName
+            onTextEdited: page.cfg_customQueryName = text
+        }
+        QQC2.Label {
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 24
+            wrapMode: Text.Wrap
+            font.pointSize: Kirigami.Theme.smallFont.pointSize
+            opacity: 0.7
+            text: i18n("Any Todoist filter query, without saving it in Todoist. It appears in the list menu.")
         }
 
         RowLayout {

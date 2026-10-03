@@ -51,7 +51,10 @@ ColumnLayout {
     Component.onCompleted: refresh()
 
     readonly property string kind: controller ? controller.viewSpec.kind : "today"
-    readonly property string filterError: controller && kind === "filter" ? (controller.filterErrors[controller.viewSpec.id] || "") : ""
+    readonly property bool isFilterKind: kind === "filter" || kind === "query"
+    readonly property string filterError: !controller ? ""
+        : (kind === "filter" ? (controller.filterErrors[controller.viewSpec.id] || "")
+           : (kind === "query" ? (controller.filterErrors["__query"] || "") : ""))
     readonly property string subtitle: {
         var c = controller;
         if (!c) {
@@ -63,6 +66,7 @@ ColumnLayout {
         case "upcoming":
             return "";
         case "filter":
+        case "query":
             if (c.view.filterFetchedAt > 0 && (c.phase === "OFFLINE" || filterError !== "")) {
                 return i18n("Results from %1", Qt.formatTime(new Date(c.view.filterFetchedAt), Qt.locale().timeFormat(Locale.ShortFormat)));
             }
@@ -154,7 +158,7 @@ ColumnLayout {
             }
 
             Kirigami.PlaceholderMessage {
-                readonly property bool waitingForFilter: listRoot.kind === "filter" && !listRoot.controller.view.hasFilterResult
+                readonly property bool waitingForFilter: listRoot.isFilterKind && !listRoot.controller.view.hasFilterResult
                 anchors.centerIn: parent
                 width: parent.width - Kirigami.Units.gridUnit * 2
                 visible: listView.count === 0
