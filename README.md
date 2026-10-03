@@ -143,6 +143,7 @@ Dates are parsed in the language your Todoist account uses. English always works
 
 ```sh
 npm test                                   # Node ≥ 20, zero dependencies
+npm run check                              # everything CI checks: tests, runner tests, translations up to date
 plasmoidviewer -a package                  # desktop form factor
 plasmoidviewer -a package -l bottomedge -f horizontal   # panel
 LANGUAGE=tr LANG=tr_TR.UTF-8 plasmoidviewer -a package  # Turkish UI (run scripts/i18n-build.sh first)

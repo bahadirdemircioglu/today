@@ -9,6 +9,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "check": "npm test && python3 -m unittest discover -s krunner/tests && scripts/i18n-extract.sh && git diff --exit-code -- translations/"
   }
 }
