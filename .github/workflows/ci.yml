@@ -17,6 +17,8 @@ jobs:
           node-version: 22
       - name: Unit tests
         run: npm test
+      - name: KRunner runner tests
+        run: python3 -m unittest discover -s krunner/tests -v && python3 -m py_compile krunner/todoist_runner.py
       - name: Validate metadata.json
         run: |
           node -e '

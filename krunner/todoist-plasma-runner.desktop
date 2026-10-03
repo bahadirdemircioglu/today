@@ -1,0 +1,16 @@
+[Desktop Entry]
+Name=Todoist
+Comment=Add and find Todoist tasks (todo …, todo ?…)
+Icon=view-calendar-tasks
+Type=Service
+X-KDE-ServiceTypes=Plasma/Runner
+X-KDE-PluginInfo-Author=Bahadir Demircioglu
+X-KDE-PluginInfo-Name=todoist-plasma-runner
+X-KDE-PluginInfo-Version=2.1.0
+X-KDE-PluginInfo-License=GPL-3.0-or-later
+X-KDE-PluginInfo-EnabledByDefault=true
+X-Plasma-API=DBus
+X-Plasma-DBusRunner-Service=io.github.bahadirdemircioglu.TodoistRunner
+X-Plasma-DBusRunner-Path=/runner
+X-Plasma-Request-Actions-Once=true
+X-Plasma-Runner-Min-Letter-Count=6
