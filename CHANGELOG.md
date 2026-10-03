@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+- Tasks added from the widget without a date are now scheduled for today (as in Todoist's Today
+  view) instead of silently landing in the Inbox and never appearing in the list.
+
 ## [1.0.0] - 2026-10-03
 
 ### Added

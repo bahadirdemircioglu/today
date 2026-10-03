@@ -43,9 +43,9 @@ Whatever you type goes to Todoist's [Quick Add](https://todoist.com/help/article
 | `Call mom today p1` | due today, priority 1 |
 | `Dentist tomorrow 3pm #Personal` | due tomorrow 15:00 in *Personal* (you'll see "Added to Personal · tomorrow 3pm") |
 | `Pay rent every 1st @home` | recurring, labelled |
-| `Buy milk // two litres` | with a description |
+| `Buy milk // two litres` | due today (no date given), with a description |
 
-Dates are parsed in the language your Todoist account uses. English always works; Todoist's date parser may not support every language (for example Turkish), while `#project`, `@label` and `p1`–`p4` work in any language.
+A task without a date is scheduled for **today**, like in Todoist's own Today view. Dates are parsed in the language your Todoist account uses. English always works; Todoist's date parser may not support every language (for example Turkish), while `#project`, `@label` and `p1`–`p4` work in any language.
 
 ## Security
 

@@ -3,6 +3,7 @@
 
 // Pure, persistent offline queue of user actions.
 //   { kind: "close", uuid, itemId, createdAt, attempts }                       -> sync item_close
+//   { kind: "due_today", uuid, itemId, date, createdAt, attempts }             -> sync item_update (due date)
 //   { kind: "quick_add", localId, text, createdAt, attempts, state, sentAt }   -> POST /tasks/quick
 // Every function returns a new queue; inputs are never mutated.
 
@@ -41,6 +42,11 @@ function uuid4(randomFn) {
     });
 }
 
+// Entries sent as /sync commands (uuid-idempotent).
+function isSyncCommand(e) {
+    return e.kind === "close" || e.kind === "due_today";
+}
+
 function hasClose(queue, itemId) {
     var entries = queue.entries;
     for (var i = 0; i < entries.length; i++) {
@@ -61,6 +67,14 @@ function enqueueClose(queue, itemId, nowMs, uuidFn) {
     return withEntries(entries);
 }
 
+// A task added from the Today widget without a date is moved to today, like Todoist's own
+// Today view does. dateKey: "YYYY-MM-DD" in the user's reference zone.
+function enqueueDueToday(queue, itemId, dateKey, nowMs, uuidFn) {
+    var entries = queue.entries.slice();
+    entries.push({ kind: "due_today", uuid: uuidFn(), itemId: String(itemId), date: dateKey, createdAt: nowMs, attempts: 0 });
+    return withEntries(entries);
+}
+
 // -> { queue, error: null | "empty" | "too_long", localId }
 function enqueueQuickAdd(queue, text, nowMs, uuidFn) {
     var t = String(text === undefined || text === null ? "" : text).trim();
@@ -76,14 +90,18 @@ function enqueueQuickAdd(queue, text, nowMs, uuidFn) {
     return { queue: withEntries(entries), error: null, localId: localId };
 }
 
-// -> [{ type: "item_close", uuid, args: { id } }, ...] (at most `max`)
+// -> [{ type: "item_close", uuid, args: { id } } | { type: "item_update", uuid, args: { id, due } }, ...]
+//    (at most `max`, queue order)
 function nextSyncBatch(queue, max) {
     var limit = max || MAX_BATCH;
     var out = [];
     var entries = queue.entries;
     for (var i = 0; i < entries.length && out.length < limit; i++) {
-        if (entries[i].kind === "close") {
-            out.push({ type: "item_close", uuid: entries[i].uuid, args: { id: entries[i].itemId } });
+        var e = entries[i];
+        if (e.kind === "close") {
+            out.push({ type: "item_close", uuid: e.uuid, args: { id: e.itemId } });
+        } else if (e.kind === "due_today") {
+            out.push({ type: "item_update", uuid: e.uuid, args: { id: e.itemId, due: { date: e.date } } });
         }
     }
     return out;
@@ -111,7 +129,7 @@ function applySyncStatus(queue, sentUuids, syncStatus) {
     var retryAfterSec = null;
     for (i = 0; i < queue.entries.length; i++) {
         var e = queue.entries[i];
-        if (e.kind !== "close" || !sent[e.uuid] || !Object.prototype.hasOwnProperty.call(status, e.uuid)) {
+        if (!isSyncCommand(e) || !sent[e.uuid] || !Object.prototype.hasOwnProperty.call(status, e.uuid)) {
             kept.push(e);
             continue;
         }
@@ -127,14 +145,14 @@ function applySyncStatus(queue, sentUuids, syncStatus) {
             var next = copyEntry(e);
             next.attempts = (e.attempts || 0) + 1;
             if (next.attempts >= MAX_ATTEMPTS) {
-                dropped.push({ kind: "close", itemId: e.itemId, errorTag: st.error_tag || "", httpCode: st.http_code || 0 });
+                dropped.push({ kind: e.kind, itemId: e.itemId, errorTag: st.error_tag || "", httpCode: st.http_code || 0 });
             } else {
                 kept.push(next);
             }
             continue;
         }
         dropped.push({
-            kind: "close",
+            kind: e.kind,
             itemId: e.itemId,
             errorTag: st && st.error_tag ? st.error_tag : "",
             httpCode: st && st.http_code ? st.http_code : 0
@@ -143,7 +161,7 @@ function applySyncStatus(queue, sentUuids, syncStatus) {
     return { queue: withEntries(kept), dropped: dropped, retryAfterSec: retryAfterSec };
 }
 
-// Removes close entries whose uuid is in `uuids` (recovery path: a batch the server keeps rejecting).
+// Removes sync-command entries whose uuid is in `uuids` (recovery path: a batch the server keeps rejecting).
 // -> { queue, dropped }
 function dropByUuids(queue, uuids) {
     var set = {};
@@ -154,8 +172,8 @@ function dropByUuids(queue, uuids) {
     var dropped = [];
     for (var j = 0; j < queue.entries.length; j++) {
         var e = queue.entries[j];
-        if (e.kind === "close" && set[e.uuid]) {
-            dropped.push({ kind: "close", itemId: e.itemId, errorTag: "BATCH_REJECTED", httpCode: 400 });
+        if (isSyncCommand(e) && set[e.uuid]) {
+            dropped.push({ kind: e.kind, itemId: e.itemId, errorTag: "BATCH_REJECTED", httpCode: 400 });
         } else {
             kept.push(e);
         }
@@ -357,7 +375,7 @@ function countByKind(queue) {
     for (var i = 0; i < queue.entries.length; i++) {
         if (queue.entries[i].kind === "close") {
             c.close++;
-        } else {
+        } else if (queue.entries[i].kind === "quick_add") {
             c.quickAdd++;
         }
         c.total++;
@@ -382,7 +400,9 @@ function deserialize(str) {
     var entries = [];
     for (var i = 0; i < obj.entries.length; i++) {
         var e = obj.entries[i];
-        if (e && (e.kind === "close" && e.uuid && e.itemId) || (e && e.kind === "quick_add" && e.localId && e.text)) {
+        if (e && ((e.kind === "close" && e.uuid && e.itemId)
+                  || (e.kind === "due_today" && e.uuid && e.itemId && e.date)
+                  || (e.kind === "quick_add" && e.localId && e.text))) {
             entries.push(e);
         }
     }

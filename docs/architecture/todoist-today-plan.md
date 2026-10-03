@@ -860,3 +860,8 @@ Uygulama sırasında plandan sapmalar / plana eklenen düzeltmeler:
    kalıcı yazıldığından, istek yoldayken plasmashell kapanırsa girdi `pending` + `sentAt` ile kalıyordu
    ve körlemesine yeniden gönderilirdi. `CommandQueue.recoverAfterRestart()` yüklemede bu girdileri
    `uncertain` yapar; ilk başarılı sync'te `resolveUncertain` karar verir.
+9. **Tarihsiz Quick Add → bugün (kullanıcı geri bildirimi):** Widget'tan tarihsiz eklenen görev
+   ("deneme") Inbox'a tarihsiz düşüyor, Today listesinde hiç görünmüyordu; tek ipucu 4 sn'lik
+   "Added to Inbox" satırıydı. Todoist'in kendi Today görünümü gibi: Quick Add yanıtında `due` yoksa
+   kuyruğa `due_today` girdisi eklenir → aynı döngünün `/sync` isteğinde uuid'li
+   `item_update {id, due: {date: todayKey}}` olarak gider (`close` ile aynı `sync_status` kuralları).

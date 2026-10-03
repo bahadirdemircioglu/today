@@ -28,6 +28,9 @@ msgid_plural "%1 tasks today"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "A new task was added to Todoist but couldn't be moved to today."
+msgstr ""
+
 msgid "API token:"
 msgstr ""
 

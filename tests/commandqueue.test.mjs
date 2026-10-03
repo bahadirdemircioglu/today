@@ -144,3 +144,20 @@ test("recoverAfterRestart: an in-flight Quick Add becomes uncertain, others are 
   assert.deepEqual(r.entries.map((e) => e.state || e.kind), ["uncertain", "pending", "close"]);
   assert.equal(Q.recoverAfterRestart(queueOf(qa("B", "b"))).entries[0].state, "pending");
 });
+
+test("enqueueDueToday becomes an item_update with the date, in queue order", () => {
+  let q = Q.enqueueClose(Q.emptyQueue(), "a", 0, uuidFn);
+  q = Q.enqueueDueToday(q, "b", "2026-10-03", 0, uuidFn);
+  const batch = Q.nextSyncBatch(q, 100);
+  assert.deepEqual(batch.map((c) => c.type), ["item_close", "item_update"]);
+  assert.deepEqual(batch[1].args, { id: "b", due: { date: "2026-10-03" } });
+});
+
+test("due_today entries follow the same sync_status rules as closes", () => {
+  const q = Q.enqueueDueToday(Q.emptyQueue(), "b", "2026-10-03", 0, () => "d1");
+  assert.equal(Q.applySyncStatus(q, ["d1"], { d1: "ok" }).queue.entries.length, 0);
+  const r = Q.applySyncStatus(q, ["d1"], { d1: { http_code: 404, error_tag: "ITEM_NOT_FOUND" } });
+  assert.deepEqual(r.dropped, [{ kind: "due_today", itemId: "b", errorTag: "ITEM_NOT_FOUND", httpCode: 404 }]);
+  assert.equal(Q.dropByUuids(q, ["d1"]).queue.entries.length, 0);
+  assert.deepEqual(Q.deserialize(Q.serialize(q)), q);
+});

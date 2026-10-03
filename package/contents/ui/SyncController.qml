@@ -258,6 +258,7 @@ Item {
             recompute();
             if (res.kind === "ok" || res.kind === "client") {
                 if (res.kind === "ok") {
+                    scheduleForTodayIfUndated(res.json);
                     describeAdded(res.json);
                 } else {
                     reportDropped(r.dropped, {});
@@ -357,9 +358,19 @@ Item {
         return CommandQueue.uuid4(Math.random);
     }
 
-    function describeAdded(task) {
-        if (!task) {
+    // Like Todoist's own Today view: a task added here without a date lands on today.
+    // Sent as a uuid-idempotent item_update in this same cycle's /sync request.
+    function scheduleForTodayIfUndated(task) {
+        if (!task || task.due || task.id === undefined || task.id === null || !TaskStore.isValidId(String(task.id))) {
             return;
+        }
+        queue = CommandQueue.enqueueDueToday(queue, String(task.id), view.todayKey, Date.now(), newUuid);
+        saveQueue();
+    }
+
+    function describeAdded(task) {
+        if (!task || !task.due) {
+            return; // undated tasks are moved to today and show up in the list
         }
         var due = DateUtil.parseDue(task.due, DateUtil.makeOffsetFn(store.tz, DateUtil.systemOffsetAt));
         if (due && due.dateKey <= view.todayKey) {
@@ -381,7 +392,9 @@ Item {
             warn("dropped", dropped[i].kind, dropped[i].errorTag || dropped[i].reason || "", dropped[i].itemId || "");
         }
         var d = dropped[0];
-        if (d.kind === "close") {
+        if (d.kind === "due_today") {
+            showInfo(i18n("A new task was added to Todoist but couldn't be moved to today."), true);
+        } else if (d.kind === "close") {
             var title = titles[d.itemId] || "";
             showInfo(title ? i18n("Couldn't complete “%1” — it may have been deleted.", title)
                            : i18n("Couldn't complete a task — it may have been deleted."), true);
