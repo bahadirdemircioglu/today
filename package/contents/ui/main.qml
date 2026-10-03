@@ -101,6 +101,7 @@ PlasmoidItem {
         customQuery: Plasmoid.configuration.customQuery
         customQueryName: Plasmoid.configuration.customQueryName
         notifyLeadMinutes: Plasmoid.configuration.notifyLeadMinutes
+        showGoal: Plasmoid.configuration.showGoal
         onReminderDue: (itemId, title, body, baseKey) => {
             if (notifierLoader.item) {
                 notifierLoader.item.show(itemId, title, body, baseKey);

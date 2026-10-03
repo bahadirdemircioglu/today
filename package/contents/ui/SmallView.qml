@@ -63,6 +63,13 @@ ColumnLayout {
         }
     }
 
+    GoalRing {
+        Layout.alignment: Qt.AlignHCenter
+        Layout.topMargin: Kirigami.Units.smallSpacing
+        implicitWidth: Kirigami.Units.gridUnit * 1.6
+        progress: small.controller && small.controller.viewSpec.kind === "today" ? small.controller.goal : null
+    }
+
     Item { Layout.fillHeight: true }
 
     TapHandler {

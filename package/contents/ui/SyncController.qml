@@ -9,6 +9,7 @@ import "logic/Storage.js" as Storage
 import "logic/ViewModel.js" as ViewModel
 import "logic/ContextRules.js" as ContextRules
 import "logic/Reminders.js" as Reminders
+import "logic/Goals.js" as Goals
 
 // Thin effect runner around SyncMachine: owns timers, XHRs and LocalStorage I/O.
 // It makes no sync decisions of its own; branches here only dispatch on effect type
@@ -26,6 +27,12 @@ Item {
     property string customQueryName: ""
     readonly property var customQueryOption: customQuery.trim() !== ""
         ? { name: customQueryName.trim() || i18n("Custom filter"), query: customQuery.trim() } : null
+    // daily goal ring (config) and its data
+    property bool showGoal: true
+    property var goalStats: null
+    property double goalFetchedAt: 0
+    property int completedSinceStats: 0
+    readonly property var goal: showGoal ? Goals.progress(goalStats, todayView.todayKey, completedSinceStats) : null
     // minutes before a timed task to notify (0 = at the time, -1 = off)
     property int notifyLeadMinutes: 10
     // reminders put off with "Remind me in 10 minutes": { baseKey: untilMs }
@@ -107,6 +114,7 @@ Item {
         property double reqStartedAt: 0
         property var lastBatchUuids: []
         property int lastUnparsable: 0
+        property bool undoIsCompletion: false
     }
 
     function log() {
@@ -141,6 +149,8 @@ Item {
         recompute();
         var uuid = CommandQueue.closeUuid(queue, itemId);
         if (uuid) {
+            completedSinceStats++;
+            priv.undoIsCompletion = true;
             undoUuid = uuid;
             undoText = title ? i18n("Completed “%1”", title) : i18n("Completed");
             undoTimer.interval = completeUndoMs + 200;
@@ -288,6 +298,7 @@ Item {
         saveQueue();
         recompute();
         undoUuid = r.uuid;
+        priv.undoIsCompletion = false;
         undoText = i18n("Deleted “%1”", title);
         undoTimer.interval = undoMs + 200;
         undoTimer.restart();
@@ -299,6 +310,9 @@ Item {
         }
         queue = CommandQueue.cancelEntry(queue, undoUuid);
         saveQueue();
+        if (priv.undoIsCompletion && completedSinceStats > 0) {
+            completedSinceStats--;
+        }
         recompute();
         undoUuid = "";
         undoTimer.stop();
@@ -582,7 +596,28 @@ Item {
             var q = customQueryOption.query;
             steps.push(function (next) { fetchFilter(ViewModel.QUERY_RESULT_KEY, q, null, [], 0, next); });
         }
+        if (showGoal && Goals.needsRefresh(goalStats, goalFetchedAt, Date.now(), todayView.todayKey)) {
+            steps.push(fetchStats);
+        }
         return steps;
+    }
+
+    // Productivity stats for the daily goal ring; on failure the ring just stays hidden.
+    function fetchStats(next) {
+        send(function (cb) {
+            return TodoistClient.productivityStats(priv.activeToken, cb);
+        }, function (res) {
+            goalFetchedAt = Date.now();
+            if (res.kind === "ok") {
+                var parsed = Goals.parseStats(res.json, todayView.todayKey, store.dailyGoal);
+                if (parsed === null) {
+                    warn("unexpected productivity stats shape; daily goal hidden");
+                }
+                goalStats = parsed;
+                completedSinceStats = 0;
+            }
+            next();
+        });
     }
 
     function runSteps(steps, done) {

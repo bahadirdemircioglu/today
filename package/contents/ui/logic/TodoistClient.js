@@ -115,6 +115,11 @@ function quickAdd(token, text, cb) {
     return request("POST", "/tasks/quick", token, JSON.stringify({ text: text, meta: false }), "application/json", cb);
 }
 
+// Productivity stats (completed per day, goals). Used for the daily goal ring.
+function productivityStats(token, cb) {
+    return request("GET", "/tasks/completed/stats", token, null, null, cb);
+}
+
 // Saved-filter results evaluated by Todoist (the query language is not interpreted locally).
 // Paginated: { results: [task...], next_cursor }; a plain array is accepted as well.
 function filterTasks(token, query, lang, cursor, cb) {

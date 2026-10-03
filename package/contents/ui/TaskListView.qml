@@ -168,6 +168,12 @@ ColumnLayout {
             }
         }
 
+        GoalRing {
+            Layout.alignment: Qt.AlignTop
+            implicitWidth: Kirigami.Units.gridUnit * 2
+            progress: listRoot.kind === "today" && listRoot.controller ? listRoot.controller.goal : null
+        }
+
         PlasmaComponents3.BusyIndicator {
             Layout.alignment: Qt.AlignTop
             implicitWidth: Kirigami.Units.iconSizes.small

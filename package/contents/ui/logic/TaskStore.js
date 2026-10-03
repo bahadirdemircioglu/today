@@ -194,6 +194,9 @@ function applySyncResponse(store, resp, nowMs, sysOffsetAt) {
         if (typeof user.lang === "string") {
             s.lang = user.lang;
         }
+        if (typeof user.daily_goal === "number") {
+            s.dailyGoal = user.daily_goal;
+        }
         if (user.inbox_project_id !== undefined && user.inbox_project_id !== null) {
             s.inboxProjectId = String(user.inbox_project_id);
         }

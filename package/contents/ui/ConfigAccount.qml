@@ -20,6 +20,8 @@ KCM.SimpleKCM {
     property string cfg_pinnedViewDefault: ""
     property string cfg_badgeSource
     property string cfg_badgeSourceDefault: "today"
+    property bool cfg_showGoal
+    property bool cfg_showGoalDefault: true
     property int cfg_notifyLeadMinutes
     property int cfg_notifyLeadMinutesDefault: 10
     property string cfg_customQuery
@@ -198,6 +200,13 @@ KCM.SimpleKCM {
             font.pointSize: Kirigami.Theme.smallFont.pointSize
             opacity: 0.7
             text: i18n("Any Todoist filter query, without saving it in Todoist. It appears in the list menu.")
+        }
+
+        QQC2.CheckBox {
+            Kirigami.FormData.label: i18n("Daily goal:")
+            text: i18n("Show progress towards my Todoist daily goal")
+            checked: page.cfg_showGoal
+            onToggled: page.cfg_showGoal = checked
         }
 
         QQC2.ComboBox {

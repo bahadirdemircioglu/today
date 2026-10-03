@@ -23,6 +23,10 @@
     <entry name="customQueryName" type="String">
       <default></default>
     </entry>
+    <!-- Show the daily goal ring (Todoist productivity stats) -->
+    <entry name="showGoal" type="Bool">
+      <default>true</default>
+    </entry>
     <!-- Notify this many minutes before a timed task (0 = at the time, -1 = off) -->
     <entry name="notifyLeadMinutes" type="Int">
       <default>10</default>
