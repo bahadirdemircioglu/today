@@ -12,6 +12,8 @@ ColumnLayout {
     property var controller
     property string addDate: ""
 
+    signal leaveToList()
+
     spacing: Kirigami.Units.smallSpacing / 2
 
     property int seenFocusRequest: 0
@@ -102,6 +104,13 @@ ColumnLayout {
             Keys.onEscapePressed: {
                 text = "";
                 field.addDate = "";
+            }
+            // ↑ from an empty field moves into the list
+            Keys.onUpPressed: event => {
+                event.accepted = text === "";
+                if (event.accepted) {
+                    field.leaveToList();
+                }
             }
         }
 

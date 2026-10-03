@@ -55,6 +55,10 @@ Item {
     signal menuRequested(Item anchor)
     // "+" on an Upcoming day header
     signal addRequested(string dateKey)
+    // a click on the row (not on its controls): make it the keyboard-current row
+    signal selectRequested()
+
+    property bool keyboardCurrent: false
 
     readonly property string groupLabel: {
         switch (header) {
@@ -191,12 +195,19 @@ Item {
             enabled: !row.pending && !row.editing
             onTapped: row.menuRequested(null)
         }
+        TapHandler {
+            acceptedButtons: Qt.LeftButton
+            enabled: !row.pending && !row.editing
+            onTapped: row.selectRequested()
+        }
 
         Rectangle {
             anchors.fill: parent
             radius: Kirigami.Units.cornerRadius
             color: Kirigami.Theme.highlightColor
-            opacity: rowHover.hovered && !row.pending ? 0.12 : 0
+            opacity: row.keyboardCurrent ? 0.22 : (rowHover.hovered && !row.pending ? 0.12 : 0)
+            border.width: row.keyboardCurrent ? 1 : 0
+            border.color: Kirigami.Theme.highlightColor
             Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration } }
         }
 
@@ -358,7 +369,7 @@ Item {
                 id: moreButton
                 Layout.alignment: Qt.AlignVCenter
                 visible: !row.pending && !row.editing
-                opacity: rowHover.hovered || activeFocus ? 1 : 0
+                opacity: rowHover.hovered || activeFocus || row.keyboardCurrent ? 1 : 0
                 icon.name: "overflow-menu"
                 text: i18n("More actions")
                 display: PlasmaComponents3.AbstractButton.IconOnly

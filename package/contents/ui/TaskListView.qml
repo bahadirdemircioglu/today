@@ -17,6 +17,74 @@ ColumnLayout {
 
     property string shownViewKey: ""
 
+    function isTaskIndex(i) {
+        return i >= 0 && i < taskModel.count && taskModel.get(i).kind === "task";
+    }
+
+    // next task row from `from` in direction dir (+1/-1), skipping headers and pending rows
+    function nextTaskIndex(from, dir) {
+        for (var i = from + dir; i >= 0 && i < taskModel.count; i += dir) {
+            if (isTaskIndex(i)) {
+                return i;
+            }
+        }
+        return isTaskIndex(from) ? from : -1;
+    }
+
+    function handleKey(event) {
+        var row = listView.currentItem;
+        var hasRow = row !== null && isTaskIndex(listView.currentIndex);
+        switch (event.key) {
+        case Qt.Key_Down:
+        case Qt.Key_Up: {
+            var next = nextTaskIndex(listView.currentIndex, event.key === Qt.Key_Down ? 1 : -1);
+            if (next >= 0) {
+                listView.currentIndex = next;
+                listView.positionViewAtIndex(next, ListView.Contain);
+            }
+            return true;
+        }
+        case Qt.Key_Q:
+        case Qt.Key_Slash:
+            newTask.startAdding("");
+            return true;
+        case Qt.Key_Escape:
+            listView.currentIndex = -1;
+            listView.focus = false;
+            return true;
+        }
+        if (!hasRow) {
+            return false;
+        }
+        switch (event.key) {
+        case Qt.Key_Space:
+            row.startCompleting();
+            return true;
+        case Qt.Key_E:
+        case Qt.Key_F2:
+            row.startEditing();
+            return true;
+        case Qt.Key_T:
+        case Qt.Key_Menu:
+            taskMenu.openFor(row, row);
+            return true;
+        case Qt.Key_1:
+        case Qt.Key_2:
+        case Qt.Key_3:
+        case Qt.Key_4:
+            controller.setPriority(row.itemId, 5 - (event.key - Qt.Key_0));
+            return true;
+        case Qt.Key_Delete:
+            controller.remove(row.itemId, row.title);
+            return true;
+        case Qt.Key_Return:
+        case Qt.Key_Enter:
+            Qt.openUrlExternally("https://app.todoist.com/app/task/" + row.itemId);
+            return true;
+        }
+        return false;
+    }
+
     function refresh() {
         if (!controller) {
             return;
@@ -130,6 +198,7 @@ ColumnLayout {
 
         ListView {
             id: listView
+            objectName: "taskList"
 
             model: taskModel
             clip: true
@@ -140,8 +209,27 @@ ColumnLayout {
                 id: taskRow
                 width: ListView.view.width
                 controller: listRoot.controller
+                keyboardCurrent: ListView.isCurrentItem && listView.activeFocus
                 onMenuRequested: anchor => taskMenu.openFor(taskRow, anchor)
                 onAddRequested: dateKey => newTask.startAdding(dateKey)
+                onSelectRequested: {
+                    listView.currentIndex = index;
+                    listView.forceActiveFocus();
+                }
+            }
+
+            // Keyboard (Todoist-like): ↑/↓ move, Space complete, E/F2 edit, T task menu, 1–4 priority,
+            // Delete delete, Enter open in Todoist, Q or / new task, Esc leave the list.
+            currentIndex: -1
+            keyNavigationEnabled: false
+            activeFocusOnTab: true
+            onActiveFocusChanged: {
+                if (activeFocus && !listRoot.isTaskIndex(currentIndex)) {
+                    currentIndex = listRoot.nextTaskIndex(-1, 1);
+                }
+            }
+            Keys.onPressed: event => {
+                event.accepted = listRoot.handleKey(event);
             }
 
             add: Transition {
@@ -190,6 +278,10 @@ ColumnLayout {
     NewTaskField {
         id: newTask
         Layout.fillWidth: true
+        onLeaveToList: {
+            listView.currentIndex = listRoot.nextTaskIndex(taskModel.count, -1);
+            listView.forceActiveFocus();
+        }
         controller: listRoot.controller
     }
 
