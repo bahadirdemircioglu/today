@@ -81,6 +81,17 @@ PlasmoidItem {
         }
     ]
 
+    Loader {
+        id: notifierLoader
+        source: "Notifier.qml"
+        onLoaded: item.controller = sync
+        onStatusChanged: {
+            if (status === Loader.Error) {
+                console.warn("[todoist-plasma] notifications unavailable (org.kde.notification missing)");
+            }
+        }
+    }
+
     SyncController {
         id: sync
         token: Plasmoid.configuration.apiToken
@@ -89,6 +100,12 @@ PlasmoidItem {
         badgeSource: Plasmoid.configuration.badgeSource
         customQuery: Plasmoid.configuration.customQuery
         customQueryName: Plasmoid.configuration.customQueryName
+        notifyLeadMinutes: Plasmoid.configuration.notifyLeadMinutes
+        onReminderDue: (itemId, title, body, baseKey) => {
+            if (notifierLoader.item) {
+                notifierLoader.item.show(itemId, title, body, baseKey);
+            }
+        }
         onAccountVerified: name => {
             if (name && Plasmoid.configuration.accountName !== name) {
                 Plasmoid.configuration.accountName = name;

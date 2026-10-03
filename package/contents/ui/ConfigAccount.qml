@@ -20,6 +20,8 @@ KCM.SimpleKCM {
     property string cfg_pinnedViewDefault: ""
     property string cfg_badgeSource
     property string cfg_badgeSourceDefault: "today"
+    property int cfg_notifyLeadMinutes
+    property int cfg_notifyLeadMinutesDefault: 10
     property string cfg_customQuery
     property string cfg_customQueryDefault: ""
     property string cfg_customQueryName
@@ -196,6 +198,23 @@ KCM.SimpleKCM {
             font.pointSize: Kirigami.Theme.smallFont.pointSize
             opacity: 0.7
             text: i18n("Any Todoist filter query, without saving it in Todoist. It appears in the list menu.")
+        }
+
+        QQC2.ComboBox {
+            Kirigami.FormData.label: i18n("Reminders:")
+            textRole: "text"
+            valueRole: "value"
+            model: [
+                { value: -1, text: i18n("Off") },
+                { value: 0, text: i18n("At the task's time") },
+                { value: 5, text: i18n("5 minutes before") },
+                { value: 10, text: i18n("10 minutes before") },
+                { value: 15, text: i18n("15 minutes before") },
+                { value: 30, text: i18n("30 minutes before") },
+                { value: 60, text: i18n("1 hour before") }
+            ]
+            Component.onCompleted: currentIndex = Math.max(0, indexOfValue(page.cfg_notifyLeadMinutes))
+            onActivated: page.cfg_notifyLeadMinutes = currentValue
         }
 
         RowLayout {

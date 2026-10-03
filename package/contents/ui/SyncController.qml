@@ -8,6 +8,7 @@ import "logic/TodoistClient.js" as TodoistClient
 import "logic/Storage.js" as Storage
 import "logic/ViewModel.js" as ViewModel
 import "logic/ContextRules.js" as ContextRules
+import "logic/Reminders.js" as Reminders
 
 // Thin effect runner around SyncMachine: owns timers, XHRs and LocalStorage I/O.
 // It makes no sync decisions of its own; branches here only dispatch on effect type
@@ -25,6 +26,10 @@ Item {
     property string customQueryName: ""
     readonly property var customQueryOption: customQuery.trim() !== ""
         ? { name: customQueryName.trim() || i18n("Custom filter"), query: customQuery.trim() } : null
+    // minutes before a timed task to notify (0 = at the time, -1 = off)
+    property int notifyLeadMinutes: 10
+    // reminders put off with "Remind me in 10 minutes": { baseKey: untilMs }
+    property var snoozed: ({})
     // parents whose sub-tasks are folded away (per instance, persisted)
     property var collapsed: ({})
 
@@ -89,6 +94,8 @@ Item {
     property double focusNewTaskAt: 0
 
     signal accountVerified(string name)
+    // a timed task is coming up (main.qml shows the notification)
+    signal reminderDue(string itemId, string title, string body, string baseKey)
 
     QtObject {
         id: priv
@@ -139,6 +146,41 @@ Item {
             undoTimer.interval = completeUndoMs + 200;
             undoTimer.restart();
         }
+    }
+
+    // Raises due reminders once. The record of shown reminders is shared by all widget instances.
+    function checkReminders() {
+        if (!priv.started || !priv.activeToken || !TaskStore.hasData(store)) {
+            return;
+        }
+        var day = todayView.todayKey;
+        var sent = Reminders.prune(Storage.loadShared("notified") || {}, day);
+        var list = Reminders.due(todayView.today, day, todayView.nowMinutes, Date.now(), notifyLeadMinutes, sent, snoozed);
+        if (!list.length) {
+            return;
+        }
+        var z = Object.assign({}, snoozed);
+        for (var i = 0; i < list.length; i++) {
+            sent[list[i].key] = true;
+            if (list[i].snoozed) {
+                delete z[list[i].baseKey];
+            }
+        }
+        snoozed = z;
+        Storage.saveShared("notified", sent);
+        for (var j = 0; j < list.length; j++) {
+            var r = list[j];
+            var when = timeText(r.minutes);
+            var body = r.minutes <= todayView.nowMinutes ? i18n("Now · %1", when)
+                                                         : i18np("In %1 minute · %2", "In %1 minutes · %2", r.minutes - todayView.nowMinutes, when);
+            reminderDue(r.id, r.title, body, r.baseKey);
+        }
+    }
+
+    function snooze(baseKey) {
+        var z = Object.assign({}, snoozed);
+        z[baseKey] = Date.now() + Reminders.SNOOZE_MINUTES * 60000;
+        snoozed = z;
     }
 
     function requestNewTaskFocus() {
@@ -775,6 +817,13 @@ Item {
         id: infoTimer
         interval: 4000
         onTriggered: controller.infoText = ""
+    }
+    Timer {
+        id: reminderTimer
+        interval: 30 * 1000
+        repeat: true
+        running: true
+        onTriggered: controller.checkReminders()
     }
     // Day rollover, "late" markers and "updated N min ago"; also catches sleep/wake within 60 s.
     Timer {

@@ -23,6 +23,10 @@
     <entry name="customQueryName" type="String">
       <default></default>
     </entry>
+    <!-- Notify this many minutes before a timed task (0 = at the time, -1 = off) -->
+    <entry name="notifyLeadMinutes" type="Int">
+      <default>10</default>
+    </entry>
     <!-- Panel badge: today (overdue + today), view (current view), none -->
     <entry name="badgeSource" type="String">
       <default>today</default>

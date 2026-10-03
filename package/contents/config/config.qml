@@ -3,7 +3,7 @@ import org.kde.plasma.configuration
 
 ConfigModel {
     ConfigCategory {
-        name: i18n("Account")
+        name: i18n("General")
         icon: "user-identity"
         source: "ConfigAccount.qml"
     }
