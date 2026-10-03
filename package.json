@@ -1,8 +1,8 @@
 {
-  "name": "todoist-today",
-  "version": "1.0.0",
+  "name": "todoist-plasma",
+  "version": "2.0.0",
   "private": true,
-  "description": "Todoist Today plasmoid for KDE Plasma 6 (pure QML/JS). Dev tooling only: no runtime dependencies.",
+  "description": "Todoist for Plasma: plasmoid for KDE Plasma 6 (pure QML/JS). Dev tooling only: no runtime dependencies.",
   "license": "GPL-3.0-or-later",
   "type": "module",
   "engines": {

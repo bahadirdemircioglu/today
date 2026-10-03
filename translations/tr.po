@@ -1,9 +1,10 @@
-# Turkish translation of Todoist Today.
-# This file is distributed under the same license as the Todoist Today package (GPL-3.0-or-later).
+# Turkish translation of Todoist for Plasma.
+# This file is distributed under the same license as the Todoist for Plasma package (GPL-3.0-or-later).
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: plasma_applet_io.github.bahadirdemircioglu.todoisttoday\n"
+"Project-Id-Version: plasma_applet_io.github.bahadirdemircioglu."
+"todoistplasma\n"
 "Report-Msgid-Bugs-To: https://github.com/bahadirdemircioglu/today/issues\n"
 "PO-Revision-Date: 2026-10-03 12:00+0300\n"
 "Last-Translator: Bahadir Demircioglu\n"
@@ -216,9 +217,6 @@ msgid_plural "Today · %1 overdue"
 msgstr[0] "Bugün · %1 gecikmiş"
 msgstr[1] "Bugün · %1 gecikmiş"
 
-msgid "Todoist Today"
-msgstr "Todoist Bugün"
-
 msgid "Todoist asked to slow down. Retrying soon…"
 msgstr "Todoist yavaşlamamızı istedi. Birazdan yeniden denenecek…"
 
@@ -231,6 +229,9 @@ msgstr "Todoist token'ınızı kabul etmedi."
 msgid "Todoist didn't accept your token. Paste a new one to reconnect."
 msgstr ""
 "Todoist token'ınızı kabul etmedi. Yeniden bağlanmak için yenisini yapıştırın."
+
+msgid "Todoist for Plasma"
+msgstr "Todoist for Plasma"
 
 msgid "Todoist is having trouble"
 msgstr "Todoist'te bir sorun var"

@@ -24,7 +24,7 @@ PlasmoidItem {
         controller: sync
     }
 
-    toolTipMainText: i18n("Todoist Today")
+    toolTipMainText: i18n("Todoist for Plasma")
     toolTipSubText: {
         switch (sync.phase) {
         case "SETUP":

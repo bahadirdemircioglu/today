@@ -1,7 +1,7 @@
 # Architecture Plan: todoist-plasma (v2 — esnek görünümler)
 
-**Status:** draft
-**Revision:** 1
+**Status:** in progress
+**Revision:** 2
 **Önceki plan:** [todoist-today-plan.md](todoist-today-plan.md) (v1, uygulandı). Bu plan onun üzerine
 kurulur; v1'deki sync, kuyruk, durum makinesi, güvenlik ve i18n kararları aynen geçerlidir. Yalnızca
 değişenler burada.
@@ -181,13 +181,14 @@ Her adım v1'deki gibi: önce kabul vakaları test olarak, sonra kod; her adım 
 
 ## Open Questions
 
-- [ ] **Q1** Ad ve Id: "Todoist for Plasma" / `…todoistplasma` olarak değişsin mi (öneri: evet, yayından önce)?
-  Repo adı `today` kalsın mı?
-- [ ] **Q2** Filtreler v2'de olsun mu? (Öneri: evet, sunucu tarafı; uç nokta yoksa basit-sorgu yedeği.)
-- [ ] **Q3** Masaüstü widget'ı sabitlenmiş görünümde de seçici göstersin mi, yoksa tamamen sabit mi?
-  (Öneri: seçici görünür, sabit görünüm başlangıç noktası.)
-- [ ] **Q4** Upcoming kaç gün: 7 (öneri) mi, 14 mü?
-- [ ] **Q5** Panel rozeti varsayılanı: Today sayısı (öneri) mi, seçili görünüm mü?
+Kapatıldı (kullanıcı kararları, Rev. 2):
+
+- [x] **Q1** Ad "Todoist for Plasma", Id `io.github.bahadirdemircioglu.todoistplasma`, paket
+  `todoist-plasma-<v>.plasmoid`, LocalStorage veritabanı `TodoistPlasma`. Repo adı `today` kalır.
+- [x] **Q2** Filtreler v2'de (sunucu tarafı).
+- [x] **Q3** Sabitlenmiş widget'ta seçici açık kalır; sabit görünüm başlangıç noktasıdır.
+- [x] **Q4** Upcoming 7 gün (öneri kabul edildi; sabit, ayar yok).
+- [x] **Q5** Panel rozeti varsayılanı Today sayısı (ayarlardan değiştirilebilir).
 
 ## Decision Log
 

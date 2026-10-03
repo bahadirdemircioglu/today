@@ -1,13 +1,13 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the plasma_applet_io.github.bahadirdemircioglu.todoisttoday package.
+# This file is distributed under the same license as the plasma_applet_io.github.bahadirdemircioglu.todoistplasma package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: plasma_applet_io.github.bahadirdemircioglu.todoisttoday "
-"1.0.0\n"
+"Project-Id-Version: plasma_applet_io.github.bahadirdemircioglu.todoistplasma "
+"2.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/bahadirdemircioglu/today/issues\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
@@ -218,9 +218,6 @@ msgid_plural "Today · %1 overdue"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "Todoist Today"
-msgstr ""
-
 msgid "Todoist asked to slow down. Retrying soon…"
 msgstr ""
 
@@ -231,6 +228,9 @@ msgid "Todoist didn't accept your token."
 msgstr ""
 
 msgid "Todoist didn't accept your token. Paste a new one to reconnect."
+msgstr ""
+
+msgid "Todoist for Plasma"
 msgstr ""
 
 msgid "Todoist is having trouble"

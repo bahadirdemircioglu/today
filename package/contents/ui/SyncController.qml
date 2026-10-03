@@ -58,7 +58,7 @@ Item {
     }
 
     function log() {
-        var args = ["[todoist-today]"];
+        var args = ["[todoist-plasma]"];
         for (var i = 0; i < arguments.length; i++) {
             args.push(arguments[i]);
         }
@@ -66,7 +66,7 @@ Item {
     }
 
     function warn() {
-        var args = ["[todoist-today]"];
+        var args = ["[todoist-plasma]"];
         for (var i = 0; i < arguments.length; i++) {
             args.push(arguments[i]);
         }

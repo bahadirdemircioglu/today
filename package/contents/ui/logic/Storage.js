@@ -4,14 +4,14 @@
 // QML-only persistence (SQLite via QtQuick.LocalStorage). Not loaded in Node tests.
 // Rows are keyed by applet id so two widget instances never share a queue.
 
-var DB_NAME = "TodoistToday";
+var DB_NAME = "TodoistPlasma";
 var db = null;
 
 function open() {
     if (db !== null) {
         return db;
     }
-    db = Sql.LocalStorage.openDatabaseSync(DB_NAME, "", "Todoist Today cache", 5 * 1024 * 1024);
+    db = Sql.LocalStorage.openDatabaseSync(DB_NAME, "", "Todoist for Plasma cache", 5 * 1024 * 1024);
     db.transaction(function (tx) {
         tx.executeSql("CREATE TABLE IF NOT EXISTS kv ("
                       + "applet_id TEXT NOT NULL, key TEXT NOT NULL, value TEXT NOT NULL, "
@@ -31,7 +31,7 @@ function load(appletId, key) {
             }
         });
     } catch (e) {
-        console.warn("[todoist-today] storage load failed:", e);
+        console.warn("[todoist-plasma] storage load failed:", e);
     }
     return value;
 }
@@ -44,7 +44,7 @@ function save(appletId, key, value) {
         });
         return true;
     } catch (e) {
-        console.warn("[todoist-today] storage save failed:", e);
+        console.warn("[todoist-plasma] storage save failed:", e);
         return false;
     }
 }
@@ -55,6 +55,6 @@ function clear(appletId) {
             tx.executeSql("DELETE FROM kv WHERE applet_id = ?", [appletId]);
         });
     } catch (e) {
-        console.warn("[todoist-today] storage clear failed:", e);
+        console.warn("[todoist-plasma] storage clear failed:", e);
     }
 }
