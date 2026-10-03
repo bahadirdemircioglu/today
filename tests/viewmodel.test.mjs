@@ -172,3 +172,16 @@ test("navList: fixed views, project tree, labels, filters with counts", () => {
   ]);
   assert.equal(V.navList(st, emptyQ, NOON, sys180, {}).at(-1).count, -1);
 });
+
+test("deadline and description roles", () => {
+  const st = store([
+    item({ id: "d", project_id: "work", deadline: { date: "2026-10-03", lang: "en" }, description: "First line\nSecond line" }),
+    item({ id: "e", project_id: "work", deadline: { date: "2026-10-20" } }),
+  ]);
+  const rows = V.flattenView(view(st, "project:work"));
+  const d = rows.find((r) => r.itemId === "d");
+  const e = rows.find((r) => r.itemId === "e");
+  assert.deepEqual([d.deadlineKey, d.deadlineDue, d.description, d.descriptionFull],
+    ["2026-10-03", true, "First line", "First line\nSecond line"]);
+  assert.deepEqual([e.deadlineKey, e.deadlineDue], ["2026-10-20", false]);
+});

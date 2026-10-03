@@ -68,14 +68,29 @@ function hasClose(queue, itemId) {
     return false;
 }
 
-function enqueueClose(queue, itemId, nowMs, uuidFn) {
+// holdMs > 0 keeps the command back that long so the completion can be undone (cancelEntry).
+function enqueueClose(queue, itemId, nowMs, uuidFn, holdMs) {
     var id = String(itemId);
     if (hasClose(queue, id)) {
         return queue;
     }
     var entries = queue.entries.slice();
-    entries.push({ kind: "close", uuid: uuidFn(), itemId: id, createdAt: nowMs, attempts: 0 });
+    var entry = { kind: "close", uuid: uuidFn(), itemId: id, createdAt: nowMs, attempts: 0 };
+    if (holdMs > 0) {
+        entry.sendAfter = nowMs + holdMs;
+    }
+    entries.push(entry);
     return withEntries(entries);
+}
+
+// uuid of the queued close for an item, or null
+function closeUuid(queue, itemId) {
+    for (var i = 0; i < queue.entries.length; i++) {
+        if (queue.entries[i].kind === "close" && queue.entries[i].itemId === String(itemId)) {
+            return queue.entries[i].uuid;
+        }
+    }
+    return null;
 }
 
 // A task added from the Today widget without a date is moved to today, like Todoist's own

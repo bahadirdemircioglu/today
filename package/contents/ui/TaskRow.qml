@@ -31,6 +31,9 @@ Item {
     required property int depth
     required property string labelsText
     required property string description
+    required property string descriptionFull
+    required property string deadlineKey
+    required property bool deadlineDue
     required property string section
     required property string header
     required property string headerText
@@ -267,7 +270,7 @@ Item {
 
                 RowLayout {
                     Layout.fillWidth: true
-                    visible: row.whenText !== "" || row.detailText !== ""
+                    visible: row.whenText !== "" || row.detailText !== "" || row.deadlineKey !== ""
                     spacing: Kirigami.Units.smallSpacing
 
                     PlasmaComponents3.Label {
@@ -277,6 +280,23 @@ Item {
                         font.pointSize: Kirigami.Theme.smallFont.pointSize
                         color: row.redDate ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.textColor
                         opacity: row.redDate ? 1 : 0.7
+                    }
+                    Kirigami.Icon {
+                        visible: row.deadlineKey !== ""
+                        implicitWidth: Kirigami.Units.iconSizes.small * 0.75
+                        implicitHeight: implicitWidth
+                        source: "flag"
+                        color: row.deadlineDue ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.textColor
+                        isMask: true
+                        opacity: row.deadlineDue ? 1 : 0.6
+                    }
+                    PlasmaComponents3.Label {
+                        visible: row.deadlineKey !== ""
+                        text: row.controller && row.deadlineKey ? i18nc("deadline date", "Deadline %1", row.controller.dateText(row.deadlineKey)) : ""
+                        textFormat: Text.PlainText
+                        font.pointSize: Kirigami.Theme.smallFont.pointSize
+                        color: row.deadlineDue ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.textColor
+                        opacity: row.deadlineDue ? 1 : 0.7
                     }
                     Kirigami.Icon {
                         visible: row.isRecurring
@@ -317,6 +337,6 @@ Item {
     Timer {
         id: completeTimer
         interval: Math.max(1, Kirigami.Units.longDuration * 2)
-        onTriggered: row.controller.complete(row.itemId)
+        onTriggered: row.controller.complete(row.itemId, row.title)
     }
 }

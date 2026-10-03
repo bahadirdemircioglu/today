@@ -90,7 +90,8 @@ function normalizeItem(raw) {
         due: due,
         sectionId: raw.section_id !== undefined && raw.section_id !== null ? String(raw.section_id) : null,
         labels: Array.isArray(raw.labels) ? raw.labels.slice() : [],
-        description: typeof raw.description === "string" ? raw.description.split("\n")[0].slice(0, 200) : "",
+        description: typeof raw.description === "string" ? raw.description.slice(0, 2000) : "",
+        deadline: raw.deadline && typeof raw.deadline.date === "string" ? raw.deadline.date.slice(0, 10) : "",
         dayOrder: typeof raw.day_order === "number" ? raw.day_order : -1,
         childOrder: typeof raw.child_order === "number" ? raw.child_order : 0,
         addedAt: DateUtil.parseIsoUtc(raw.added_at)
@@ -391,6 +392,7 @@ function makeRow(st, item, due, todayKey, nowMinutes) {
         parentId: item.parentId || null,
         labels: item.labels || [],
         description: item.description || "",
+        deadline: item.deadline || "",
         dateKey: due ? due.dateKey : "",
         minutes: due ? due.minutes : null,
         isRecurring: due ? due.isRecurring : false,

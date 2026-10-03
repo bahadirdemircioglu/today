@@ -28,7 +28,7 @@ test("#1 full sync keeps every open item (dated or not) and the v2 resources", (
   const s = S.applySyncResponse(S.emptyStore(), fixture("full-sync"), NOON, sys180);
   assert.deepEqual(Object.keys(s.items).sort(), ["6X7rM8997g3RQmvh", "6X7rfEVP8hvv25ZQ", "6X7rfFVPjhvv84XG"]);
   assert.equal(s.items["6X7rfEVP8hvv25ZQ"].sectionId, "S1");
-  assert.equal(s.items["6X7rfEVP8hvv25ZQ"].description, "Line one");
+  assert.equal(s.items["6X7rfEVP8hvv25ZQ"].description, "Line one\nline two");
   assert.deepEqual(s.items["6X7rM8997g3RQmvh"].labels, ["health"]);
   assert.deepEqual(Object.keys(s.sections), ["S1"]);
   assert.deepEqual(s.sections.S1, { name: "Ideas", projectId: "6Jf8VQXxpwv56VQ7", order: 1 });

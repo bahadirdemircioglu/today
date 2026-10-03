@@ -185,3 +185,13 @@ test("enqueueQuickAdd keeps the view context", () => {
   assert.deepEqual(r.queue.entries[0].context, { kind: "project", projectId: "w" });
   assert.equal(Q.enqueueQuickAdd(Q.emptyQueue(), "x", 0, uuidFn).queue.entries[0].context, null);
 });
+
+test("enqueueClose with a hold is undoable and not sent before the hold ends", () => {
+  const q = Q.enqueueClose(Q.emptyQueue(), "a", 1000, () => "c1", 4000);
+  assert.equal(q.entries[0].sendAfter, 5000);
+  assert.equal(Q.closeUuid(q, "a"), "c1");
+  assert.equal(Q.nextSyncBatch(q, 100, 2000).length, 0);
+  assert.equal(Q.nextSyncBatch(q, 100, 5000).length, 1);
+  assert.equal(Q.cancelEntry(q, "c1").entries.length, 0);
+  assert.equal(Q.enqueueClose(Q.emptyQueue(), "a", 0, () => "c2").entries[0].sendAfter, undefined);
+});

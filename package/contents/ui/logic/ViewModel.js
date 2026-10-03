@@ -337,7 +337,10 @@ function flattenView(view) {
                 showDate: showDate && group.kind !== "day",
                 depth: r.depth || 0,
                 labelsText: (r.labels || []).join(", "),
-                description: r.description || "",
+                description: (r.description || "").split("\n")[0].slice(0, 200),
+                descriptionFull: r.description || "",
+                deadlineKey: r.deadline || "",
+                deadlineDue: !!r.deadline && r.deadline <= view.todayKey,
                 section: group.kind,
                 header: i === 0 ? h : "",
                 headerText: i === 0 ? group.label : "",
@@ -360,7 +363,8 @@ function blank(key, header, headerText, headerDate) {
     return {
         key: key, kind: "header", itemId: "", title: "", content: "", projectId: "", priority: 1,
         projectName: "", dateKey: "", minutes: -1, isLate: false, isRecurring: false, isOverdue: false,
-        showDate: false, depth: 0, labelsText: "", description: "", section: header,
+        showDate: false, depth: 0, labelsText: "", description: "", descriptionFull: "", deadlineKey: "",
+        deadlineDue: false, section: header,
         header: header, headerText: headerText, headerDate: headerDate
     };
 }

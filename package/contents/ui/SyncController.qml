@@ -76,6 +76,10 @@ Item {
     property string undoText: ""
 
     readonly property int undoMs: 5000
+    readonly property int completeUndoMs: 4000
+    // incremented to ask the "New task" field to take focus (global shortcut)
+    property int focusNewTaskRequest: 0
+    property double focusNewTaskAt: 0
 
     signal accountVerified(string name)
 
@@ -113,14 +117,26 @@ Item {
         dispatch({ type: "SYNC_REQUESTED", reason: reason });
     }
 
-    function complete(itemId) {
+    // Held back for completeUndoMs so it can be undone from the footer.
+    function complete(itemId, title) {
         if (!TaskStore.isValidId(itemId)) {
             return;
         }
-        queue = CommandQueue.enqueueClose(queue, itemId, Date.now(), newUuid);
+        queue = CommandQueue.enqueueClose(queue, itemId, Date.now(), newUuid, completeUndoMs);
         saveQueue();
         recompute();
-        requestSync("action");
+        var uuid = CommandQueue.closeUuid(queue, itemId);
+        if (uuid) {
+            undoUuid = uuid;
+            undoText = title ? i18n("Completed “%1”", title) : i18n("Completed");
+            undoTimer.interval = completeUndoMs + 200;
+            undoTimer.restart();
+        }
+    }
+
+    function requestNewTaskFocus() {
+        focusNewTaskAt = Date.now();
+        focusNewTaskRequest++;
     }
 
     function setView(key) {
@@ -210,6 +226,7 @@ Item {
         recompute();
         undoUuid = r.uuid;
         undoText = i18n("Deleted “%1”", title);
+        undoTimer.interval = undoMs + 200;
         undoTimer.restart();
     }
 

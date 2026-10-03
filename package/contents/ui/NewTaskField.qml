@@ -14,6 +14,28 @@ ColumnLayout {
 
     spacing: Kirigami.Units.smallSpacing / 2
 
+    property int seenFocusRequest: 0
+
+    function takeFocusRequest() {
+        if (!controller || controller.focusNewTaskRequest === seenFocusRequest) {
+            return;
+        }
+        seenFocusRequest = controller.focusNewTaskRequest;
+        // the popup may just be opening: ignore stale requests
+        if (Date.now() - controller.focusNewTaskAt < 3000) {
+            Qt.callLater(input.forceActiveFocus);
+        }
+    }
+
+    Connections {
+        target: field.controller
+        function onFocusNewTaskRequestChanged() {
+            field.takeFocusRequest();
+        }
+    }
+
+    Component.onCompleted: takeFocusRequest()
+
     function startAdding(dateKey) {
         addDate = dateKey || "";
         input.forceActiveFocus();
