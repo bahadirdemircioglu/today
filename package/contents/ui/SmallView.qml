@@ -10,7 +10,7 @@ ColumnLayout {
 
     property var controller
 
-    readonly property var next: controller ? controller.view.next : null
+    readonly property var next: controller ? controller.nextTask : null
     readonly property int count: controller ? controller.count : 0
     readonly property int overdue: controller ? controller.overdueCount : 0
 
@@ -34,13 +34,14 @@ ColumnLayout {
         textFormat: Text.PlainText
         opacity: 0.7
         text: {
+            var title = small.controller ? small.controller.viewTitle : "";
             if (small.count === 0) {
-                return i18n("All done for today");
+                return small.controller && small.controller.viewSpec.kind === "today" ? i18n("All done for today") : title;
             }
             if (small.overdue > 0) {
-                return i18np("Today · %1 overdue", "Today · %1 overdue", small.overdue);
+                return i18np("%2 · %1 overdue", "%2 · %1 overdue", small.overdue, title);
             }
-            return i18n("Today");
+            return title;
         }
     }
 

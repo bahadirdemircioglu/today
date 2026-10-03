@@ -16,6 +16,10 @@ KCM.SimpleKCM {
     property string cfg_apiTokenDefault: ""
     property string cfg_accountName
     property string cfg_accountNameDefault: ""
+    property string cfg_pinnedView
+    property string cfg_pinnedViewDefault: ""
+    property string cfg_badgeSource
+    property string cfg_badgeSourceDefault: "today"
 
     readonly property string tokenUrl: "https://app.todoist.com/app/settings/integrations/developer"
 
@@ -146,6 +150,40 @@ KCM.SimpleKCM {
             font.pointSize: Kirigami.Theme.smallFont.pointSize
             opacity: 0.7
             text: i18n("Your token is stored unencrypted in your Plasma config file. You can revoke it any time in Todoist's settings.")
+        }
+
+        Item {
+            Kirigami.FormData.isSection: true
+        }
+
+        QQC2.ComboBox {
+            id: badgeCombo
+            Kirigami.FormData.label: i18n("Panel badge:")
+            textRole: "text"
+            valueRole: "value"
+            model: [
+                { value: "today", text: i18n("Overdue and today's tasks") },
+                { value: "view", text: i18n("Tasks in the current list") },
+                { value: "none", text: i18n("No badge") }
+            ]
+            Component.onCompleted: currentIndex = Math.max(0, indexOfValue(page.cfg_badgeSource))
+            onActivated: page.cfg_badgeSource = currentValue
+        }
+
+        RowLayout {
+            Kirigami.FormData.label: i18n("Start with:")
+            spacing: Kirigami.Units.smallSpacing
+
+            QQC2.Label {
+                text: page.cfg_pinnedView === "" ? i18n("The list you used last")
+                                                 : i18n("A pinned list (set from the list title menu)")
+            }
+            QQC2.Button {
+                visible: page.cfg_pinnedView !== ""
+                text: i18n("Unpin")
+                icon.name: "window-unpin"
+                onClicked: page.cfg_pinnedView = ""
+            }
         }
     }
 }

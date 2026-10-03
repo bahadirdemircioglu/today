@@ -205,28 +205,6 @@ test("recently added items without a due date are remembered for Quick Add match
   assert.equal(later.recent.nodue, undefined);
 });
 
-test("flattenRows produces uniform rows with sections", () => {
-  const s = storeWith([
-    item({ id: "o", due: { date: "2026-10-01" } }),
-    item({ id: "t", due: { date: "2026-10-03T13:30:00" } }),
-  ]);
-  const q = { v: 1, entries: [{ kind: "quick_add", localId: "L", text: "New", state: "pending" }] };
-  const rows = S.flattenRows(S.computeToday(s, q, NOON, sys180));
-  assert.deepEqual(rows.map((r) => [r.key, r.section, r.header, r.minutes]),
-    [["t:o", "overdue", "overdue", -1], ["t:t", "today", "today", 810], ["q:L", "pending", "pending", -1]]);
-  const keys = Object.keys(rows[0]).sort();
-  for (const r of rows) assert.deepEqual(Object.keys(r).sort(), keys);
-});
-
-test("flattenRows: no Today label without overdue rows; one label per section", () => {
-  const s = storeWith([
-    item({ id: "a", due: { date: "2026-10-03" } }),
-    item({ id: "b", due: { date: "2026-10-03" } }),
-  ]);
-  const rows = S.flattenRows(S.computeToday(s, emptyQ, NOON, sys180));
-  assert.deepEqual(rows.map((r) => r.header), ["", ""]);
-});
-
 test("isValidId", () => {
   assert.equal(S.isValidId("6X7rM8997g3RQmvh"), true);
   assert.equal(S.isValidId("../x"), false);

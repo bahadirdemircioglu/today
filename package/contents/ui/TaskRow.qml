@@ -6,8 +6,10 @@ import org.kde.kirigami as Kirigami
 
 import "logic/TaskStore.js" as TaskStore
 
-// One task: round check + title + (time · project), optionally preceded by its section label.
-// Roles come from TaskStore.flattenRows().
+// One list row: an optional group label (Overdue / section / day …) above a task with its round
+// check, title, date · project · labels and the first line of its description. Rows of kind
+// "header" are an empty day in Upcoming: only the label (with its "+") is drawn.
+// Roles come from ViewModel.flattenView().
 Item {
     id: row
 
@@ -24,20 +26,86 @@ Item {
     required property int minutes
     required property bool isLate
     required property bool isRecurring
+    required property bool isOverdue
+    required property bool showDate
+    required property int depth
+    required property string labelsText
+    required property string description
     required property string section
     required property string header
+    required property string headerText
+    required property string headerDate
 
     property var controller
 
     readonly property bool pending: kind === "pending"
+    readonly property bool headerOnly: kind === "header"
     property bool completing: false
     property bool editing: false
 
     // anchor: the ⋯ button, or null to open at the mouse position
     signal menuRequested(Item anchor)
+    // "+" on an Upcoming day header
+    signal addRequested(string dateKey)
+
+    readonly property string groupLabel: {
+        switch (header) {
+        case "overdue":
+            return i18n("Overdue");
+        case "today":
+            return i18n("Today");
+        case "pending":
+            return i18n("Waiting to sync");
+        case "section":
+            return headerText;
+        case "day":
+            return controller ? controller.dayHeaderText(headerDate) : headerDate;
+        default:
+            return "";
+        }
+    }
+
+    readonly property bool redDate: isLate || isOverdue || section === "overdue"
+    readonly property string whenText: {
+        if (pending || headerOnly || !controller) {
+            return "";
+        }
+        var time = controller.timeText(minutes);
+        if ((section === "overdue" || showDate) && dateKey !== "") {
+            var date = controller.dateText(dateKey);
+            return time ? date + " " + time : date;
+        }
+        return time;
+    }
+    readonly property string labelsDisplay: labelsText === "" ? ""
+        : labelsText.split(", ").map(function (l) { return "@" + l; }).join(" ")
+    readonly property string detailText: {
+        if (pending) {
+            return i18n("Waiting to sync");
+        }
+        var parts = [];
+        if (projectName !== "") {
+            parts.push(projectName);
+        }
+        if (labelsDisplay !== "") {
+            parts.push(labelsDisplay);
+        }
+        return parts.join(" · ");
+    }
+
+    implicitHeight: headerRow.height + (headerOnly ? 0 : body.height)
+    height: implicitHeight
+
+    function startCompleting() {
+        if (completing || pending || headerOnly) {
+            return;
+        }
+        completing = true;
+        completeTimer.start();
+    }
 
     function startEditing() {
-        if (pending) {
+        if (pending || headerOnly) {
             return;
         }
         editing = true;
@@ -60,66 +128,50 @@ Item {
         editing = false;
     }
 
-    readonly property string whenText: {
-        if (pending || !controller) {
-            return "";
-        }
-        var time = controller.timeText(minutes);
-        if (section === "overdue") {
-            var date = controller.dateText(dateKey);
-            return time ? date + " " + time : date;
-        }
-        return time;
-    }
-    readonly property string detailText: pending ? i18n("Waiting to sync") : projectName
-
-    readonly property string headerText: {
-        switch (header) {
-        case "overdue":
-            return i18n("Overdue");
-        case "today":
-            return i18n("Today");
-        case "pending":
-            return i18n("Waiting to sync");
-        default:
-            return "";
-        }
-    }
-
-    implicitHeight: headerLabel.height + body.height
-    height: implicitHeight
-
-    function startCompleting() {
-        if (completing || pending) {
-            return;
-        }
-        completing = true;
-        completeTimer.start();
-    }
-
-    PlasmaComponents3.Label {
-        id: headerLabel
+    RowLayout {
+        id: headerRow
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.leftMargin: Kirigami.Units.smallSpacing
-        height: row.headerText !== "" ? implicitHeight + Kirigami.Units.largeSpacing : 0
-        visible: row.headerText !== ""
-        verticalAlignment: Text.AlignBottom
-        bottomPadding: Kirigami.Units.smallSpacing / 2
-        text: row.headerText
-        textFormat: Text.PlainText
-        elide: Text.ElideRight
-        font.pointSize: Kirigami.Theme.smallFont.pointSize
-        font.weight: Font.DemiBold
-        color: row.header === "overdue" ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.textColor
-        opacity: 0.8
+        height: row.groupLabel !== "" ? Math.max(headerLabel.implicitHeight, addButton.visible ? addButton.implicitHeight : 0)
+                                        + Kirigami.Units.largeSpacing : 0
+        visible: row.groupLabel !== ""
+        spacing: Kirigami.Units.smallSpacing
+
+        PlasmaComponents3.Label {
+            id: headerLabel
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignBottom
+            bottomPadding: Kirigami.Units.smallSpacing / 2
+            text: row.groupLabel
+            textFormat: Text.PlainText
+            elide: Text.ElideRight
+            font.pointSize: Kirigami.Theme.smallFont.pointSize
+            font.weight: Font.DemiBold
+            color: row.header === "overdue" ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.textColor
+            opacity: 0.8
+        }
+        PlasmaComponents3.ToolButton {
+            id: addButton
+            Layout.alignment: Qt.AlignBottom
+            visible: row.header === "day"
+            icon.name: "list-add"
+            text: i18n("Add task to this day")
+            display: PlasmaComponents3.AbstractButton.IconOnly
+            onClicked: row.addRequested(row.headerDate)
+            PlasmaComponents3.ToolTip.text: text
+            PlasmaComponents3.ToolTip.visible: hovered
+            PlasmaComponents3.ToolTip.delay: Kirigami.Units.toolTipDelay
+        }
     }
 
     Item {
         id: body
-        anchors.top: headerLabel.bottom
+        visible: !row.headerOnly
+        anchors.top: headerRow.bottom
         anchors.left: parent.left
         anchors.right: parent.right
+        anchors.leftMargin: row.depth * Kirigami.Units.gridUnit
         height: layout.implicitHeight + Kirigami.Units.smallSpacing * 2
 
         HoverHandler {
@@ -202,6 +254,17 @@ Item {
                     }
                 }
 
+                PlasmaComponents3.Label {
+                    Layout.fillWidth: true
+                    visible: row.description !== "" && !row.editing
+                    text: row.description
+                    textFormat: Text.PlainText
+                    elide: Text.ElideRight
+                    maximumLineCount: 1
+                    font.pointSize: Kirigami.Theme.smallFont.pointSize
+                    opacity: 0.6
+                }
+
                 RowLayout {
                     Layout.fillWidth: true
                     visible: row.whenText !== "" || row.detailText !== ""
@@ -212,8 +275,8 @@ Item {
                         text: row.whenText
                         textFormat: Text.PlainText
                         font.pointSize: Kirigami.Theme.smallFont.pointSize
-                        color: row.isLate || row.section === "overdue" ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.textColor
-                        opacity: row.isLate || row.section === "overdue" ? 1 : 0.7
+                        color: row.redDate ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.textColor
+                        opacity: row.redDate ? 1 : 0.7
                     }
                     Kirigami.Icon {
                         visible: row.isRecurring

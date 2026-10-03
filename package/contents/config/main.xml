@@ -12,5 +12,13 @@
     <entry name="accountName" type="String">
       <default></default>
     </entry>
+    <!-- View this widget starts with: "" (last used), today, upcoming, inbox, project:<id>, label:<id>, filter:<id> -->
+    <entry name="pinnedView" type="String">
+      <default></default>
+    </entry>
+    <!-- Panel badge: today (overdue + today), view (current view), none -->
+    <entry name="badgeSource" type="String">
+      <default>today</default>
+    </entry>
   </group>
 </kcfg>

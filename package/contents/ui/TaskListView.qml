@@ -7,7 +7,7 @@ import org.kde.kirigami as Kirigami
 
 import "logic/ModelSync.js" as ModelSync
 
-// Full list: header, Overdue/Today sections, empty state, "+ New task" field, footer.
+// Full list: view selector + subtitle, grouped rows, empty state, "+ New task" field, footer.
 ColumnLayout {
     id: listRoot
 
@@ -15,10 +15,21 @@ ColumnLayout {
 
     spacing: Kirigami.Units.smallSpacing
 
+    property string shownViewKey: ""
+
     function refresh() {
-        if (controller) {
-            ModelSync.sync(taskModel, controller.rows);
+        if (!controller) {
+            return;
         }
+        // switching lists replaces the rows outright; only changes within a list animate
+        if (controller.viewKey !== shownViewKey) {
+            shownViewKey = controller.viewKey;
+            taskModel.clear();
+            ModelSync.sync(taskModel, controller.rows);
+            listView.positionViewAtBeginning();
+            return;
+        }
+        ModelSync.sync(taskModel, controller.rows);
     }
 
     ListModel {
@@ -39,6 +50,28 @@ ColumnLayout {
 
     Component.onCompleted: refresh()
 
+    readonly property string kind: controller ? controller.viewSpec.kind : "today"
+    readonly property string filterError: controller && kind === "filter" ? (controller.filterErrors[controller.viewSpec.id] || "") : ""
+    readonly property string subtitle: {
+        var c = controller;
+        if (!c) {
+            return "";
+        }
+        switch (kind) {
+        case "today":
+            return Qt.formatDate(new Date(c.nowMs), "dddd, d MMMM");
+        case "upcoming":
+            return "";
+        case "filter":
+            if (c.view.filterFetchedAt > 0 && (c.phase === "OFFLINE" || filterError !== "")) {
+                return i18n("Results from %1", Qt.formatTime(new Date(c.view.filterFetchedAt), Qt.locale().timeFormat(Locale.ShortFormat)));
+            }
+            return c.count > 0 ? i18np("%1 task", "%1 tasks", c.count) : "";
+        default:
+            return c.count > 0 ? i18np("%1 task", "%1 tasks", c.count) : "";
+        }
+    }
+
     RowLayout {
         Layout.fillWidth: true
         Layout.leftMargin: Kirigami.Units.smallSpacing
@@ -49,15 +82,15 @@ ColumnLayout {
             Layout.fillWidth: true
             spacing: 0
 
-            Kirigami.Heading {
+            ViewSelector {
                 Layout.fillWidth: true
-                level: 1
-                text: i18n("Today")
-                elide: Text.ElideRight
+                controller: listRoot.controller
             }
             PlasmaComponents3.Label {
                 Layout.fillWidth: true
-                text: Qt.formatDate(new Date(listRoot.controller.nowMs), "dddd, d MMMM")
+                visible: text !== ""
+                text: listRoot.subtitle
+                textFormat: Text.PlainText
                 elide: Text.ElideRight
                 opacity: 0.7
             }
@@ -104,6 +137,7 @@ ColumnLayout {
                 width: ListView.view.width
                 controller: listRoot.controller
                 onMenuRequested: anchor => taskMenu.openFor(taskRow, anchor)
+                onAddRequested: dateKey => newTask.startAdding(dateKey)
             }
 
             add: Transition {
@@ -120,17 +154,37 @@ ColumnLayout {
             }
 
             Kirigami.PlaceholderMessage {
+                readonly property bool waitingForFilter: listRoot.kind === "filter" && !listRoot.controller.view.hasFilterResult
                 anchors.centerIn: parent
                 width: parent.width - Kirigami.Units.gridUnit * 2
                 visible: listView.count === 0
-                icon.name: "checkmark"
-                text: i18n("All done for today")
-                explanation: i18n("Enjoy the rest of your day.")
+                icon.name: listRoot.filterError === "client" ? "data-warning"
+                         : (waitingForFilter ? "view-filter" : "checkmark")
+                text: {
+                    if (listRoot.filterError === "client") {
+                        return i18n("Todoist couldn't run this filter");
+                    }
+                    if (waitingForFilter) {
+                        return listRoot.controller.phase === "OFFLINE" ? i18n("Filter results need a connection")
+                                                                        : i18n("Loading…");
+                    }
+                    return listRoot.kind === "today" ? i18n("All done for today") : i18n("No tasks here");
+                }
+                explanation: {
+                    if (listRoot.filterError === "client") {
+                        return i18n("Open it in Todoist to check the query.");
+                    }
+                    if (waitingForFilter) {
+                        return "";
+                    }
+                    return listRoot.kind === "today" ? i18n("Enjoy the rest of your day.") : i18n("Add one below.");
+                }
             }
         }
     }
 
     NewTaskField {
+        id: newTask
         Layout.fillWidth: true
         controller: listRoot.controller
     }

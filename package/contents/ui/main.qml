@@ -37,11 +37,11 @@ PlasmoidItem {
             }
             break;
         }
-        if (sync.count === 0) {
+        if (sync.todayCount === 0) {
             return i18n("All done for today");
         }
-        var text = i18np("%1 task today", "%1 tasks today", sync.count);
-        var next = sync.view.next;
+        var text = i18np("%1 task today", "%1 tasks today", sync.todayCount);
+        var next = sync.todayView.next;
         if (next) {
             var when = sync.timeText(next.minutes);
             text += " · " + (when ? i18nc("next task: title time", "Next: %1 %2", next.title, when)
@@ -74,6 +74,8 @@ PlasmoidItem {
         id: sync
         token: Plasmoid.configuration.apiToken
         appletId: String(Plasmoid.id)
+        pinnedView: Plasmoid.configuration.pinnedView
+        badgeSource: Plasmoid.configuration.badgeSource
         onAccountVerified: name => {
             if (name && Plasmoid.configuration.accountName !== name) {
                 Plasmoid.configuration.accountName = name;

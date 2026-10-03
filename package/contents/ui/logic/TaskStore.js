@@ -469,59 +469,6 @@ function computeToday(store, queue, nowMs, sysOffsetAt) {
     };
 }
 
-// Flattens a computeToday() result into uniform rows for a QML ListModel
-// (every role always present with the same type). `header` names the section label drawn
-// above a row ("" = none): the first overdue row, the first today row (only when overdue
-// rows precede it, the big heading already says Today) and the first pending row.
-function flattenRows(view) {
-    var rows = [];
-    function push(r, section, header) {
-        rows.push({
-            key: "t:" + r.id,
-            kind: "task",
-            itemId: r.id,
-            title: r.title,
-            content: r.content || r.title,
-            projectId: r.projectId || "",
-            priority: r.priority,
-            projectName: r.projectName || "",
-            dateKey: r.dateKey,
-            minutes: r.minutes === null ? -1 : r.minutes,
-            isLate: !!r.isLate,
-            isRecurring: !!r.isRecurring,
-            section: section,
-            header: header
-        });
-    }
-    var i;
-    for (i = 0; i < view.overdue.length; i++) {
-        push(view.overdue[i], "overdue", i === 0 ? "overdue" : "");
-    }
-    for (i = 0; i < view.today.length; i++) {
-        push(view.today[i], "today", i === 0 && view.overdue.length > 0 ? "today" : "");
-    }
-    for (i = 0; i < view.pending.length; i++) {
-        var p = view.pending[i];
-        rows.push({
-            key: "q:" + p.localId,
-            kind: "pending",
-            itemId: "",
-            title: p.text,
-            content: p.text,
-            projectId: "",
-            priority: 1,
-            projectName: "",
-            dateKey: "",
-            minutes: -1,
-            isLate: false,
-            isRecurring: false,
-            section: "pending",
-            header: i === 0 ? "pending" : ""
-        });
-    }
-    return rows;
-}
-
 // Projects for a "Move to" menu: Inbox first, then by name. -> [{ id, name, isInbox }]
 function projectList(store) {
     var out = [];

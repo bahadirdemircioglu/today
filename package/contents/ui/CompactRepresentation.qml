@@ -10,10 +10,10 @@ MouseArea {
     property PlasmoidItem plasmoidItem
     property var controller
 
-    readonly property int count: controller ? controller.count : 0
+    readonly property int count: controller ? controller.badgeCount : 0
     readonly property bool needsAttention: !!controller
         && (controller.phase === "SETUP" || controller.phase === "AUTH_INVALID")
-    readonly property bool hasOverdue: !!controller && controller.overdueCount > 0
+    readonly property bool hasOverdue: !!controller && controller.badgeAlert
     property bool wasExpanded: false
 
     hoverEnabled: true

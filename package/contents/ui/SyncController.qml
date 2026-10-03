@@ -6,6 +6,8 @@ import "logic/CommandQueue.js" as CommandQueue
 import "logic/SyncMachine.js" as SyncMachine
 import "logic/TodoistClient.js" as TodoistClient
 import "logic/Storage.js" as Storage
+import "logic/ViewModel.js" as ViewModel
+import "logic/ContextRules.js" as ContextRules
 
 // Thin effect runner around SyncMachine: owns timers, XHRs and LocalStorage I/O.
 // It makes no sync decisions of its own; branches here only dispatch on effect type
@@ -17,6 +19,8 @@ Item {
     // inputs
     property string token: ""
     property string appletId: ""
+    property string pinnedView: ""          // config: view this widget starts with ("" = last used)
+    property string badgeSource: "today"    // config: "today" | "view" | "none"
 
     // state for the views
     property var machine: SyncMachine.initialState()
@@ -27,11 +31,41 @@ Item {
     readonly property double lastSyncAt: machine.lastSyncAt
     property var store: TaskStore.emptyStore()
     property var queue: CommandQueue.emptyQueue()
-    property var view: ({ overdue: [], today: [], pending: [], next: null, todayKey: "", nowMinutes: 0, unparsable: 0,
-                          counts: { overdue: 0, today: 0, total: 0, pending: 0 } })
+    // current view
+    property string viewKey: "today"
+    readonly property var viewSpec: ViewModel.parseSpec(viewKey)
+    property var view: ({ spec: { kind: "today", id: "" }, title: "", exists: true, groups: [], pending: [],
+                          counts: { total: 0, overdue: 0, pending: 0 }, todayKey: "", nowMinutes: 0,
+                          filterFetchedAt: 0, filterMissing: 0, hasFilterResult: true })
+    property var todayView: ({ overdue: [], today: [], pending: [], next: null, todayKey: "", nowMinutes: 0, unparsable: 0,
+                               counts: { overdue: 0, today: 0, total: 0, pending: 0 } })
     property var rows: []
+    property var nav: []
+    property var filterResults: ({})
+    property var filterErrors: ({})
     readonly property int count: view.counts.total
+    readonly property string viewTitle: {
+        switch (viewSpec.kind) {
+        case "inbox":
+            return i18n("Inbox");
+        case "upcoming":
+            return i18n("Upcoming");
+        case "project":
+        case "label":
+        case "filter":
+            return view.title || "";
+        default:
+            return i18n("Today");
+        }
+    }
     readonly property int overdueCount: view.counts.overdue
+    readonly property int todayCount: todayView.counts.total
+    readonly property int todayOverdueCount: todayView.counts.overdue
+    readonly property int badgeCount: badgeSource === "none" ? 0 : (badgeSource === "view" ? count : todayCount)
+    readonly property bool badgeAlert: badgeSource === "view" ? overdueCount > 0 : todayOverdueCount > 0
+    // first upcoming timed task of today, else the first row of the current view
+    readonly property var nextTask: viewSpec.kind === "today" ? todayView.next
+                                    : (view.groups.length && view.groups[0].rows.length ? view.groups[0].rows[0] : null)
     readonly property int queuedCount: queue.entries.length
     property double nowMs: Date.now()
     property string infoText: ""
@@ -89,9 +123,25 @@ Item {
         requestSync("action");
     }
 
-    // -> "" on success, otherwise "empty" | "too_long"
-    function addTask(text) {
-        var r = CommandQueue.enqueueQuickAdd(queue, text, Date.now(), newUuid);
+    function setView(key) {
+        var spec = ViewModel.parseSpec(key);
+        var k = ViewModel.specKey(spec);
+        if (k !== viewKey) {
+            viewKey = k;
+            if (appletId) {
+                Storage.save(appletId, "lastView", k);
+            }
+            recompute();
+        }
+        if (spec.kind === "filter") {
+            requestSync("view");
+        }
+    }
+
+    // -> "" on success, otherwise "empty" | "too_long". date: "YYYY-MM-DD" when adding to a day in Upcoming.
+    function addTask(text, date) {
+        var context = ContextRules.contextFor(viewSpec, store, date || "");
+        var r = CommandQueue.enqueueQuickAdd(queue, text, Date.now(), newUuid, context);
         if (r.error) {
             return r.error;
         }
@@ -200,16 +250,45 @@ Item {
         return Qt.formatTime(d, Qt.locale().timeFormat(Locale.ShortFormat));
     }
 
+    // Relative day: Yesterday / Today / Tomorrow / weekday (this week) / "d MMM" (/ "d MMM yyyy")
     function dateText(dateKey) {
         var p = DateUtil.splitDateKey(dateKey);
         if (!p) {
             return "";
         }
-        var days = DateUtil.daysBetween(dateKey, view.todayKey);
-        if (days === 1) {
+        var date = new Date(p.y, p.m - 1, p.d);
+        var diff = DateUtil.daysBetween(view.todayKey, dateKey);
+        if (diff === -1) {
             return i18n("Yesterday");
         }
-        return Qt.formatDate(new Date(p.y, p.m - 1, p.d), "d MMM");
+        if (diff === 0) {
+            return i18n("Today");
+        }
+        if (diff === 1) {
+            return i18n("Tomorrow");
+        }
+        if (diff > 1 && diff < 7) {
+            return Qt.formatDate(date, "dddd");
+        }
+        var thisYear = DateUtil.splitDateKey(view.todayKey);
+        return Qt.formatDate(date, thisYear && thisYear.y === p.y ? "d MMM" : "d MMM yyyy");
+    }
+
+    // Upcoming day header: "Today · Saturday 3 October"
+    function dayHeaderText(dateKey) {
+        var p = DateUtil.splitDateKey(dateKey);
+        if (!p) {
+            return "";
+        }
+        var full = Qt.formatDate(new Date(p.y, p.m - 1, p.d), "dddd d MMMM");
+        var diff = DateUtil.daysBetween(view.todayKey, dateKey);
+        if (diff === 0) {
+            return i18nc("day header: Today · weekday date", "Today · %1", full);
+        }
+        if (diff === 1) {
+            return i18nc("day header: Tomorrow · weekday date", "Tomorrow · %1", full);
+        }
+        return full;
     }
 
     // ---- machine plumbing -------------------------------------------------
@@ -266,6 +345,8 @@ Item {
         case "clearData":
             store = TaskStore.emptyStore();
             queue = CommandQueue.emptyQueue();
+            filterResults = {};
+            filterErrors = {};
             Storage.clear(appletId);
             recompute();
             break;
@@ -347,8 +428,8 @@ Item {
             recompute();
             if (res.kind === "ok" || res.kind === "client") {
                 if (res.kind === "ok") {
-                    scheduleForTodayIfUndated(res.json);
-                    describeAdded(res.json);
+                    applyContext(entry.context, res.json);
+                    describeAdded(entry.context, res.json);
                 } else {
                     reportDropped(r.dropped, {});
                 }
@@ -397,7 +478,55 @@ Item {
             recompute();
             var more = moreQuickAdds || CommandQueue.nextQuickAdd(queue) !== null
                 || (commands.length >= CommandQueue.MAX_BATCH && CommandQueue.nextSyncBatch(queue, 1, Date.now()).length > 0);
-            dispatch({ type: "REQUEST_DONE", kind: "ok", fullSync: !!json.full_sync, hadCommands: commands.length > 0, moreWork: more });
+            var done = function () {
+                dispatch({ type: "REQUEST_DONE", kind: "ok", fullSync: !!json.full_sync, hadCommands: commands.length > 0, moreWork: more });
+            };
+            // the current filter view is refreshed inside the same cycle (one request in flight at a time)
+            if (mode !== "readOnlyFull" && viewSpec.kind === "filter" && store.filters[viewSpec.id]) {
+                fetchFilter(viewSpec.id, null, [], 0, done);
+            } else {
+                done();
+            }
+        });
+    }
+
+    // Saved filters are evaluated by Todoist; failures never fail the sync cycle.
+    function fetchFilter(filterId, cursor, ids, pages, done) {
+        var filter = store.filters[filterId];
+        send(function (cb) {
+            return TodoistClient.filterTasks(priv.activeToken, filter.query, store.lang || "", cursor, cb);
+        }, function (res) {
+            var errors = Object.assign({}, filterErrors);
+            if (res.kind !== "ok") {
+                errors[filterId] = res.kind;
+                filterErrors = errors;
+                recompute();
+                done();
+                return;
+            }
+            var page = TodoistClient.filterPage(res.json);
+            var all = ids.slice();
+            for (var i = 0; i < page.tasks.length; i++) {
+                if (page.tasks[i] && page.tasks[i].id !== undefined && page.tasks[i].id !== null) {
+                    all.push(String(page.tasks[i].id));
+                }
+            }
+            store = TaskStore.mergeTasks(store, page.tasks);
+            if (page.nextCursor && pages < 4) {
+                fetchFilter(filterId, page.nextCursor, all, pages + 1, done);
+                return;
+            }
+            delete errors[filterId];
+            filterErrors = errors;
+            var results = Object.assign({}, filterResults);
+            results[filterId] = { ids: all, fetchedAt: Date.now() };
+            filterResults = results;
+            saveStore();
+            if (appletId) {
+                Storage.save(appletId, "filters", JSON.stringify(filterResults));
+            }
+            recompute();
+            done();
         });
     }
 
@@ -420,15 +549,24 @@ Item {
 
     function recompute() {
         nowMs = Date.now();
-        var v = TaskStore.computeToday(store, queue, nowMs, DateUtil.systemOffsetAt);
-        if (v.unparsable !== priv.lastUnparsable) {
-            priv.lastUnparsable = v.unparsable;
-            if (v.unparsable > 0) {
-                warn("tasks with unparsable due dates:", v.unparsable);
+        var t = TaskStore.computeToday(store, queue, nowMs, DateUtil.systemOffsetAt);
+        if (t.unparsable !== priv.lastUnparsable) {
+            priv.lastUnparsable = t.unparsable;
+            if (t.unparsable > 0) {
+                warn("tasks with unparsable due dates:", t.unparsable);
             }
         }
+        todayView = t;
+        var v = ViewModel.computeView(store, queue, viewSpec, nowMs, DateUtil.systemOffsetAt, filterResults);
+        if (!v.exists && TaskStore.hasData(store)) {
+            // the project/label/filter was deleted or archived in Todoist
+            viewKey = "today";
+            showInfo(i18n("That list no longer exists in Todoist. Showing Today."), false);
+            v = ViewModel.computeView(store, queue, viewSpec, nowMs, DateUtil.systemOffsetAt, filterResults);
+        }
         view = v;
-        rows = TaskStore.flattenRows(v);
+        rows = ViewModel.flattenView(v);
+        nav = ViewModel.navList(store, queue, nowMs, DateUtil.systemOffsetAt, filterResults);
         projects = TaskStore.projectList(store);
     }
 
@@ -448,22 +586,32 @@ Item {
         return CommandQueue.uuid4(Math.random);
     }
 
-    // Like Todoist's own Today view: a task added here without a date lands on today.
-    // Sent as a uuid-idempotent item_update in this same cycle's /sync request.
-    function scheduleForTodayIfUndated(task) {
-        if (!task || task.due || task.id === undefined || task.id === null || !TaskStore.isValidId(String(task.id))) {
+    // The view the task was added from decides where it lands (ContextRules); the commands go
+    // out uuid-idempotently in this same cycle's /sync request.
+    function applyContext(context, task) {
+        if (!task || task.id === undefined || task.id === null || !TaskStore.isValidId(String(task.id))) {
             return;
         }
-        queue = CommandQueue.enqueueDueToday(queue, String(task.id), view.todayKey, Date.now(), newUuid);
+        var cmds = ContextRules.followUps(context, task, view.todayKey, store.inboxProjectId || "");
+        for (var i = 0; i < cmds.length; i++) {
+            if (cmds[i].kind === "move" && TaskStore.isValidId(cmds[i].projectId)) {
+                queue = CommandQueue.enqueueMove(queue, String(task.id), cmds[i].projectId, Date.now(), newUuid);
+            } else if (cmds[i].kind === "update") {
+                queue = CommandQueue.enqueueUpdate(queue, String(task.id), cmds[i].args, Date.now(), newUuid);
+            }
+        }
         saveQueue();
     }
 
-    function describeAdded(task) {
-        if (!task || !task.due) {
-            return; // undated tasks are moved to today and show up in the list
+    // Tell the user where a task went when it won't appear in the list they added it from.
+    function describeAdded(context, task) {
+        var kind = context ? context.kind : "today";
+        if (!task || !task.due || (kind !== "today" && kind !== "upcoming")) {
+            return;
         }
         var due = DateUtil.parseDue(task.due, DateUtil.makeOffsetFn(store.tz, DateUtil.systemOffsetAt));
-        if (due && due.dateKey <= view.todayKey) {
+        var lastVisible = kind === "today" ? view.todayKey : DateUtil.addDaysKey(view.todayKey, ViewModel.UPCOMING_DAYS - 1);
+        if (due && due.dateKey <= lastVisible) {
             return; // it will show up in the list with the next sync
         }
         var projectId = task.project_id !== undefined && task.project_id !== null ? String(task.project_id) : "";
@@ -567,6 +715,12 @@ Item {
         }
     }
 
+    onPinnedViewChanged: {
+        if (priv.started && pinnedView) {
+            setView(pinnedView);
+        }
+    }
+
     onTokenChanged: {
         if (!priv.started) {
             return;
@@ -589,6 +743,14 @@ Item {
             var q = Storage.load(appletId, "queue");
             store = s ? TaskStore.deserialize(s) : TaskStore.emptyStore();
             queue = q ? CommandQueue.recoverAfterRestart(CommandQueue.deserialize(q)) : CommandQueue.emptyQueue();
+            try {
+                var f = JSON.parse(Storage.load(appletId, "filters") || "{}");
+                filterResults = f && typeof f === "object" ? f : {};
+            } catch (err) {
+                filterResults = {};
+            }
+            // a pinned view is the starting point; otherwise continue where the user left off
+            viewKey = ViewModel.specKey(ViewModel.parseSpec(pinnedView || Storage.load(appletId, "lastView") || "today"));
         }
         priv.activeToken = token.trim();
         priv.started = true;
