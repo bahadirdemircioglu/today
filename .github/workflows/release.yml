@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - "v*"
+  # Manual release from the Actions tab (or the API): creates the v<version> tag on the chosen commit.
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (must equal metadata.json KPlugin.Version), e.g. 2.1.0"
+        required: true
 
 permissions:
   contents: write
@@ -17,13 +23,16 @@ jobs:
         with:
           node-version: 22
       - name: Tag must match metadata.json version
+        env:
+          REF_TAG: ${{ github.event_name == 'workflow_dispatch' && format('v{0}', inputs.version) || github.ref_name }}
         run: |
           VERSION=$(node -e 'process.stdout.write(require("./package/metadata.json").KPlugin.Version)')
-          TAG="${GITHUB_REF_NAME#v}"
+          TAG="${REF_TAG#v}"
+          echo "RELEASE_TAG=$REF_TAG" >> "$GITHUB_ENV"
           # pre-release tags (v1.0.0-rc1) must start with the metadata version
           case "$TAG" in
-            "$VERSION"|"$VERSION"-*) echo "version ok: $VERSION ($GITHUB_REF_NAME)" ;;
-            *) echo "::error::tag $GITHUB_REF_NAME does not match metadata.json version $VERSION"; exit 1 ;;
+            "$VERSION"|"$VERSION"-*) echo "version ok: $VERSION ($REF_TAG)" ;;
+            *) echo "::error::tag $REF_TAG does not match metadata.json version $VERSION"; exit 1 ;;
           esac
       - name: Unit tests
         run: npm test
@@ -43,4 +52,6 @@ jobs:
         with:
           files: dist/*.plasmoid
           body_path: release-notes.md
-          prerelease: ${{ contains(github.ref_name, '-') }}
+          tag_name: ${{ env.RELEASE_TAG }}
+          target_commitish: ${{ github.sha }}
+          prerelease: ${{ contains(env.RELEASE_TAG, '-') }}
