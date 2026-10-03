@@ -298,12 +298,10 @@ function compareRows(a, b) {
     return a.id < b.id ? -1 : (a.id > b.id ? 1 : 0);
 }
 
-// -> { overdue, today, pending, counts, next, todayKey, nowMinutes, unparsable }
-function computeToday(store, queue, nowMs, sysOffsetAt) {
-    var st = store || emptyStore();
-    var offsetAt = DateUtil.makeOffsetFn(st.tz, sysOffsetAt);
-    var todayKey = DateUtil.dayKeyAt(nowMs, offsetAt);
-    var nowMinutes = DateUtil.minutesOfDayAt(nowMs, offsetAt);
+// Applies the offline queue to the cache the way the server will once it is sent:
+// closed/deleted items disappear, updates/moves are patched in (queue order, later wins).
+// -> { items: { id: item }, pending: [{ localId, text, state }] }  (store is not mutated)
+function applyOverlay(store, queue) {
     var entries = queue && queue.entries ? queue.entries : [];
     var closing = {};
     var patches = {};
@@ -314,16 +312,24 @@ function computeToday(store, queue, nowMs, sysOffsetAt) {
         if (e.kind === "close" || e.kind === "delete") {
             closing[e.itemId] = true;
         } else if (e.kind === "update" || e.kind === "move") {
-            // optimistic overlay, applied in queue order (later wins)
             var patch = patches[e.itemId] || {};
             if (e.kind === "move") {
                 patch.projectId = e.projectId;
+                if (e.sectionId !== undefined) {
+                    patch.sectionId = e.sectionId;
+                }
+                if (e.parentId !== undefined) {
+                    patch.parentId = e.parentId;
+                }
             } else {
                 if (e.args.content !== undefined) {
                     patch.content = e.args.content;
                 }
                 if (e.args.priority !== undefined) {
                     patch.priority = e.args.priority;
+                }
+                if (e.args.labels !== undefined) {
+                    patch.labels = e.args.labels;
                 }
                 if (e.args.due !== undefined) {
                     patch.due = e.args.due ? { date: e.args.due.date, isRecurring: false, string: "" } : null;
@@ -334,16 +340,13 @@ function computeToday(store, queue, nowMs, sysOffsetAt) {
             pending.push({ localId: e.localId, text: e.text, state: e.state });
         }
     }
-
-    var overdue = [];
-    var today = [];
-    var unparsable = 0;
-    var items = st.items || {};
-    for (var id in items) {
-        if (!Object.prototype.hasOwnProperty.call(items, id) || closing[id]) {
+    var src = store && store.items ? store.items : {};
+    var items = {};
+    for (var id in src) {
+        if (!Object.prototype.hasOwnProperty.call(src, id) || closing[id]) {
             continue;
         }
-        var item = items[id];
+        var item = src[id];
         if (patches[id]) {
             item = copyMap(item);
             for (var pk in patches[id]) {
@@ -352,6 +355,55 @@ function computeToday(store, queue, nowMs, sysOffsetAt) {
                 }
             }
         }
+        items[id] = item;
+    }
+    return { items: items, pending: pending };
+}
+
+// Display row for an item (shared by every view). due: parseDue() result or null.
+function makeRow(st, item, due, todayKey, nowMinutes) {
+    var project = item.projectId ? (st.projects || {})[item.projectId] : null;
+    return {
+        id: item.id,
+        title: plainTitle(item.content),
+        content: item.content,
+        priority: item.priority,
+        projectId: item.projectId,
+        projectName: project && item.projectId !== st.inboxProjectId ? project.name : "",
+        sectionId: item.sectionId || null,
+        parentId: item.parentId || null,
+        labels: item.labels || [],
+        description: item.description || "",
+        dateKey: due ? due.dateKey : "",
+        minutes: due ? due.minutes : null,
+        isRecurring: due ? due.isRecurring : false,
+        isOverdue: !!due && due.dateKey < todayKey,
+        isLate: !!due && due.dateKey === todayKey && due.minutes !== null && due.minutes < nowMinutes,
+        orderKey: Object.prototype.hasOwnProperty.call(st.orderKeys || {}, item.id) ? st.orderKeys[item.id] : null,
+        dayOrder: item.dayOrder,
+        childOrder: item.childOrder
+    };
+}
+
+// -> { overdue, today, pending, counts, next, todayKey, nowMinutes, unparsable }
+function computeToday(store, queue, nowMs, sysOffsetAt) {
+    var st = store || emptyStore();
+    var offsetAt = DateUtil.makeOffsetFn(st.tz, sysOffsetAt);
+    var todayKey = DateUtil.dayKeyAt(nowMs, offsetAt);
+    var nowMinutes = DateUtil.minutesOfDayAt(nowMs, offsetAt);
+    var ov = applyOverlay(st, queue);
+    var pending = ov.pending;
+    var i;
+
+    var overdue = [];
+    var today = [];
+    var unparsable = 0;
+    var items = ov.items;
+    for (var id in items) {
+        if (!Object.prototype.hasOwnProperty.call(items, id)) {
+            continue;
+        }
+        var item = items[id];
         var due = DateUtil.parseDue(item.due, offsetAt);
         if (!due) {
             if (item.due) {
@@ -362,23 +414,7 @@ function computeToday(store, queue, nowMs, sysOffsetAt) {
         if (due.dateKey > todayKey) {
             continue;
         }
-        var project = item.projectId ? (st.projects || {})[item.projectId] : null;
-        var row = {
-            id: item.id,
-            title: plainTitle(item.content),
-            content: item.content,
-            priority: item.priority,
-            projectId: item.projectId,
-            projectName: project && item.projectId !== st.inboxProjectId ? project.name : "",
-            dateKey: due.dateKey,
-            minutes: due.minutes,
-            isRecurring: due.isRecurring,
-            isOverdue: due.dateKey < todayKey,
-            isLate: due.dateKey === todayKey && due.minutes !== null && due.minutes < nowMinutes,
-            orderKey: Object.prototype.hasOwnProperty.call(st.orderKeys || {}, id) ? st.orderKeys[id] : null,
-            dayOrder: item.dayOrder,
-            childOrder: item.childOrder
-        };
+        var row = makeRow(st, item, due, todayKey, nowMinutes);
         if (row.isOverdue) {
             overdue.push(row);
         } else {
