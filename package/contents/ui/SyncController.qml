@@ -101,6 +101,8 @@ Item {
     property double focusNewTaskAt: 0
 
     signal accountVerified(string name)
+    // a pinned view pointed at a temporary project id that now has its real id
+    signal pinnedViewRemapped(string key)
     // a timed task is coming up (main.qml shows the notification)
     signal reminderDue(string itemId, string title, string body, string baseKey)
 
@@ -283,6 +285,21 @@ Item {
         if (TaskStore.isValidId(itemId)) {
             enqueueEdit(CommandQueue.enqueueUpdate(queue, itemId, { content: t }, Date.now(), newUuid));
         }
+        return "";
+    }
+
+    // Creates a project (offline-capable: queued with a temporary id) and switches to it.
+    // -> "" | "empty" | "too_long"
+    function createProject(name, color, parentId) {
+        var r = CommandQueue.enqueueProjectAdd(queue, name, color, parentId, Date.now(), newUuid);
+        if (r.error) {
+            return r.error;
+        }
+        queue = r.queue;
+        saveQueue();
+        recompute();
+        setView("project:" + r.tempId);
+        requestSync("action");
         return "";
     }
 
@@ -563,6 +580,21 @@ Item {
                 queue = st.queue;
                 dropped = st.dropped;
             }
+            // temporary ids (projects created here) -> real ids, everywhere they are referenced
+            if (json.temp_id_mapping) {
+                queue = CommandQueue.remapTempIds(queue, json.temp_id_mapping);
+                var spec = viewSpec;
+                if (spec.kind === "project" && json.temp_id_mapping[spec.id]) {
+                    var realKey = "project:" + json.temp_id_mapping[spec.id];
+                    if (pinnedView === "project:" + spec.id) {
+                        pinnedViewRemapped(realKey);
+                    }
+                    viewKey = realKey;
+                    if (appletId) {
+                        Storage.save(appletId, "lastView", realKey);
+                    }
+                }
+            }
             var titles = {};
             for (var j = 0; j < dropped.length; j++) {
                 var known = store.items[dropped[j].itemId];
@@ -708,13 +740,19 @@ Item {
         if (!v.exists && TaskStore.hasData(store)) {
             // the project/label/filter was deleted or archived in Todoist
             viewKey = "today";
-            showInfo(i18n("That list no longer exists in Todoist. Showing Today."), false);
+            if (infoText === "") {
+                showInfo(i18n("That list no longer exists in Todoist. Showing Today."), false);
+            }
             v = ViewModel.computeView(store, queue, viewSpec, nowMs, DateUtil.systemOffsetAt, filterResults, options);
         }
         view = v;
         rows = ViewModel.flattenView(v);
         nav = ViewModel.navList(store, queue, nowMs, DateUtil.systemOffsetAt, filterResults, options);
-        projects = TaskStore.projectList(store);
+        // reassign only on change: menus rebuild their items whenever this list is replaced
+        var nextProjects = TaskStore.projectList(TaskStore.withPendingProjects(store, queue));
+        if (JSON.stringify(nextProjects) !== JSON.stringify(projects)) {
+            projects = nextProjects;
+        }
     }
 
     // Lets other widget instances offer this account in their setup screen (token reuse only:
@@ -790,7 +828,11 @@ Item {
             warn("dropped", dropped[i].kind, dropped[i].errorTag || dropped[i].reason || "", dropped[i].itemId || "");
         }
         var d = dropped[0];
-        if (d.kind === "update" || d.kind === "move" || d.kind === "delete") {
+        if (d.kind === "project_add") {
+            showInfo(/LIMIT/i.test(d.errorTag || "")
+                     ? i18n("Couldn't create “%1”: your Todoist plan's project limit is reached.", d.name)
+                     : i18n("Couldn't create the project “%1”.", d.name), true);
+        } else if (d.kind === "update" || d.kind === "move" || d.kind === "delete") {
             var changed = titles[d.itemId] || "";
             showInfo(changed ? i18n("Couldn't save a change to “%1” — it may have been deleted.", changed)
                              : i18n("Couldn't save a change to a task — it may have been deleted."), true);

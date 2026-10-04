@@ -13,6 +13,8 @@ PlasmaComponents3.AbstractButton {
 
     property var controller
 
+    signal newProjectRequested()
+
     readonly property var projectEntries: controller ? controller.nav.filter(function (e) { return e.kind === "project"; }) : []
     readonly property var labelEntries: controller ? controller.nav.filter(function (e) { return e.kind === "label"; }) : []
     readonly property var filterEntries: controller ? controller.nav.filter(function (e) { return e.kind === "filter"; }) : []
@@ -102,7 +104,6 @@ PlasmaComponents3.AbstractButton {
         PlasmaComponents3.Menu {
             id: projectsMenu
             title: i18n("Projects")
-            enabled: selector.projectEntries.length > 0
 
             Instantiator {
                 model: selector.projectEntries
@@ -115,6 +116,13 @@ PlasmaComponents3.AbstractButton {
                 }
                 onObjectAdded: (index, object) => projectsMenu.insertItem(index, object)
                 onObjectRemoved: (index, object) => projectsMenu.removeItem(object)
+            }
+
+            PlasmaComponents3.MenuSeparator {}
+            PlasmaComponents3.MenuItem {
+                text: i18n("New project…")
+                icon.name: "folder-new"
+                onTriggered: selector.newProjectRequested()
             }
         }
         PlasmaComponents3.Menu {

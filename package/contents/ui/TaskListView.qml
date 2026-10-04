@@ -113,6 +113,12 @@ ColumnLayout {
         onPickDateRequested: row => duePicker.openFor(row)
     }
 
+    NewProjectDialog {
+        id: newProjectDialog
+        parent: listRoot
+        controller: listRoot.controller
+    }
+
     DuePicker {
         id: duePicker
         parent: listRoot
@@ -167,6 +173,7 @@ ColumnLayout {
             ViewSelector {
                 Layout.fillWidth: true
                 controller: listRoot.controller
+                onNewProjectRequested: newProjectDialog.openDialog()
             }
             PlasmaComponents3.Label {
                 Layout.fillWidth: true

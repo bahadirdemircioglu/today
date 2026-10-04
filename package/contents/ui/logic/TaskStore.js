@@ -384,6 +384,29 @@ function applyOverlay(store, queue) {
     return { items: items, pending: pending };
 }
 
+// The store as views should see it: projects still waiting to be created (queued project_add)
+// already appear, under their temporary id. -> shallow store copy (input not mutated)
+function withPendingProjects(store, queue) {
+    var st = store || emptyStore();
+    var entries = queue && queue.entries ? queue.entries : [];
+    var pending = [];
+    for (var i = 0; i < entries.length; i++) {
+        if (entries[i].kind === "project_add") {
+            pending.push(entries[i]);
+        }
+    }
+    if (!pending.length) {
+        return st;
+    }
+    var s = copyStore(st);
+    for (var j = 0; j < pending.length; j++) {
+        var e = pending[j];
+        s.projects[e.tempId] = { name: e.name, color: e.color || "", order: 100000 + j,
+                                 parentId: e.parentId || null, isInbox: false, pending: true };
+    }
+    return s;
+}
+
 // Display row for an item (shared by every view). due: parseDue() result or null.
 function makeRow(st, item, due, todayKey, nowMinutes) {
     var project = item.projectId ? (st.projects || {})[item.projectId] : null;

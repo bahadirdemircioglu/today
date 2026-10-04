@@ -119,6 +119,9 @@ msgstr ""
 msgid "Checking…"
 msgstr ""
 
+msgid "Colour"
+msgstr ""
+
 msgid "Complete"
 msgstr ""
 
@@ -158,10 +161,19 @@ msgstr ""
 msgid "Couldn't complete “%1” — it may have been deleted."
 msgstr ""
 
+msgid "Couldn't create the project “%1”."
+msgstr ""
+
+msgid "Couldn't create “%1”: your Todoist plan's project limit is reached."
+msgstr ""
+
 msgid "Couldn't save a change to a task — it may have been deleted."
 msgstr ""
 
 msgid "Couldn't save a change to “%1” — it may have been deleted."
+msgstr ""
+
+msgid "Create"
 msgstr ""
 
 msgid "Custom filter"
@@ -207,6 +219,9 @@ msgstr ""
 msgid "General"
 msgstr ""
 
+msgid "Give the project a name."
+msgstr ""
+
 msgid "Hide details"
 msgstr ""
 
@@ -222,6 +237,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "Inbox"
+msgstr ""
+
+msgid "Inside:"
 msgstr ""
 
 msgid "Labels"
@@ -240,6 +258,12 @@ msgid "More actions"
 msgstr ""
 
 msgid "Move to"
+msgstr ""
+
+msgid "New project"
+msgstr ""
+
+msgid "New project…"
 msgstr ""
 
 msgid "New task in %1"
@@ -272,6 +296,9 @@ msgid "No badge"
 msgstr ""
 
 msgid "No date"
+msgstr ""
+
+msgid "No parent project"
 msgstr ""
 
 msgid "No tasks here"
@@ -345,6 +372,9 @@ msgstr ""
 msgid "Priority 4"
 msgstr ""
 
+msgid "Project name"
+msgstr ""
+
 msgid "Projects"
 msgstr ""
 
@@ -402,6 +432,9 @@ msgid "Tasks in the current list"
 msgstr ""
 
 msgid "That list no longer exists in Todoist. Showing Today."
+msgstr ""
+
+msgid "That name is too long."
 msgstr ""
 
 msgid "That time isn't valid. Use e.g. 15:30."

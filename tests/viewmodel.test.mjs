@@ -229,3 +229,13 @@ test("project and label colours (Todoist names -> hex)", () => {
   // inside the project itself the project name (and colour) is not repeated
   assert.equal(V.flattenView(view(st, "project:work"))[0].projectColor, "");
 });
+
+test("projects waiting to be created already appear in nav and as a list", () => {
+  const st = store([]);
+  const q = { v: 1, entries: [{ kind: "project_add", uuid: "u", tempId: "tmpA", name: "Garden", color: "green", parentId: "" }] };
+  const nav = V.navList(st, q, NOON, sys180, {});
+  assert.ok(nav.some((e) => e.key === "project:tmpA" && e.name === "Garden"));
+  const v = V.computeView(st, q, V.parseSpec("project:tmpA"), NOON, sys180, {}, {});
+  assert.equal(v.exists, true);
+  assert.equal(v.title, "Garden");
+});

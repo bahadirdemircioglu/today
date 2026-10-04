@@ -45,8 +45,8 @@ function byOrderThenName(map) {
     return out;
 }
 
-function context(store, nowMs, sysOffsetAt) {
-    var st = store || TaskStore.emptyStore();
+function context(store, queue, nowMs, sysOffsetAt) {
+    var st = TaskStore.withPendingProjects(store || TaskStore.emptyStore(), queue);
     var offsetAt = DateUtil.makeOffsetFn(st.tz, sysOffsetAt);
     return {
         st: st,
@@ -193,7 +193,7 @@ function upcomingGroups(ctx, items) {
 // options: { collapsed: { "<itemId>": true }, customQuery: { name, query } }
 function computeView(store, queue, spec, nowMs, sysOffsetAt, filterResults, options) {
     var opts = options || {};
-    var ctx = context(store, nowMs, sysOffsetAt);
+    var ctx = context(store, queue, nowMs, sysOffsetAt);
     var ov = TaskStore.applyOverlay(ctx.st, queue);
     var groups = [];
     var title = "";
@@ -415,7 +415,7 @@ function blank(key, header, headerText, headerDate) {
 // -> [{ key, kind, id, name, count, depth }]  (count -1 = unknown)
 function navList(store, queue, nowMs, sysOffsetAt, filterResults, options) {
     var opts = options || {};
-    var ctx = context(store, nowMs, sysOffsetAt);
+    var ctx = context(store, queue, nowMs, sysOffsetAt);
     var ov = TaskStore.applyOverlay(ctx.st, queue);
     var perProject = {};
     var perLabel = {};

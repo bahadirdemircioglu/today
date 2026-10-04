@@ -195,3 +195,34 @@ test("enqueueClose with a hold is undoable and not sent before the hold ends", (
   assert.equal(Q.cancelEntry(q, "c1").entries.length, 0);
   assert.equal(Q.enqueueClose(Q.emptyQueue(), "a", 0, () => "c2").entries[0].sendAfter, undefined);
 });
+
+test("project_add: temp id, sync command shape, validation", () => {
+  let n = 0;
+  const ids = () => `0000-${++n}`;
+  const r = Q.enqueueProjectAdd(Q.emptyQueue(), "  Garden ", "teal", "P1", 0, ids);
+  assert.equal(r.error, null);
+  assert.match(r.tempId, /^tmp[A-Za-z0-9]+$/);
+  assert.deepEqual(Q.nextSyncBatch(r.queue, 100, 0), [
+    { type: "project_add", temp_id: r.tempId, uuid: r.queue.entries[0].uuid, args: { name: "Garden", color: "teal", parent_id: "P1" } },
+  ]);
+  assert.equal(Q.enqueueProjectAdd(Q.emptyQueue(), "  ", "", "", 0, ids).error, "empty");
+  assert.deepEqual(Q.deserialize(Q.serialize(r.queue)), r.queue);
+  const dropped = Q.applySyncStatus(r.queue, [r.queue.entries[0].uuid],
+    { [r.queue.entries[0].uuid]: { http_code: 403, error_tag: "MAX_PROJECTS_LIMIT_REACHED" } }).dropped;
+  assert.deepEqual([dropped[0].kind, dropped[0].name, dropped[0].errorTag], ["project_add", "Garden", "MAX_PROJECTS_LIMIT_REACHED"]);
+});
+
+test("remapTempIds rewrites ids in moves, quick add contexts and parents", () => {
+  const q = { v: 1, entries: [
+    { kind: "move", uuid: "1", itemId: "a", projectId: "tmpX" },
+    { kind: "quick_add", localId: "L", text: "t", state: "pending", context: { kind: "project", projectId: "tmpX" } },
+    { kind: "project_add", uuid: "2", tempId: "tmpY", name: "Sub", parentId: "tmpX" },
+    { kind: "close", uuid: "3", itemId: "b" },
+  ] };
+  const r = Q.remapTempIds(q, { tmpX: "999" });
+  assert.equal(r.entries[0].projectId, "999");
+  assert.equal(r.entries[1].context.projectId, "999");
+  assert.equal(r.entries[2].parentId, "999");
+  assert.equal(q.entries[0].projectId, "tmpX");
+  assert.equal(Q.remapTempIds(q, { other: "1" }), q);
+});

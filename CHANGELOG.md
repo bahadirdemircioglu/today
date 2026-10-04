@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- "New project…" under Projects in the list title menu: name, Todoist colour and an optional
+  parent project. The widget switches to the new project right away; offline it is queued
+  with a temporary id and gets its real id on the next sync. Hitting the Todoist plan's
+  project limit shows a clear message.
+
 ## [2.2.0] - 2026-10-04
 
 ### Added

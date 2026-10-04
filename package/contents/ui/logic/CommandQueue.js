@@ -6,6 +6,7 @@
 //   { kind: "update", uuid, itemId, args, createdAt, attempts }                -> sync item_update {id, ...args}
 //   { kind: "move", uuid, itemId, projectId, createdAt, attempts }             -> sync item_move
 //   { kind: "delete", uuid, itemId, sendAfter, createdAt, attempts }           -> sync item_delete (after an undo window)
+//   { kind: "project_add", uuid, tempId, name, color, parentId, createdAt, attempts } -> sync project_add (temp_id)
 //   { kind: "quick_add", localId, text, createdAt, attempts, state, sentAt }   -> POST /tasks/quick
 // Every function returns a new queue; inputs are never mutated.
 
@@ -46,7 +47,65 @@ function uuid4(randomFn) {
 
 // Entries sent as /sync commands (uuid-idempotent).
 function isSyncCommand(e) {
-    return e.kind === "close" || e.kind === "update" || e.kind === "move" || e.kind === "delete";
+    return e.kind === "close" || e.kind === "update" || e.kind === "move" || e.kind === "delete"
+        || e.kind === "project_add";
+}
+
+// Temporary ids look like real ones (alphanumeric) so views, menus and later commands can use
+// them before the server answers; remapTempIds() swaps them for the real ids afterwards.
+function newTempId(uuidFn) {
+    return "tmp" + String(uuidFn()).replace(/[^A-Za-z0-9]/g, "");
+}
+
+// -> { queue, tempId, error: null | "empty" | "too_long" }
+function enqueueProjectAdd(queue, name, color, parentId, nowMs, uuidFn) {
+    var n = String(name === undefined || name === null ? "" : name).trim();
+    if (!n) {
+        return { queue: queue, tempId: null, error: "empty" };
+    }
+    if (n.length > 120) {
+        return { queue: queue, tempId: null, error: "too_long" };
+    }
+    var tempId = newTempId(uuidFn);
+    var entries = queue.entries.slice();
+    entries.push({ kind: "project_add", uuid: uuidFn(), tempId: tempId, name: n, color: color || "",
+                   parentId: parentId || "", createdAt: nowMs, attempts: 0 });
+    return { queue: withEntries(entries), tempId: tempId, error: null };
+}
+
+// After a sync: temp_id_mapping { tempId: realId } rewritten into every remaining entry.
+function remapTempIds(queue, mapping) {
+    if (!mapping) {
+        return queue;
+    }
+    var changed = false;
+    function m(id) {
+        if (id && Object.prototype.hasOwnProperty.call(mapping, id)) {
+            changed = true;
+            return String(mapping[id]);
+        }
+        return id;
+    }
+    var entries = [];
+    for (var i = 0; i < queue.entries.length; i++) {
+        var e = copyEntry(queue.entries[i]);
+        if (e.itemId) {
+            e.itemId = m(e.itemId);
+        }
+        if (e.projectId) {
+            e.projectId = m(e.projectId);
+        }
+        if (e.parentId) {
+            e.parentId = m(e.parentId);
+        }
+        if (e.context && e.context.projectId) {
+            var ctx = copyEntry(e.context);
+            ctx.projectId = m(ctx.projectId);
+            e.context = ctx;
+        }
+        entries.push(e);
+    }
+    return changed ? withEntries(entries) : queue;
 }
 
 function hasDelete(queue, itemId) {
@@ -193,6 +252,15 @@ function nextSyncBatch(queue, max, nowMs) {
             out.push({ type: "item_move", uuid: e.uuid, args: { id: e.itemId, project_id: e.projectId } });
         } else if (e.kind === "delete") {
             out.push({ type: "item_delete", uuid: e.uuid, args: { id: e.itemId } });
+        } else if (e.kind === "project_add") {
+            var pargs = { name: e.name };
+            if (e.color) {
+                pargs.color = e.color;
+            }
+            if (e.parentId) {
+                pargs.parent_id = e.parentId;
+            }
+            out.push({ type: "project_add", temp_id: e.tempId, uuid: e.uuid, args: pargs });
         }
     }
     return out;
@@ -208,6 +276,14 @@ function isTransientStatus(st) {
 }
 
 // -> { queue, dropped: [{ kind, itemId, errorTag, httpCode }], retryAfterSec: number|null }
+function droppedEntry(e, errorTag, httpCode) {
+    var d = { kind: e.kind, itemId: e.itemId, errorTag: errorTag, httpCode: httpCode };
+    if (e.kind === "project_add") {
+        d.name = e.name;
+    }
+    return d;
+}
+
 function applySyncStatus(queue, sentUuids, syncStatus) {
     var sent = {};
     var i;
@@ -236,18 +312,13 @@ function applySyncStatus(queue, sentUuids, syncStatus) {
             var next = copyEntry(e);
             next.attempts = (e.attempts || 0) + 1;
             if (next.attempts >= MAX_ATTEMPTS) {
-                dropped.push({ kind: e.kind, itemId: e.itemId, errorTag: st.error_tag || "", httpCode: st.http_code || 0 });
+                dropped.push(droppedEntry(e, st.error_tag || "", st.http_code || 0));
             } else {
                 kept.push(next);
             }
             continue;
         }
-        dropped.push({
-            kind: e.kind,
-            itemId: e.itemId,
-            errorTag: st && st.error_tag ? st.error_tag : "",
-            httpCode: st && st.http_code ? st.http_code : 0
-        });
+        dropped.push(droppedEntry(e, st && st.error_tag ? st.error_tag : "", st && st.http_code ? st.http_code : 0));
     }
     return { queue: withEntries(kept), dropped: dropped, retryAfterSec: retryAfterSec };
 }
@@ -491,7 +562,7 @@ function deserialize(str) {
     var entries = [];
     for (var i = 0; i < obj.entries.length; i++) {
         var e = obj.entries[i];
-        if (e && ((isSyncCommand(e) && e.uuid && e.itemId)
+        if (e && ((isSyncCommand(e) && e.uuid && (e.itemId || (e.kind === "project_add" && e.tempId && e.name)))
                   || (e.kind === "quick_add" && e.localId && e.text))) {
             entries.push(e);
         }

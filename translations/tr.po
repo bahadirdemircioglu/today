@@ -117,6 +117,9 @@ msgstr "Zamanlamayı değiştir…"
 msgid "Checking…"
 msgstr "Kontrol ediliyor…"
 
+msgid "Colour"
+msgstr "Renk"
+
 msgid "Complete"
 msgstr "Tamamla"
 
@@ -156,11 +159,20 @@ msgstr "Bir görev tamamlanamadı — silinmiş olabilir."
 msgid "Couldn't complete “%1” — it may have been deleted."
 msgstr "“%1” tamamlanamadı — silinmiş olabilir."
 
+msgid "Couldn't create the project “%1”."
+msgstr "“%1” projesi oluşturulamadı."
+
+msgid "Couldn't create “%1”: your Todoist plan's project limit is reached."
+msgstr "“%1” oluşturulamadı: Todoist planınızın proje sınırına ulaşıldı."
+
 msgid "Couldn't save a change to a task — it may have been deleted."
 msgstr "Bir görevdeki değişiklik kaydedilemedi — silinmiş olabilir."
 
 msgid "Couldn't save a change to “%1” — it may have been deleted."
 msgstr "“%1” üzerindeki değişiklik kaydedilemedi — silinmiş olabilir."
+
+msgid "Create"
+msgstr "Oluştur"
 
 msgid "Custom filter"
 msgstr "Özel filtre"
@@ -205,6 +217,9 @@ msgstr "Filtreler"
 msgid "General"
 msgstr "Genel"
 
+msgid "Give the project a name."
+msgstr "Projeye bir ad verin."
+
 msgid "Hide details"
 msgstr "Ayrıntıları gizle"
 
@@ -221,6 +236,9 @@ msgstr[1] "%1 dakika sonra · %2"
 
 msgid "Inbox"
 msgstr "Gelen Kutusu"
+
+msgid "Inside:"
+msgstr "Üst proje:"
 
 msgid "Labels"
 msgstr "Etiketler"
@@ -239,6 +257,12 @@ msgstr "Diğer eylemler"
 
 msgid "Move to"
 msgstr "Taşı"
+
+msgid "New project"
+msgstr "Yeni proje"
+
+msgid "New project…"
+msgstr "Yeni proje…"
 
 msgid "New task in %1"
 msgstr "%1 içinde yeni görev"
@@ -271,6 +295,9 @@ msgstr "Rozet yok"
 
 msgid "No date"
 msgstr "Tarihsiz"
+
+msgid "No parent project"
+msgstr "Üst proje yok"
 
 msgid "No tasks here"
 msgstr "Burada görev yok"
@@ -345,6 +372,9 @@ msgstr "Öncelik 3"
 msgid "Priority 4"
 msgstr "Öncelik 4"
 
+msgid "Project name"
+msgstr "Proje adı"
+
 msgid "Projects"
 msgstr "Projeler"
 
@@ -403,6 +433,9 @@ msgstr "Geçerli listedeki görevler"
 
 msgid "That list no longer exists in Todoist. Showing Today."
 msgstr "Bu liste artık Todoist'te yok. Bugün gösteriliyor."
+
+msgid "That name is too long."
+msgstr "Bu ad çok uzun."
 
 msgid "That time isn't valid. Use e.g. 15:30."
 msgstr "Bu saat geçerli değil. Örneğin 15:30 kullanın."

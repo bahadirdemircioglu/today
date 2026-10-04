@@ -119,7 +119,7 @@ PlasmaComponents3.Menu {
                 text: modelData.isInbox ? i18n("Inbox") : modelData.name
                 icon.name: modelData.isInbox ? "mail-folder-inbox" : "folder"
                 checkable: true
-                checked: modelData.id === menu.projectId
+                checked: modelData && menu ? modelData.id === menu.projectId : false
                 onTriggered: menu.controller.moveTo(menu.itemId, modelData.id)
             }
             onObjectAdded: (index, object) => moveMenu.insertItem(index, object)

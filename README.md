@@ -18,6 +18,7 @@ Your Todoist tasks on the KDE Plasma 6 desktop and panel: **Inbox, Today, Upcomi
 - **Follows your Plasma theme:** light/dark, accent colour, font size and animation speed. No hard-coded colours.
 - **Offline-first:** tasks are cached, and completions/additions made offline are queued. The queue survives Plasma restarts and is sent once you are back online.
 - **Task menu:** right-click a task (or use its ⋯ button) to edit it, reschedule it (quick choices or *Pick date & time…* with a calendar, a time, or Todoist-style text like `next friday 3pm`), change priority, move it to another project, copy its link, show its full description, or delete it. Completing and deleting can be undone for a few seconds.
+- **New projects:** *Projects ▸ New project…* in the list title menu creates a project (name, Todoist colour, optional parent) and opens it. It works offline too. Todoist's free plan allows 5 projects; if you hit the limit, the widget says so.
 - **Details at a glance:** labels, deadlines (red when due), the first line of the description (click it for the rest), and sub-tasks you can fold away in projects.
 - **Reminders:** a Plasma notification before a timed task (10 minutes by default), with *Complete* and *Remind me in 10 minutes*.
 - **Daily goal:** a small ring shows how close you are to your Todoist daily goal.
