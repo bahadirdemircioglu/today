@@ -96,7 +96,8 @@ msgstr "Bugünlük hepsi tamam"
 msgid ""
 "Any Todoist filter query, without saving it in Todoist. It appears in the "
 "list menu."
-msgstr "Todoist'te kaydetmeden herhangi bir filtre sorgusu. Liste menüsünde görünür."
+msgstr ""
+"Todoist'te kaydetmeden herhangi bir filtre sorgusu. Liste menüsünde görünür."
 
 msgid "At the task's time"
 msgstr "Görevin saatinde"
@@ -106,6 +107,12 @@ msgstr "Todoist'e ulaşılamıyor"
 
 msgid "Can't reach Todoist. Check your connection."
 msgstr "Todoist'e ulaşılamıyor. Bağlantınızı kontrol edin."
+
+msgid "Cancel"
+msgstr "İptal"
+
+msgid "Change schedule…"
+msgstr "Zamanlamayı değiştir…"
 
 msgid "Checking…"
 msgstr "Kontrol ediliyor…"
@@ -245,6 +252,9 @@ msgstr "@%1 etiketli yeni görev"
 msgid "New task, e.g. “Dentist tomorrow 3pm #Personal”"
 msgstr "Yeni görev, ör. “Dentist tomorrow 3pm #Personal”"
 
+msgid "Next month"
+msgstr "Sonraki ay"
+
 msgid "Next week"
 msgstr "Gelecek hafta"
 
@@ -258,6 +268,9 @@ msgstr "Sıradaki: %1 %2"
 
 msgid "No badge"
 msgstr "Rozet yok"
+
+msgid "No date"
+msgstr "Tarihsiz"
 
 msgid "No tasks here"
 msgstr "Burada görev yok"
@@ -308,6 +321,15 @@ msgstr ""
 "Bugünkü görevlerinizi burada görmek için Todoist ayarlarındaki kişisel API "
 "token'ınızı yapıştırın."
 
+msgid "Pick a day first."
+msgstr "Önce bir gün seçin."
+
+msgid "Pick date & time…"
+msgstr "Tarih ve saat seç…"
+
+msgid "Previous month"
+msgstr "Önceki ay"
+
 msgid "Priority"
 msgstr "Öncelik"
 
@@ -329,8 +351,8 @@ msgstr "Projeler"
 msgid "Reconnect"
 msgstr "Yeniden bağlan"
 
-msgid "Recurring: reschedule in Todoist"
-msgstr "Tekrarlayan: Todoist'te yeniden planlayın"
+msgid "Recurring task: type its new schedule"
+msgstr "Tekrarlayan görev: yeni zamanlamasını yazın"
 
 msgid "Refresh now"
 msgstr "Şimdi yenile"
@@ -343,6 +365,9 @@ msgstr "Hatırlatmalar:"
 
 msgid "Results from %1"
 msgstr "%1 itibarıyla sonuçlar"
+
+msgid "Save"
+msgstr "Kaydet"
 
 msgid "Show %1 sub-task"
 msgid_plural "Show %1 sub-tasks"
@@ -379,6 +404,9 @@ msgstr "Geçerli listedeki görevler"
 msgid "That list no longer exists in Todoist. Showing Today."
 msgstr "Bu liste artık Todoist'te yok. Bugün gösteriliyor."
 
+msgid "That time isn't valid. Use e.g. 15:30."
+msgstr "Bu saat geçerli değil. Örneğin 15:30 kullanın."
+
 msgid "That's too long. Keep it under 1000 characters."
 msgstr "Bu çok uzun. 1000 karakterin altında tutun."
 
@@ -390,6 +418,9 @@ msgstr "Bu token çalışmadı. Todoist ayarlarından yeniden kopyalayın."
 
 msgid "This weekend"
 msgstr "Bu hafta sonu"
+
+msgid "Time:"
+msgstr "Saat:"
 
 msgid "Today"
 msgstr "Bugün"
@@ -436,6 +467,9 @@ msgstr "Yarın · %1"
 msgid "Try again"
 msgstr "Tekrar dene"
 
+msgid "Type a new schedule for this recurring task."
+msgstr "Bu tekrarlayan görev için yeni bir zamanlama yazın."
+
 msgid "Undo"
 msgstr "Geri al"
 
@@ -472,14 +506,26 @@ msgstr ""
 "Token'ınız Plasma yapılandırma dosyanızda şifrelenmeden saklanır. "
 "İstediğiniz zaman Todoist ayarlarından iptal edebilirsiniz."
 
+msgid "e.g. next friday 3pm, every monday 9am"
+msgstr "ör. next friday 3pm, every monday 9am"
+
 msgid "e.g. today & #Work"
 msgstr "ör. today & #İş"
 
+msgid "optional, e.g. 15:30"
+msgstr "isteğe bağlı, ör. 15:30"
+
 msgid "or connect a different account:"
 msgstr "ya da başka bir hesap bağlayın:"
+
+msgid "…or type it the Todoist way"
+msgstr "…ya da Todoist usulü yazın"
 
 #~ msgid "A new task was added to Todoist but couldn't be moved to today."
 #~ msgstr "Yeni görev Todoist'e eklendi ama bugüne taşınamadı."
 
 #~ msgid "Account"
 #~ msgstr "Hesap"
+
+#~ msgid "Recurring: reschedule in Todoist"
+#~ msgstr "Tekrarlayan: Todoist'te yeniden planlayın"

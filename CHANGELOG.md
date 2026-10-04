@@ -6,6 +6,19 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-10-04
+
+### Added
+- "Pick date & time…" in the task menu (and the T key): quick choices, a month calendar, an
+  optional time, "No date", or a schedule typed the Todoist way ("next friday 3pm",
+  "every monday 9am"). Recurring tasks can now be rescheduled by typing a new schedule.
+- Project and label colours from Todoist: a coloured "#" before the project name and coloured
+  "@labels", like on the web.
+
+### Changed
+- The task menu moved from T to M on the keyboard (T now picks the date, as in Todoist).
+- Smaller "+" buttons on Upcoming day headers.
+
 ## [2.1.0] - 2026-10-03
 
 ### Added

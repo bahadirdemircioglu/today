@@ -243,3 +243,18 @@ test("mergeTasks adds REST tasks without touching the sync token", () => {
   assert.equal(s.items.r2, undefined);
   assert.equal(s.syncToken, s0.syncToken);
 });
+
+test("overlay: due removed, timed due set, typed schedule left to the server", () => {
+  const s = storeWith([
+    item({ id: "a", due: { date: "2026-10-03" } }),
+    item({ id: "b", due: { date: "2026-10-03" } }),
+    item({ id: "c", due: { date: "2026-10-03" } }),
+  ]);
+  const q = { v: 1, entries: [
+    { kind: "update", uuid: "1", itemId: "a", args: { due: null } },
+    { kind: "update", uuid: "2", itemId: "b", args: { due: { date: "2026-10-03T13:15:00" } } },
+    { kind: "update", uuid: "3", itemId: "c", args: { due: { string: "every monday" } } },
+  ] };
+  const v = S.computeToday(s, q, NOON, sys180);
+  assert.deepEqual(v.today.map((r) => [r.id, r.minutes]), [["b", 795], ["c", null]]);
+});

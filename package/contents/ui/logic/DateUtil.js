@@ -205,3 +205,56 @@ function quickDate(todayKey, which) {
         return null;
     }
 }
+
+// Lenient time input -> minutes since midnight, or null.
+// "15:30", "15.30", "1530", "930", "9", "09:05" are all accepted.
+function parseTimeInput(text) {
+    var s = String(text === undefined || text === null ? "" : text).trim();
+    if (!s) {
+        return null;
+    }
+    var m = /^(\d{1,2})(?:[:.]?(\d{2}))?$/.exec(s);
+    if (!m) {
+        return null;
+    }
+    var h = parseInt(m[1], 10);
+    var mi = m[2] ? parseInt(m[2], 10) : 0;
+    if (s.length === 3 && !/[:.]/.test(s)) {      // "930" -> 9:30
+        h = parseInt(s.charAt(0), 10);
+        mi = parseInt(s.substr(1), 10);
+    }
+    if (h > 23 || mi > 59) {
+        return null;
+    }
+    return h * 60 + mi;
+}
+
+// Due object for item_update from a day and an optional time ("" = all day).
+// Times are floating (no zone), like dates typed in Todoist. -> { date } or null if the time is invalid.
+function composeDue(dateKey, timeText) {
+    if (!splitDateKey(dateKey)) {
+        return null;
+    }
+    var t = String(timeText || "").trim();
+    if (!t) {
+        return { date: dateKey };
+    }
+    var minutes = parseTimeInput(t);
+    if (minutes === null) {
+        return null;
+    }
+    return { date: dateKey + "T" + pad2(Math.floor(minutes / 60)) + ":" + pad2(minutes % 60) + ":00" };
+}
+
+// "YYYY-MM-DD" for a local JS Date's calendar day (picker cells are local dates).
+function keyOfLocalDate(d) {
+    return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
+}
+
+// "HH:MM" from minutes, for prefilling the time field.
+function minutesToHHMM(minutes) {
+    if (minutes === null || minutes === undefined || minutes < 0) {
+        return "";
+    }
+    return pad2(Math.floor(minutes / 60)) + ":" + pad2(minutes % 60);
+}

@@ -32,6 +32,8 @@ Item {
     required property int childCount
     required property bool collapsed
     required property string labelsText
+    required property string labelColors
+    required property string projectColor
     required property string description
     required property string descriptionFull
     required property string deadlineKey
@@ -91,6 +93,15 @@ Item {
     }
     readonly property string labelsDisplay: labelsText === "" ? ""
         : labelsText.split(", ").map(function (l) { return "@" + l; }).join(" ")
+    // [{ name, color }] for the coloured label chips
+    readonly property var labelList: {
+        if (labelsText === "") {
+            return [];
+        }
+        var names = labelsText.split(", ");
+        var colors = labelColors.split(",");
+        return names.map(function (n, i) { return { name: n, color: colors[i] || "" }; });
+    }
     readonly property string detailText: {
         if (pending) {
             return i18n("Waiting to sync");
@@ -168,6 +179,10 @@ Item {
             Layout.alignment: Qt.AlignBottom
             visible: row.header === "day"
             icon.name: "list-add"
+            icon.width: Kirigami.Units.iconSizes.small
+            icon.height: Kirigami.Units.iconSizes.small
+            implicitWidth: Kirigami.Units.iconSizes.small + Kirigami.Units.smallSpacing * 2
+            implicitHeight: implicitWidth
             text: i18n("Add task to this day")
             display: PlasmaComponents3.AbstractButton.IconOnly
             onClicked: row.addRequested(row.headerDate)
@@ -354,13 +369,44 @@ Item {
                         opacity: 0.6
                     }
                     PlasmaComponents3.Label {
-                        Layout.fillWidth: true
-                        visible: row.detailText !== ""
-                        text: row.detailText
+                        visible: row.pending
+                        text: i18n("Waiting to sync")
+                        textFormat: Text.PlainText
+                        font.pointSize: Kirigami.Theme.smallFont.pointSize
+                        opacity: 0.7
+                    }
+                    // project like on the web: a "#" in the project's Todoist colour
+                    PlasmaComponents3.Label {
+                        visible: !row.pending && row.projectName !== ""
+                        text: "#"
+                        font.pointSize: Kirigami.Theme.smallFont.pointSize
+                        font.weight: Font.Bold
+                        color: row.projectColor !== "" ? row.projectColor : Kirigami.Theme.textColor
+                        opacity: row.projectColor !== "" ? 1 : 0.7
+                    }
+                    PlasmaComponents3.Label {
+                        Layout.maximumWidth: Kirigami.Units.gridUnit * 9
+                        visible: !row.pending && row.projectName !== ""
+                        text: row.projectName
                         textFormat: Text.PlainText
                         elide: Text.ElideRight
                         font.pointSize: Kirigami.Theme.smallFont.pointSize
                         opacity: 0.7
+                    }
+                    Repeater {
+                        model: row.pending ? [] : row.labelList
+                        delegate: PlasmaComponents3.Label {
+                            required property var modelData
+                            text: "@" + modelData.name
+                            textFormat: Text.PlainText
+                            elide: Text.ElideRight
+                            font.pointSize: Kirigami.Theme.smallFont.pointSize
+                            color: modelData.color !== "" ? modelData.color : Kirigami.Theme.textColor
+                            opacity: modelData.color !== "" ? 1 : 0.7
+                        }
+                    }
+                    Item {
+                        Layout.fillWidth: true
                     }
                 }
             }

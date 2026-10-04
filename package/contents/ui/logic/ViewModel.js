@@ -1,6 +1,7 @@
 .pragma library
 .import "DateUtil.js" as DateUtil
 .import "TaskStore.js" as TaskStore
+.import "Colors.js" as Colors
 
 // Pure view computation for every navigable view (Inbox, Today, Upcoming, project, label,
 // filter) plus the navigation list. Works entirely from the local cache (filters: from the
@@ -279,9 +280,23 @@ function computeView(store, queue, spec, nowMs, sysOffsetAt, filterResults, opti
             overdueCount += groups[g].rows.length;
         }
     }
+    var projectColors = {};
+    for (var pc in ctx.st.projects) {
+        if (Object.prototype.hasOwnProperty.call(ctx.st.projects, pc)) {
+            projectColors[pc] = ctx.st.projects[pc].color;
+        }
+    }
+    var labelColorByName = {};
+    for (var lc in ctx.st.labels) {
+        if (Object.prototype.hasOwnProperty.call(ctx.st.labels, lc)) {
+            labelColorByName[ctx.st.labels[lc].name] = ctx.st.labels[lc].color;
+        }
+    }
     return {
         spec: spec,
         title: title,
+        projectColors: projectColors,
+        labelColorByName: labelColorByName,
         exists: exists,
         groups: groups,
         pending: ov.pending,
@@ -352,6 +367,9 @@ function flattenView(view) {
                 childCount: r.childCount || 0,
                 collapsed: !!r.collapsed,
                 labelsText: (r.labels || []).join(", "),
+                labelColors: labelColorsOf(view.labelColorByName, r.labels || []),
+                projectColor: view.spec.kind === "project" || view.spec.kind === "inbox" || !r.projectName ? ""
+                              : Colors.hex(view.projectColors[r.projectId] || ""),
                 description: (r.description || "").split("\n")[0].slice(0, 200),
                 descriptionFull: r.description || "",
                 deadlineKey: r.deadline || "",
@@ -374,11 +392,20 @@ function flattenView(view) {
     return rows;
 }
 
+// "#hex,#hex" aligned with labelsText ("" for a label without a known colour)
+function labelColorsOf(byName, labels) {
+    var out = [];
+    for (var i = 0; i < labels.length; i++) {
+        out.push(Colors.hex((byName || {})[labels[i]] || ""));
+    }
+    return out.join(",");
+}
+
 function blank(key, header, headerText, headerDate) {
     return {
         key: key, kind: "header", itemId: "", title: "", content: "", projectId: "", priority: 1,
         projectName: "", dateKey: "", minutes: -1, isLate: false, isRecurring: false, isOverdue: false,
-        showDate: false, depth: 0, childCount: 0, collapsed: false, labelsText: "", description: "", descriptionFull: "", deadlineKey: "",
+        showDate: false, depth: 0, childCount: 0, collapsed: false, labelsText: "", labelColors: "", projectColor: "", description: "", descriptionFull: "", deadlineKey: "",
         deadlineDue: false, section: header,
         header: header, headerText: headerText, headerDate: headerDate
     };

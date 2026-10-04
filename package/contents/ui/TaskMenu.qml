@@ -15,6 +15,9 @@ PlasmaComponents3.Menu {
     readonly property bool recurring: row ? row.isRecurring : false
     readonly property string projectId: row ? row.projectId : ""
 
+    // "Pick date & time…" (the list owns the picker popup)
+    signal pickDateRequested(Item row)
+
     // anchor: an Item to open below (the ⋯ button), or null for the mouse position
     function openFor(r, anchor) {
         row = r;
@@ -65,10 +68,9 @@ PlasmaComponents3.Menu {
         onTriggered: menu.controller.reschedule(menu.itemId, "nextweek")
     }
     PlasmaComponents3.MenuItem {
-        visible: menu.recurring
-        height: visible ? implicitHeight : 0
-        enabled: false
-        text: i18n("Recurring: reschedule in Todoist")
+        text: menu.recurring ? i18n("Change schedule…") : i18n("Pick date & time…")
+        icon.name: "view-calendar-day"
+        onTriggered: menu.pickDateRequested(menu.row)
     }
 
     PlasmaComponents3.MenuSeparator {}

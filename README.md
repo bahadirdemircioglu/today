@@ -17,7 +17,7 @@ Your Todoist tasks on the KDE Plasma 6 desktop and panel: **Inbox, Today, Upcomi
 - **Desktop, large / popup:** the full list with round, priority-coloured check circles, a completion animation, a "New task" field and an "All done" state.
 - **Follows your Plasma theme:** light/dark, accent colour, font size and animation speed. No hard-coded colours.
 - **Offline-first:** tasks are cached, and completions/additions made offline are queued. The queue survives Plasma restarts and is sent once you are back online.
-- **Task menu:** right-click a task (or use its ⋯ button) to edit it, reschedule it, change priority, move it to another project, copy its link, show its full description, or delete it. Completing and deleting can be undone for a few seconds.
+- **Task menu:** right-click a task (or use its ⋯ button) to edit it, reschedule it (quick choices or *Pick date & time…* with a calendar, a time, or Todoist-style text like `next friday 3pm`), change priority, move it to another project, copy its link, show its full description, or delete it. Completing and deleting can be undone for a few seconds.
 - **Details at a glance:** labels, deadlines (red when due), the first line of the description (click it for the rest), and sub-tasks you can fold away in projects.
 - **Reminders:** a Plasma notification before a timed task (10 minutes by default), with *Complete* and *Remind me in 10 minutes*.
 - **Daily goal:** a small ring shows how close you are to your Todoist daily goal.
@@ -56,7 +56,7 @@ Your Todoist tasks on the KDE Plasma 6 desktop and panel: **Inbox, Today, Upcomi
 ## Keyboard
 
 - **Add a task from anywhere:** right-click the widget → *Configure…* → *Keyboard Shortcuts*, and pick a shortcut (for example Meta+T). Pressing it opens the widget with the cursor in *New task*, like Todoist's global Quick Add.
-- **In the list:** ↑/↓ move, Space completes, E or F2 edits, T opens the task menu, 1–4 set the priority, Delete deletes, Enter opens the task in Todoist, Q or / jumps to *New task*, Esc leaves the list.
+- **In the list:** ↑/↓ move, Space completes, E or F2 edits, T picks a date and time, M opens the task menu, 1–4 set the priority, Delete deletes, Enter opens the task in Todoist, Q or / jumps to *New task*, Esc leaves the list.
 
 ## More options
 
@@ -146,7 +146,7 @@ Dates are parsed in the language your Todoist account uses. English always works
 - **Reminders** look at a task's time, not at Todoist's own reminders. Two widgets never show the same reminder twice.
 - **Upcoming** shows a recurring task once, on its next date (the web shows every occurrence).
 - In Today, Upcoming, label and filter lists sub-tasks are plain rows; the hierarchy is shown in project and Inbox lists.
-- Not supported in the widget (use Todoist for these): reordering, deadlines, reminders, rescheduling recurring tasks, creating or editing projects, sections, labels and filters, and completed-task history.
+- Not supported in the widget (use Todoist for these): reordering, editing deadlines and Todoist reminders, creating or editing projects, sections, labels and filters, and completed-task history. Recurring tasks are rescheduled by typing a new schedule (e.g. `every monday 9am`).
 
 ## Troubleshooting
 

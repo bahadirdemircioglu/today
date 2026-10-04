@@ -65,6 +65,9 @@ ColumnLayout {
             row.startEditing();
             return true;
         case Qt.Key_T:
+            duePicker.openFor(row);
+            return true;
+        case Qt.Key_M:
         case Qt.Key_Menu:
             taskMenu.openFor(row, row);
             return true;
@@ -106,6 +109,13 @@ ColumnLayout {
 
     TaskMenu {
         id: taskMenu
+        controller: listRoot.controller
+        onPickDateRequested: row => duePicker.openFor(row)
+    }
+
+    DuePicker {
+        id: duePicker
+        parent: listRoot
         controller: listRoot.controller
     }
 
@@ -224,7 +234,7 @@ ColumnLayout {
                 }
             }
 
-            // Keyboard (Todoist-like): ↑/↓ move, Space complete, E/F2 edit, T task menu, 1–4 priority,
+            // Keyboard (Todoist-like): ↑/↓ move, Space complete, E/F2 edit, T date & time, M task menu, 1–4 priority,
             // Delete delete, Enter open in Todoist, Q or / new task, Esc leave the list.
             currentIndex: -1
             keyNavigationEnabled: false

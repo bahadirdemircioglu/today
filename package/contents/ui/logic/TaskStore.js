@@ -352,9 +352,12 @@ function applyOverlay(store, queue) {
                 if (e.args.labels !== undefined) {
                     patch.labels = e.args.labels;
                 }
-                if (e.args.due !== undefined) {
-                    patch.due = e.args.due ? { date: e.args.due.date, isRecurring: false, string: "" } : null;
+                if (e.args.due === null) {
+                    patch.due = null;
+                } else if (e.args.due && e.args.due.date) {
+                    patch.due = { date: e.args.due.date, isRecurring: false, string: "" };
                 }
+                // a typed schedule ({ string }) is only known after Todoist parses it: no optimistic change
             }
             patches[e.itemId] = patch;
         } else if (e.kind === "quick_add") {

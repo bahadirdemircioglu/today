@@ -251,10 +251,17 @@ Item {
     // which: "today" | "tomorrow" | "weekend" | "nextweek"
     function reschedule(itemId, which) {
         var date = DateUtil.quickDate(view.todayKey, which);
-        if (!TaskStore.isValidId(itemId) || !date) {
+        if (date) {
+            setDue(itemId, { date: date });
+        }
+    }
+
+    // due: { date: "YYYY-MM-DD" | "YYYY-MM-DDTHH:MM:00" } | { string: "<Todoist schedule text>" } | null (no date)
+    function setDue(itemId, due) {
+        if (!TaskStore.isValidId(itemId)) {
             return;
         }
-        enqueueEdit(CommandQueue.enqueueUpdate(queue, itemId, { due: { date: date } }, Date.now(), newUuid));
+        enqueueEdit(CommandQueue.enqueueUpdate(queue, itemId, { due: due }, Date.now(), newUuid));
     }
 
     // priority: Todoist API value, 4 = p1 ... 1 = p4

@@ -216,3 +216,16 @@ test("custom query view and nav entry", () => {
   assert.deepEqual(nav[3], { key: "query", kind: "query", id: "", name: "Focus", count: 2, depth: 0 });
   assert.equal(V.navList(st, emptyQ, NOON, sys180, results, {}).some((e) => e.kind === "query"), false);
 });
+
+test("project and label colours (Todoist names -> hex)", () => {
+  const st = store([item({ id: "a", project_id: "work", labels: ["health", "calls", "other"], due: { date: "2026-10-03" } })], {
+    projects: [{ id: "inbox", name: "Inbox", inbox_project: true }, { id: "work", name: "Work", color: "teal" }],
+    labels: [{ id: "L1", name: "health", color: "red" }, { id: "L2", name: "calls", color: "#123ABC" }],
+  });
+  const row = V.flattenView(view(st, "today"))[0];
+  assert.equal(row.projectColor, "#148fad");
+  assert.equal(row.labelsText, "health, calls, other");
+  assert.equal(row.labelColors, "#dc4c3e,#123abc,");
+  // inside the project itself the project name (and colour) is not repeated
+  assert.equal(V.flattenView(view(st, "project:work"))[0].projectColor, "");
+});

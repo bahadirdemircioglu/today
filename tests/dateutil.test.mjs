@@ -97,3 +97,32 @@ test("quickDate: today, tomorrow, coming weekend, next Monday", () => {
   assert.equal(D.quickDate("2026-10-04", "nextweek"), "2026-10-05");
   assert.equal(D.quickDate("2026-12-31", "tomorrow"), "2027-01-01");
 });
+
+test("parseTimeInput accepts common forms", () => {
+  assert.equal(D.parseTimeInput("15:30"), 930);
+  assert.equal(D.parseTimeInput("15.30"), 930);
+  assert.equal(D.parseTimeInput("1530"), 930);
+  assert.equal(D.parseTimeInput("930"), 570);
+  assert.equal(D.parseTimeInput("9"), 540);
+  assert.equal(D.parseTimeInput("09:05"), 545);
+  assert.equal(D.parseTimeInput(""), null);
+  assert.equal(D.parseTimeInput("24:00"), null);
+  assert.equal(D.parseTimeInput("12:60"), null);
+  assert.equal(D.parseTimeInput("3pm"), null);
+});
+
+test("composeDue builds all-day or floating timed dues", () => {
+  assert.deepEqual(D.composeDue("2026-10-09", ""), { date: "2026-10-09" });
+  assert.deepEqual(D.composeDue("2026-10-09", "9:5".replace(":5", ":05")), { date: "2026-10-09T09:05:00" });
+  assert.deepEqual(D.composeDue("2026-10-09", "1530"), { date: "2026-10-09T15:30:00" });
+  assert.equal(D.composeDue("2026-10-09", "nope"), null);
+  assert.equal(D.composeDue("bad", ""), null);
+  // the composed value parses back to the same day and time
+  assert.deepEqual(D.parseDue(D.composeDue("2026-10-09", "15:30"), 0), { dateKey: "2026-10-09", minutes: 930, isRecurring: false });
+});
+
+test("keyOfLocalDate and minutesToHHMM", () => {
+  assert.equal(D.keyOfLocalDate(new Date(2026, 0, 5)), "2026-01-05");
+  assert.equal(D.minutesToHHMM(570), "09:30");
+  assert.equal(D.minutesToHHMM(-1), "");
+});
