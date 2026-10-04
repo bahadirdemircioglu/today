@@ -92,9 +92,10 @@ Upgrading from 1.x ("Todoist Today"): 2.0 is a new widget with a new id. Remove 
 **From source:**
 
 ```sh
-kpackagetool6 -t Plasma/Applet -i package     # first install
-kpackagetool6 -t Plasma/Applet -u package     # update
+scripts/install.sh      # installs, or upgrades if already installed (and removes the old 1.x widget)
 ```
+
+or by hand: `kpackagetool6 -t Plasma/Applet -i package` the first time, `-u package` afterwards. `-u` fails with *"is not installed"* until the first `-i`.
 
 Requires Plasma 6.0 or newer. There is nothing to compile.
 
