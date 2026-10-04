@@ -6,21 +6,22 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-10-04
+
 ### Added
+- Live Quick Add preview: under "New task", the date and time, project (in its colour, or a
+  warning when it doesn't exist), labels and priority as they will be applied.
+- Dates in English and Turkish are recognised by the widget itself ("yarın saat 15", "cuma",
+  "haftaya salı", "3 gün sonra", "tomorrow 3pm", "in 3 days", "12 dec"), so they work whatever
+  language the Todoist account uses. Click the date in the preview to keep the words instead.
+- "Reschedule" on the Overdue header: moves all overdue tasks to today, tomorrow, the weekend or
+  next week, keeping their times, with undo. Recurring tasks are left as they are.
 - "New project…" under Projects in the list title menu: name, Todoist colour and an optional
   parent project. The widget switches to the new project right away; offline it is queued
   with a temporary id and gets its real id on the next sync. Hitting the Todoist plan's
   project limit shows a clear message.
 - Language setting (Settings → Language): System default, English or Türkçe. Switching takes
   effect at once, including day and month names; it applies to all widgets of this kind.
-
-### Changed
-- Translations are now built into the widget (`logic/Catalogs.js`, generated from
-  `translations/*.po`), so they work without compiling `.mo` files.
-
-## [2.2.0] - 2026-10-04
-
-### Added
 - "Pick date & time…" in the task menu (and the T key): quick choices, a month calendar, an
   optional time, "No date", or a schedule typed the Todoist way ("next friday 3pm",
   "every monday 9am"). Recurring tasks can now be rescheduled by typing a new schedule.
@@ -30,6 +31,8 @@ All notable changes to this project are documented here. The format follows
 ### Changed
 - The task menu moved from T to M on the keyboard (T now picks the date, as in Todoist).
 - Smaller "+" buttons on Upcoming day headers.
+- Translations are now built into the widget (`logic/Catalogs.js`, generated from
+  `translations/*.po`), so they work without compiling `.mo` files.
 
 ## [2.1.0] - 2026-10-03
 

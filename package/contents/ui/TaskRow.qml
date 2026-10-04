@@ -156,7 +156,8 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.leftMargin: Kirigami.Units.smallSpacing
-        height: row.groupLabel !== "" ? Math.max(headerLabel.implicitHeight, addButton.visible ? addButton.implicitHeight : 0)
+        height: row.groupLabel !== "" ? Math.max(headerLabel.implicitHeight, addButton.visible ? addButton.implicitHeight : 0,
+                                                 rescheduleButton.visible ? rescheduleButton.implicitHeight : 0)
                                         + Kirigami.Units.largeSpacing : 0
         visible: row.groupLabel !== ""
         spacing: Kirigami.Units.smallSpacing
@@ -189,6 +190,48 @@ Item {
             PlasmaComponents3.ToolTip.text: text
             PlasmaComponents3.ToolTip.visible: hovered
             PlasmaComponents3.ToolTip.delay: Kirigami.Units.toolTipDelay
+        }
+        // "Reschedule" on the Overdue header: moves all overdue tasks at once (as on the web)
+        PlasmaComponents3.ToolButton {
+            id: rescheduleButton
+            Layout.alignment: Qt.AlignBottom
+            visible: row.header === "overdue" && !!row.controller
+            text: Lang.i18n("Reschedule")
+            icon.name: "view-calendar-day"
+            icon.width: Kirigami.Units.iconSizes.small
+            icon.height: Kirigami.Units.iconSizes.small
+            font.pointSize: Kirigami.Theme.smallFont.pointSize
+            topPadding: 0
+            bottomPadding: 0
+            Accessible.name: Lang.i18n("Reschedule all overdue tasks")
+            onClicked: rescheduleMenu.popup(rescheduleButton, 0, rescheduleButton.height)
+            PlasmaComponents3.ToolTip.text: Accessible.name
+            PlasmaComponents3.ToolTip.visible: hovered
+            PlasmaComponents3.ToolTip.delay: Kirigami.Units.toolTipDelay
+
+            PlasmaComponents3.Menu {
+                id: rescheduleMenu
+                PlasmaComponents3.MenuItem {
+                    text: Lang.i18n("Today")
+                    icon.name: "go-jump-today"
+                    onTriggered: row.controller.rescheduleOverdue("today")
+                }
+                PlasmaComponents3.MenuItem {
+                    text: Lang.i18n("Tomorrow")
+                    icon.name: "view-calendar-day"
+                    onTriggered: row.controller.rescheduleOverdue("tomorrow")
+                }
+                PlasmaComponents3.MenuItem {
+                    text: Lang.i18n("This weekend")
+                    icon.name: "view-calendar-week"
+                    onTriggered: row.controller.rescheduleOverdue("weekend")
+                }
+                PlasmaComponents3.MenuItem {
+                    text: Lang.i18n("Next week")
+                    icon.name: "view-calendar-upcoming-events"
+                    onTriggered: row.controller.rescheduleOverdue("nextweek")
+                }
+            }
         }
     }
 

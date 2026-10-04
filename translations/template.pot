@@ -18,6 +18,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
+msgid "#%1 isn't a project: it stays in the title"
+msgstr ""
+
 msgid "%1 change waiting"
 msgid_plural "%1 changes waiting"
 msgstr[0] ""
@@ -50,6 +53,11 @@ msgid_plural "%2 · %1 overdue"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%2 · %1 recurring left as is"
+msgid_plural "%2 · %1 recurring left as is"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "1 hour before"
 msgstr ""
 
@@ -63,6 +71,9 @@ msgid "30 minutes before"
 msgstr ""
 
 msgid "5 minutes before"
+msgstr ""
+
+msgid "@%1 (new label)"
 msgstr ""
 
 msgid "A pinned list (set from the list title menu)"
@@ -81,6 +92,9 @@ msgid "Add task"
 msgstr ""
 
 msgid "Add task to this day"
+msgstr ""
+
+msgid "Added for %1"
 msgstr ""
 
 msgid "Added to %1"
@@ -120,6 +134,12 @@ msgid "Change schedule…"
 msgstr ""
 
 msgid "Checking…"
+msgstr ""
+
+msgid "Click to keep these words in the title instead"
+msgstr ""
+
+msgid "Click to use this as the date"
 msgstr ""
 
 msgid "Colour"
@@ -266,6 +286,11 @@ msgstr ""
 msgid "Move to"
 msgstr ""
 
+msgid "Moved %1 task"
+msgid_plural "Moved %1 tasks"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "New project"
 msgstr ""
 
@@ -366,6 +391,9 @@ msgstr ""
 msgid "Priority"
 msgstr ""
 
+msgid "Priority %1"
+msgstr ""
+
 msgid "Priority 1"
 msgstr ""
 
@@ -397,6 +425,15 @@ msgid "Remind me in 10 minutes"
 msgstr ""
 
 msgid "Reminders:"
+msgstr ""
+
+msgid "Repeats (Todoist reads the schedule)"
+msgstr ""
+
+msgid "Reschedule"
+msgstr ""
+
+msgid "Reschedule all overdue tasks"
 msgstr ""
 
 msgid "Results from %1"
@@ -454,6 +491,14 @@ msgstr ""
 
 msgid "The list you used last"
 msgstr ""
+
+msgid ""
+"The recurring task was left as it is; change its schedule from its menu."
+msgid_plural ""
+"%1 recurring tasks were left as they are; change their schedule from their "
+"menus."
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "This token didn't work. Copy it again from Todoist settings."
 msgstr ""

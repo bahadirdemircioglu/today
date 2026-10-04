@@ -17,6 +17,7 @@ Your Todoist tasks on the KDE Plasma 6 desktop and panel: **Inbox, Today, Upcomi
 - **Desktop, large / popup:** the full list with round, priority-coloured check circles, a completion animation, a "New task" field and an "All done" state.
 - **Follows your Plasma theme:** light/dark, accent colour, font size and animation speed. No hard-coded colours.
 - **Offline-first:** tasks are cached, and completions/additions made offline are queued. The queue survives Plasma restarts and is sent once you are back online.
+- **Overdue in one go:** *Reschedule* on the Overdue header moves every overdue task to today, tomorrow, the weekend or next week (keeping their times), with undo. Recurring tasks are left alone.
 - **Task menu:** right-click a task (or use its ⋯ button) to edit it, reschedule it (quick choices or *Pick date & time…* with a calendar, a time, or Todoist-style text like `next friday 3pm`), change priority, move it to another project, copy its link, show its full description, or delete it. Completing and deleting can be undone for a few seconds.
 - **Language:** English or Turkish, or the system language (Settings → *Language*). The setting is shared by all Todoist for Plasma widgets.
 - **New projects:** *Projects ▸ New project…* in the list title menu creates a project (name, Todoist colour, optional parent) and opens it. It works offline too. Todoist's free plan allows 5 projects; if you hit the limit, the widget says so.
@@ -129,7 +130,9 @@ Where a new task lands depends on the list you add it from, like on the web. Any
 | Inbox | stays in the Inbox, undated |
 | A label | gets that label |
 
-Dates are parsed in the language your Todoist account uses. English always works; Todoist's date parser may not support every language (for example Turkish), while `#project`, `@label` and `p1`–`p4` work in any language.
+While you type, a line under the field shows what the task will get: the date and time, the project (in its colour, or a warning if there is no such project), labels and priority.
+
+The widget itself recognises common English and Turkish dates, whatever language your Todoist account uses: `today`, `tomorrow 3pm`, `friday`, `next week`, `in 3 days`, `12 dec`, `bugün`, `yarın saat 15`, `cuma`, `haftaya salı`, `3 gün sonra`, `5 kasım`, `14:30'da`. The date is taken out of the title and set on the task. If a word was not meant as a date (*Pazar* is also "market"), click the date in the preview to keep the words in the title. Repeating schedules (`every monday`, `her gün`) and anything else are left to Todoist's own parser. `#project`, `@label` and `p1`–`p4` work in any language.
 
 ## Security
 
@@ -174,6 +177,8 @@ All decision logic is plain JavaScript in `package/contents/ui/logic/` (`.pragma
 
 | File | Role |
 |---|---|
+| `QuickParse.js` | live Quick Add preview; English and Turkish dates recognised in the widget |
+| `Bulk.js` | changes to several tasks at once (reschedule overdue) |
 | `I18n.js` | language choice and translation (`Lang.qml` uses it with the generated `Catalogs.js`) |
 | `DateUtil.js` | time-zone offsets, day keys, Todoist `due` parsing |
 | `TaskStore.js` | merging `/sync` responses (tasks, projects, sections, labels, filters), the offline overlay, the Today list |

@@ -226,3 +226,19 @@ test("remapTempIds rewrites ids in moves, quick add contexts and parents", () =>
   assert.equal(q.entries[0].projectId, "tmpX");
   assert.equal(Q.remapTempIds(q, { other: "1" }), q);
 });
+
+test("held updates and cancelEntries (bulk reschedule undo)", () => {
+  let n = 0;
+  const uuid = () => `u${++n}`;
+  let q = Q.emptyQueue();
+  q = Q.enqueueUpdate(q, "a1", { due: { date: "2026-10-04" } }, 1000, uuid, 5000);
+  q = Q.enqueueUpdate(q, "b2", { due: { date: "2026-10-04" } }, 1000, uuid, 5000);
+  q = Q.enqueueUpdate(q, "c3", { priority: 4 }, 1000, uuid);
+  assert.equal(q.entries[0].sendAfter, 6000);
+  assert.equal(q.entries[2].sendAfter, undefined);
+  assert.deepEqual(Q.nextSyncBatch(q, 10, 2000).map((c) => c.uuid), ["u3"]);
+  assert.deepEqual(Q.nextSyncBatch(q, 10, 7000).map((c) => c.uuid), ["u1", "u2", "u3"]);
+  const undone = Q.cancelEntries(q, ["u1", "u2"]);
+  assert.deepEqual(undone.entries.map((e) => e.uuid), ["u3"]);
+  assert.equal(Q.cancelEntries(q, ["nope"]), q);
+});

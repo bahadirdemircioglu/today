@@ -8,6 +8,8 @@ import "logic/TodoistClient.js" as TodoistClient
 import "logic/Storage.js" as Storage
 import "logic/ViewModel.js" as ViewModel
 import "logic/ContextRules.js" as ContextRules
+import "logic/Bulk.js" as Bulk
+import "logic/QuickParse.js" as QuickParse
 import "logic/Reminders.js" as Reminders
 import "logic/Goals.js" as Goals
 
@@ -117,6 +119,7 @@ Item {
         property var lastBatchUuids: []
         property int lastUnparsable: 0
         property bool undoIsCompletion: false
+        property var undoUuids: []          // several held entries undone together (bulk reschedule)
     }
 
     function log() {
@@ -153,6 +156,7 @@ Item {
         if (uuid) {
             completedSinceStats++;
             priv.undoIsCompletion = true;
+            priv.undoUuids = [];
             undoUuid = uuid;
             undoText = title ? Lang.i18n("Completed “%1”", title) : Lang.i18n("Completed");
             undoTimer.interval = completeUndoMs + 200;
@@ -243,6 +247,25 @@ Item {
         return "";
     }
 
+    // What a Quick Add text will do (live preview under "New task"), see QuickParse.parse
+    function parseQuickAdd(text) {
+        var st = TaskStore.withPendingProjects(store, queue);
+        var projects = [];
+        for (var pid in st.projects) {
+            if (Object.prototype.hasOwnProperty.call(st.projects, pid)) {
+                projects.push({ id: pid, name: st.projects[pid].name, color: st.projects[pid].color || "" });
+            }
+        }
+        var labels = [];
+        for (var lid in (st.labels || {})) {
+            if (Object.prototype.hasOwnProperty.call(st.labels, lid)) {
+                labels.push({ name: st.labels[lid].name, color: st.labels[lid].color || "" });
+            }
+        }
+        return QuickParse.parse(text, { todayKey: todayView.todayKey, nowMinutes: todayView.nowMinutes,
+                                        projects: projects, labels: labels });
+    }
+
     function enqueueEdit(newQueue) {
         queue = newQueue;
         saveQueue();
@@ -323,7 +346,43 @@ Item {
         recompute();
         undoUuid = r.uuid;
         priv.undoIsCompletion = false;
+        priv.undoUuids = [];
         undoText = Lang.i18n("Deleted “%1”", title);
+        undoTimer.interval = undoMs + 200;
+        undoTimer.restart();
+    }
+
+    // Moves every overdue task of the current list to a day (which: see reschedule), keeping
+    // times; held back for undoMs so it can be undone. Recurring tasks stay as they are.
+    function rescheduleOverdue(which) {
+        var target = DateUtil.quickDate(view.todayKey, which);
+        var rows = [];
+        for (var g = 0; g < view.groups.length; g++) {
+            if (view.groups[g].kind === "overdue") {
+                rows = rows.concat(view.groups[g].rows);
+            }
+        }
+        var plan = Bulk.rescheduleOverdue(rows, target);
+        if (!plan.changes.length) {
+            if (plan.skipped) {
+                showInfo(Lang.i18np("The recurring task was left as it is; change its schedule from its menu.",
+                                    "%1 recurring tasks were left as they are; change their schedule from their menus.", plan.skipped), false);
+            }
+            return;
+        }
+        var now = Date.now();
+        var uuids = [];
+        for (var i = 0; i < plan.changes.length; i++) {
+            queue = CommandQueue.enqueueUpdate(queue, plan.changes[i].itemId, { due: plan.changes[i].due }, now, newUuid, undoMs);
+            uuids.push(queue.entries[queue.entries.length - 1].uuid);
+        }
+        saveQueue();
+        recompute();
+        priv.undoUuids = uuids;
+        priv.undoIsCompletion = false;
+        undoUuid = uuids[0];
+        var moved = Lang.i18np("Moved %1 task", "Moved %1 tasks", plan.changes.length);
+        undoText = plan.skipped ? Lang.i18np("%2 · %1 recurring left as is", "%2 · %1 recurring left as is", plan.skipped, moved) : moved;
         undoTimer.interval = undoMs + 200;
         undoTimer.restart();
     }
@@ -332,7 +391,8 @@ Item {
         if (!undoUuid) {
             return;
         }
-        queue = CommandQueue.cancelEntry(queue, undoUuid);
+        queue = priv.undoUuids.length ? CommandQueue.cancelEntries(queue, priv.undoUuids) : CommandQueue.cancelEntry(queue, undoUuid);
+        priv.undoUuids = [];
         saveQueue();
         if (priv.undoIsCompletion && completedSinceStats > 0) {
             completedSinceStats--;
@@ -804,7 +864,19 @@ Item {
     // Tell the user where a task went when it won't appear in the list they added it from.
     function describeAdded(context, task) {
         var kind = context ? context.kind : "today";
-        if (!task || !task.due || (kind !== "today" && kind !== "upcoming")) {
+        if (!task || (kind !== "today" && kind !== "upcoming")) {
+            return;
+        }
+        if (!task.due && context && context.date) {
+            // a date recognised in the widget: applied right after, so it isn't in the response yet
+            var key = context.date.substr(0, 10);
+            var last = kind === "today" ? view.todayKey : DateUtil.addDaysKey(view.todayKey, ViewModel.UPCOMING_DAYS - 1);
+            if (key > last) {
+                showInfo(Lang.i18n("Added for %1", dateText(key)), false);
+            }
+            return;
+        }
+        if (!task.due) {
             return;
         }
         var due = DateUtil.parseDue(task.due, DateUtil.makeOffsetFn(store.tz, DateUtil.systemOffsetAt));
@@ -894,6 +966,7 @@ Item {
         interval: controller.undoMs + 200
         onTriggered: {
             controller.undoUuid = "";
+            priv.undoUuids = [];
             controller.requestSync("action");
         }
     }

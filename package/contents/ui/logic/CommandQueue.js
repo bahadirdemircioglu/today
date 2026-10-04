@@ -159,9 +159,14 @@ function enqueueDueToday(queue, itemId, dateKey, nowMs, uuidFn) {
 }
 
 // args: subset of { content, priority, due: { date } } (item_update arguments)
-function enqueueUpdate(queue, itemId, args, nowMs, uuidFn) {
+// holdMs (optional): held back that long so it can be undone (cancelEntries)
+function enqueueUpdate(queue, itemId, args, nowMs, uuidFn, holdMs) {
     var entries = queue.entries.slice();
-    entries.push({ kind: "update", uuid: uuidFn(), itemId: String(itemId), args: args, createdAt: nowMs, attempts: 0 });
+    var e = { kind: "update", uuid: uuidFn(), itemId: String(itemId), args: args, createdAt: nowMs, attempts: 0 };
+    if (holdMs > 0) {
+        e.sendAfter = nowMs + holdMs;
+    }
+    entries.push(e);
     return withEntries(entries);
 }
 
@@ -185,6 +190,15 @@ function enqueueDelete(queue, itemId, nowMs, undoMs, uuidFn) {
 }
 
 // Removes an entry that has not been sent yet (undo). -> new queue (unchanged if not found)
+function cancelEntries(queue, uuids) {
+    var drop = {};
+    for (var i = 0; i < uuids.length; i++) {
+        drop[uuids[i]] = true;
+    }
+    var entries = queue.entries.filter(function (e) { return !(e.uuid && drop[e.uuid]); });
+    return entries.length === queue.entries.length ? queue : withEntries(entries);
+}
+
 function cancelEntry(queue, uuid) {
     var entries = [];
     var found = false;

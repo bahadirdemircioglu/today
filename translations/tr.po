@@ -15,6 +15,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
+msgid "#%1 isn't a project: it stays in the title"
+msgstr "#%1 diye bir proje yok: başlıkta kalır"
+
 msgid "%1 change waiting"
 msgid_plural "%1 changes waiting"
 msgstr[0] "%1 değişiklik bekliyor"
@@ -47,6 +50,11 @@ msgid_plural "%2 · %1 overdue"
 msgstr[0] "%2 · %1 gecikmiş"
 msgstr[1] "%2 · %1 gecikmiş"
 
+msgid "%2 · %1 recurring left as is"
+msgid_plural "%2 · %1 recurring left as is"
+msgstr[0] "%2 · %1 tekrarlanan görev olduğu gibi bırakıldı"
+msgstr[1] "%2 · %1 tekrarlanan görev olduğu gibi bırakıldı"
+
 msgid "1 hour before"
 msgstr "1 saat önce"
 
@@ -61,6 +69,9 @@ msgstr "30 dakika önce"
 
 msgid "5 minutes before"
 msgstr "5 dakika önce"
+
+msgid "@%1 (new label)"
+msgstr "@%1 (yeni etiket)"
 
 msgid "A pinned list (set from the list title menu)"
 msgstr "Sabitlenmiş liste (liste başlığı menüsünden ayarlanır)"
@@ -79,6 +90,9 @@ msgstr "Görev ekle"
 
 msgid "Add task to this day"
 msgstr "Bu güne görev ekle"
+
+msgid "Added for %1"
+msgstr "%1 için eklendi"
 
 msgid "Added to %1"
 msgstr "%1 projesine eklendi"
@@ -119,6 +133,12 @@ msgstr "Zamanlamayı değiştir…"
 
 msgid "Checking…"
 msgstr "Kontrol ediliyor…"
+
+msgid "Click to keep these words in the title instead"
+msgstr "Bu kelimeleri tarih yerine başlıkta tutmak için tıklayın"
+
+msgid "Click to use this as the date"
+msgstr "Bunu tarih olarak kullanmak için tıklayın"
 
 msgid "Colour"
 msgstr "Renk"
@@ -264,6 +284,11 @@ msgstr "Diğer eylemler"
 msgid "Move to"
 msgstr "Taşı"
 
+msgid "Moved %1 task"
+msgid_plural "Moved %1 tasks"
+msgstr[0] "%1 görev taşındı"
+msgstr[1] "%1 görev taşındı"
+
 msgid "New project"
 msgstr "Yeni proje"
 
@@ -280,7 +305,7 @@ msgid "New task with @%1"
 msgstr "@%1 etiketli yeni görev"
 
 msgid "New task, e.g. “Dentist tomorrow 3pm #Personal”"
-msgstr "Yeni görev, ör. “Dentist tomorrow 3pm #Personal”"
+msgstr "Yeni görev, ör. “Diş hekimi yarın 15:00 #Kişisel”"
 
 msgid "Next month"
 msgstr "Sonraki ay"
@@ -366,6 +391,9 @@ msgstr "Önceki ay"
 msgid "Priority"
 msgstr "Öncelik"
 
+msgid "Priority %1"
+msgstr "Öncelik %1"
+
 msgid "Priority 1"
 msgstr "Öncelik 1"
 
@@ -398,6 +426,15 @@ msgstr "10 dakika sonra hatırlat"
 
 msgid "Reminders:"
 msgstr "Hatırlatmalar:"
+
+msgid "Repeats (Todoist reads the schedule)"
+msgstr "Tekrarlanır (zamanlamayı Todoist okur)"
+
+msgid "Reschedule"
+msgstr "Yeniden planla"
+
+msgid "Reschedule all overdue tasks"
+msgstr "Tüm gecikmiş görevleri yeniden planla"
 
 msgid "Results from %1"
 msgstr "%1 itibarıyla sonuçlar"
@@ -454,6 +491,14 @@ msgstr "Bu çok uzun. 1000 karakterin altında tutun."
 
 msgid "The list you used last"
 msgstr "En son kullandığınız liste"
+
+msgid ""
+"The recurring task was left as it is; change its schedule from its menu."
+msgid_plural ""
+"%1 recurring tasks were left as they are; change their schedule from their "
+"menus."
+msgstr[0] "Tekrarlanan görev olduğu gibi bırakıldı; zamanlamasını kendi menüsünden değiştirin."
+msgstr[1] "%1 tekrarlanan görev olduğu gibi bırakıldı; zamanlamalarını kendi menülerinden değiştirin."
 
 msgid "This token didn't work. Copy it again from Todoist settings."
 msgstr "Bu token çalışmadı. Todoist ayarlarından yeniden kopyalayın."
