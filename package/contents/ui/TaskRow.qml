@@ -65,11 +65,11 @@ Item {
     readonly property string groupLabel: {
         switch (header) {
         case "overdue":
-            return i18n("Overdue");
+            return Lang.i18n("Overdue");
         case "today":
-            return i18n("Today");
+            return Lang.i18n("Today");
         case "pending":
-            return i18n("Waiting to sync");
+            return Lang.i18n("Waiting to sync");
         case "section":
             return headerText;
         case "day":
@@ -104,7 +104,7 @@ Item {
     }
     readonly property string detailText: {
         if (pending) {
-            return i18n("Waiting to sync");
+            return Lang.i18n("Waiting to sync");
         }
         var parts = [];
         if (projectName !== "") {
@@ -144,7 +144,7 @@ Item {
         if (editField.text.trim() !== content) {
             var err = controller.rename(itemId, editField.text);
             if (err === "too_long") {
-                controller.showInfo(i18n("That's too long. Keep it under 1000 characters."), true);
+                controller.showInfo(Lang.i18n("That's too long. Keep it under 1000 characters."), true);
                 return;
             }
         }
@@ -183,7 +183,7 @@ Item {
             icon.height: Kirigami.Units.iconSizes.small
             implicitWidth: Kirigami.Units.iconSizes.small + Kirigami.Units.smallSpacing * 2
             implicitHeight: implicitWidth
-            text: i18n("Add task to this day")
+            text: Lang.i18n("Add task to this day")
             display: PlasmaComponents3.AbstractButton.IconOnly
             onClicked: row.addRequested(row.headerDate)
             PlasmaComponents3.ToolTip.text: text
@@ -243,8 +243,8 @@ Item {
                 icon.name: row.collapsed ? "arrow-right" : "arrow-down"
                 icon.width: Kirigami.Units.iconSizes.small
                 icon.height: Kirigami.Units.iconSizes.small
-                text: row.collapsed ? i18np("Show %1 sub-task", "Show %1 sub-tasks", row.childCount)
-                                    : i18n("Hide sub-tasks")
+                text: row.collapsed ? Lang.i18np("Show %1 sub-task", "Show %1 sub-tasks", row.childCount)
+                                    : Lang.i18n("Hide sub-tasks")
                 display: PlasmaComponents3.AbstractButton.IconOnly
                 onClicked: row.controller.toggleCollapsed(row.itemId)
                 PlasmaComponents3.ToolTip.text: text
@@ -258,7 +258,7 @@ Item {
                 checked: row.completing
                 enabled: !row.pending && !row.completing
                 opacity: row.pending ? 0.4 : 1
-                Accessible.name: i18n("Complete “%1”", row.title)
+                Accessible.name: Lang.i18n("Complete “%1”", row.title)
                 onClicked: row.startCompleting()
             }
 
@@ -325,7 +325,7 @@ Item {
                 }
                 PlasmaComponents3.Label {
                     visible: row.collapsed
-                    text: i18np("%1 sub-task", "%1 sub-tasks", row.childCount)
+                    text: Lang.i18np("%1 sub-task", "%1 sub-tasks", row.childCount)
                     textFormat: Text.PlainText
                     font.pointSize: Kirigami.Theme.smallFont.pointSize
                     opacity: 0.6
@@ -355,7 +355,7 @@ Item {
                     }
                     PlasmaComponents3.Label {
                         visible: row.deadlineKey !== ""
-                        text: row.controller && row.deadlineKey ? i18nc("deadline date", "Deadline %1", row.controller.dateText(row.deadlineKey)) : ""
+                        text: row.controller && row.deadlineKey ? Lang.i18nc("deadline date", "Deadline %1", row.controller.dateText(row.deadlineKey)) : ""
                         textFormat: Text.PlainText
                         font.pointSize: Kirigami.Theme.smallFont.pointSize
                         color: row.deadlineDue ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.textColor
@@ -370,7 +370,7 @@ Item {
                     }
                     PlasmaComponents3.Label {
                         visible: row.pending
-                        text: i18n("Waiting to sync")
+                        text: Lang.i18n("Waiting to sync")
                         textFormat: Text.PlainText
                         font.pointSize: Kirigami.Theme.smallFont.pointSize
                         opacity: 0.7
@@ -417,7 +417,7 @@ Item {
                 visible: !row.pending && !row.editing
                 opacity: rowHover.hovered || activeFocus || row.keyboardCurrent ? 1 : 0
                 icon.name: "overflow-menu"
-                text: i18n("More actions")
+                text: Lang.i18n("More actions")
                 display: PlasmaComponents3.AbstractButton.IconOnly
                 onClicked: row.menuRequested(moreButton)
                 PlasmaComponents3.ToolTip.text: text

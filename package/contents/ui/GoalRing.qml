@@ -21,7 +21,7 @@ Item {
     visible: progress !== null
 
     Accessible.role: Accessible.ProgressBar
-    Accessible.name: progress ? i18n("%1 of %2 tasks done today", progress.completed, progress.goal) : ""
+    Accessible.name: progress ? Lang.i18n("%1 of %2 tasks done today", progress.completed, progress.goal) : ""
 
     Shape {
         anchors.fill: parent
@@ -70,8 +70,8 @@ Item {
     }
     PlasmaComponents3.ToolTip {
         visible: ringHover.hovered && ring.progress !== null
-        text: ring.progress ? (ring.progress.reached ? i18n("Daily goal reached: %1 of %2 tasks", ring.progress.completed, ring.progress.goal)
-                                                    : i18n("%1 of %2 tasks done today", ring.progress.completed, ring.progress.goal))
+        text: ring.progress ? (ring.progress.reached ? Lang.i18n("Daily goal reached: %1 of %2 tasks", ring.progress.completed, ring.progress.goal)
+                                                    : Lang.i18n("%1 of %2 tasks done today", ring.progress.completed, ring.progress.goal))
                             : ""
     }
 }

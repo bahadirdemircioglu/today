@@ -24,20 +24,20 @@ RowLayout {
             return c.infoText;
         }
         var waiting = c.queuedCount > 0
-            ? " · " + i18np("%1 change waiting", "%1 changes waiting", c.queuedCount) : "";
+            ? " · " + Lang.i18np("%1 change waiting", "%1 changes waiting", c.queuedCount) : "";
         if (c.phase === "OFFLINE") {
-            return i18n("Offline. Showing saved tasks.") + waiting;
+            return Lang.i18n("Offline. Showing saved tasks.") + waiting;
         }
         if (c.phase === "ERROR") {
-            return i18n("Todoist is having trouble. Retrying…") + waiting;
+            return Lang.i18n("Todoist is having trouble. Retrying…") + waiting;
         }
         if (c.rateLimited) {
-            return i18n("Todoist asked to slow down. Retrying soon…") + waiting;
+            return Lang.i18n("Todoist asked to slow down. Retrying soon…") + waiting;
         }
         if (c.phase === "READY" && c.lastSyncAt > 0) {
             var mins = Math.floor((c.nowMs - c.lastSyncAt) / 60000);
             if (mins > 10) {
-                return i18np("Updated %1 minute ago", "Updated %1 minutes ago", mins) + waiting;
+                return Lang.i18np("Updated %1 minute ago", "Updated %1 minutes ago", mins) + waiting;
             }
         }
         return "";
@@ -68,7 +68,7 @@ RowLayout {
 
     PlasmaComponents3.ToolButton {
         visible: !!footer.controller && footer.controller.undoUuid !== ""
-        text: i18n("Undo")
+        text: Lang.i18n("Undo")
         icon.name: "edit-undo"
         onClicked: footer.controller.undoDelete()
     }

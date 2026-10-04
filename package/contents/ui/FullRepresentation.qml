@@ -71,7 +71,7 @@ Item {
             }
             PlasmaComponents3.Label {
                 Layout.alignment: Qt.AlignHCenter
-                text: i18n("Loading your tasks…")
+                text: Lang.i18n("Loading your tasks…")
                 opacity: 0.7
             }
             Item { Layout.fillHeight: true }
@@ -85,9 +85,9 @@ Item {
                 anchors.centerIn: parent
                 width: parent.width - Kirigami.Units.gridUnit * 2
                 icon.name: full.phase === "OFFLINE" ? "network-disconnect" : "data-warning"
-                text: full.phase === "OFFLINE" ? i18n("Can't reach Todoist") : i18n("Todoist is having trouble")
+                text: full.phase === "OFFLINE" ? Lang.i18n("Can't reach Todoist") : Lang.i18n("Todoist is having trouble")
                 helpfulAction: Kirigami.Action {
-                    text: i18n("Try again")
+                    text: Lang.i18n("Try again")
                     icon.name: "view-refresh"
                     onTriggered: full.controller.requestSync("manual")
                 }

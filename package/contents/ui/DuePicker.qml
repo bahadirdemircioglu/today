@@ -62,7 +62,7 @@ QQC2.Popup {
             return;
         }
         if (recurring) {
-            error = i18n("Type a new schedule for this recurring task.");
+            error = Lang.i18n("Type a new schedule for this recurring task.");
             return;
         }
         if (noDate) {
@@ -71,12 +71,12 @@ QQC2.Popup {
             return;
         }
         if (!selectedKey) {
-            error = i18n("Pick a day first.");
+            error = Lang.i18n("Pick a day first.");
             return;
         }
         var due = DateUtil.composeDue(selectedKey, timeField.text);
         if (!due) {
-            error = i18n("That time isn't valid. Use e.g. 15:30.");
+            error = Lang.i18n("That time isn't valid. Use e.g. 15:30.");
             return;
         }
         controller.setDue(itemId, due);
@@ -108,10 +108,10 @@ QQC2.Popup {
 
             Repeater {
                 model: [
-                    { which: "today", label: i18n("Today") },
-                    { which: "tomorrow", label: i18n("Tomorrow") },
-                    { which: "weekend", label: i18n("This weekend") },
-                    { which: "nextweek", label: i18n("Next week") }
+                    { which: "today", label: Lang.i18n("Today") },
+                    { which: "tomorrow", label: Lang.i18n("Tomorrow") },
+                    { which: "weekend", label: Lang.i18n("This weekend") },
+                    { which: "nextweek", label: Lang.i18n("Next week") }
                 ]
                 delegate: PlasmaComponents3.Button {
                     required property var modelData
@@ -128,7 +128,7 @@ QQC2.Popup {
                 }
             }
             PlasmaComponents3.Button {
-                text: i18n("No date")
+                text: Lang.i18n("No date")
                 icon.name: "edit-clear"
                 checkable: true
                 checked: picker.noDate
@@ -150,19 +150,19 @@ QQC2.Popup {
                 Layout.fillWidth: true
                 PlasmaComponents3.ToolButton {
                     icon.name: "go-previous"
-                    text: i18n("Previous month")
+                    text: Lang.i18n("Previous month")
                     display: PlasmaComponents3.AbstractButton.IconOnly
                     onClicked: picker.shiftMonth(-1)
                 }
                 PlasmaComponents3.Label {
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignHCenter
-                    text: Qt.formatDate(new Date(picker.shownYear, picker.shownMonth, 1), "MMMM yyyy")
+                    text: Lang.formatDate(new Date(picker.shownYear, picker.shownMonth, 1), "MMMM yyyy")
                     font.weight: Font.DemiBold
                 }
                 PlasmaComponents3.ToolButton {
                     icon.name: "go-next"
-                    text: i18n("Next month")
+                    text: Lang.i18n("Next month")
                     display: PlasmaComponents3.AbstractButton.IconOnly
                     onClicked: picker.shiftMonth(1)
                 }
@@ -170,7 +170,7 @@ QQC2.Popup {
 
             QQC2.DayOfWeekRow {
                 Layout.fillWidth: true
-                locale: Qt.locale()
+                locale: Lang.locale
                 delegate: PlasmaComponents3.Label {
                     required property string shortName
                     text: shortName
@@ -187,7 +187,7 @@ QQC2.Popup {
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 1.7 * 6
                 month: picker.shownMonth
                 year: picker.shownYear
-                locale: Qt.locale()
+                locale: Lang.locale
                 delegate: Item {
                     id: cell
                     required property var model
@@ -221,12 +221,12 @@ QQC2.Popup {
             spacing: Kirigami.Units.smallSpacing
 
             PlasmaComponents3.Label {
-                text: i18n("Time:")
+                text: Lang.i18n("Time:")
             }
             PlasmaComponents3.TextField {
                 id: timeField
                 Layout.fillWidth: true
-                placeholderText: i18n("optional, e.g. 15:30")
+                placeholderText: Lang.i18n("optional, e.g. 15:30")
                 inputMethodHints: Qt.ImhPreferNumbers
                 onAccepted: picker.save()
                 onTextEdited: picker.error = ""
@@ -236,15 +236,15 @@ QQC2.Popup {
         PlasmaComponents3.Label {
             Layout.fillWidth: true
             Layout.topMargin: Kirigami.Units.smallSpacing
-            text: picker.recurring ? i18n("Recurring task: type its new schedule")
-                                   : i18n("…or type it the Todoist way")
+            text: picker.recurring ? Lang.i18n("Recurring task: type its new schedule")
+                                   : Lang.i18n("…or type it the Todoist way")
             font.pointSize: Kirigami.Theme.smallFont.pointSize
             opacity: 0.7
         }
         PlasmaComponents3.TextField {
             id: scheduleField
             Layout.fillWidth: true
-            placeholderText: i18n("e.g. next friday 3pm, every monday 9am")
+            placeholderText: Lang.i18n("e.g. next friday 3pm, every monday 9am")
             onAccepted: picker.save()
             onTextEdited: picker.error = ""
         }
@@ -262,11 +262,11 @@ QQC2.Popup {
             Layout.topMargin: Kirigami.Units.smallSpacing
             Item { Layout.fillWidth: true }
             PlasmaComponents3.Button {
-                text: i18n("Cancel")
+                text: Lang.i18n("Cancel")
                 onClicked: picker.close()
             }
             PlasmaComponents3.Button {
-                text: i18n("Save")
+                text: Lang.i18n("Save")
                 icon.name: "dialog-ok-apply"
                 onClicked: picker.save()
             }

@@ -26,7 +26,7 @@ Item {
     property string customQuery: ""         // config: unsaved filter query shown as its own list
     property string customQueryName: ""
     readonly property var customQueryOption: customQuery.trim() !== ""
-        ? { name: customQueryName.trim() || i18n("Custom filter"), query: customQuery.trim() } : null
+        ? { name: customQueryName.trim() || Lang.i18n("Custom filter"), query: customQuery.trim() } : null
     // daily goal ring (config) and its data
     property bool showGoal: true
     property var goalStats: null
@@ -65,16 +65,16 @@ Item {
     readonly property string viewTitle: {
         switch (viewSpec.kind) {
         case "inbox":
-            return i18n("Inbox");
+            return Lang.i18n("Inbox");
         case "upcoming":
-            return i18n("Upcoming");
+            return Lang.i18n("Upcoming");
         case "project":
         case "label":
         case "filter":
         case "query":
             return view.title || "";
         default:
-            return i18n("Today");
+            return Lang.i18n("Today");
         }
     }
     readonly property int overdueCount: view.counts.overdue
@@ -154,7 +154,7 @@ Item {
             completedSinceStats++;
             priv.undoIsCompletion = true;
             undoUuid = uuid;
-            undoText = title ? i18n("Completed “%1”", title) : i18n("Completed");
+            undoText = title ? Lang.i18n("Completed “%1”", title) : Lang.i18n("Completed");
             undoTimer.interval = completeUndoMs + 200;
             undoTimer.restart();
         }
@@ -183,8 +183,8 @@ Item {
         for (var j = 0; j < list.length; j++) {
             var r = list[j];
             var when = timeText(r.minutes);
-            var body = r.minutes <= todayView.nowMinutes ? i18n("Now · %1", when)
-                                                         : i18np("In %1 minute · %2", "In %1 minutes · %2", r.minutes - todayView.nowMinutes, when);
+            var body = r.minutes <= todayView.nowMinutes ? Lang.i18n("Now · %1", when)
+                                                         : Lang.i18np("In %1 minute · %2", "In %1 minutes · %2", r.minutes - todayView.nowMinutes, when);
             reminderDue(r.id, r.title, body, r.baseKey);
         }
     }
@@ -323,7 +323,7 @@ Item {
         recompute();
         undoUuid = r.uuid;
         priv.undoIsCompletion = false;
-        undoText = i18n("Deleted “%1”", title);
+        undoText = Lang.i18n("Deleted “%1”", title);
         undoTimer.interval = undoMs + 200;
         undoTimer.restart();
     }
@@ -350,7 +350,7 @@ Item {
         clipboardHelper.selectAll();
         clipboardHelper.copy();
         clipboardHelper.text = "";
-        showInfo(i18n("Link copied"), false);
+        showInfo(Lang.i18n("Link copied"), false);
     }
 
     function showInfo(text, isError) {
@@ -365,7 +365,7 @@ Item {
             return "";
         }
         var d = new Date(2000, 0, 1, Math.floor(minutes / 60), minutes % 60);
-        return Qt.formatTime(d, Qt.locale().timeFormat(Locale.ShortFormat));
+        return Lang.formatTime(d);
     }
 
     // Relative day: Yesterday / Today / Tomorrow / weekday (this week) / "d MMM" (/ "d MMM yyyy")
@@ -377,19 +377,19 @@ Item {
         var date = new Date(p.y, p.m - 1, p.d);
         var diff = DateUtil.daysBetween(view.todayKey, dateKey);
         if (diff === -1) {
-            return i18n("Yesterday");
+            return Lang.i18n("Yesterday");
         }
         if (diff === 0) {
-            return i18n("Today");
+            return Lang.i18n("Today");
         }
         if (diff === 1) {
-            return i18n("Tomorrow");
+            return Lang.i18n("Tomorrow");
         }
         if (diff > 1 && diff < 7) {
-            return Qt.formatDate(date, "dddd");
+            return Lang.formatDate(date, "dddd");
         }
         var thisYear = DateUtil.splitDateKey(view.todayKey);
-        return Qt.formatDate(date, thisYear && thisYear.y === p.y ? "d MMM" : "d MMM yyyy");
+        return Lang.formatDate(date, thisYear && thisYear.y === p.y ? "d MMM" : "d MMM yyyy");
     }
 
     // Upcoming day header: "Today · Saturday 3 October"
@@ -398,13 +398,13 @@ Item {
         if (!p) {
             return "";
         }
-        var full = Qt.formatDate(new Date(p.y, p.m - 1, p.d), "dddd d MMMM");
+        var full = Lang.formatDate(new Date(p.y, p.m - 1, p.d), "dddd d MMMM");
         var diff = DateUtil.daysBetween(view.todayKey, dateKey);
         if (diff === 0) {
-            return i18nc("day header: Today · weekday date", "Today · %1", full);
+            return Lang.i18nc("day header: Today · weekday date", "Today · %1", full);
         }
         if (diff === 1) {
-            return i18nc("day header: Tomorrow · weekday date", "Tomorrow · %1", full);
+            return Lang.i18nc("day header: Tomorrow · weekday date", "Tomorrow · %1", full);
         }
         return full;
     }
@@ -741,7 +741,7 @@ Item {
             // the project/label/filter was deleted or archived in Todoist
             viewKey = "today";
             if (infoText === "") {
-                showInfo(i18n("That list no longer exists in Todoist. Showing Today."), false);
+                showInfo(Lang.i18n("That list no longer exists in Todoist. Showing Today."), false);
             }
             v = ViewModel.computeView(store, queue, viewSpec, nowMs, DateUtil.systemOffsetAt, filterResults, options);
         }
@@ -814,10 +814,10 @@ Item {
         }
         var projectId = task.project_id !== undefined && task.project_id !== null ? String(task.project_id) : "";
         var project = store.projects[projectId];
-        var projectName = project && projectId !== store.inboxProjectId ? project.name : i18n("Inbox");
+        var projectName = project && projectId !== store.inboxProjectId ? project.name : Lang.i18n("Inbox");
         var dueText = task.due && task.due.string ? task.due.string : "";
-        showInfo(dueText ? i18nc("task added: project · due date", "Added to %1 · %2", projectName, dueText)
-                         : i18n("Added to %1", projectName), false);
+        showInfo(dueText ? Lang.i18nc("task added: project · due date", "Added to %1 · %2", projectName, dueText)
+                         : Lang.i18n("Added to %1", projectName), false);
     }
 
     function reportDropped(dropped, titles) {
@@ -830,18 +830,18 @@ Item {
         var d = dropped[0];
         if (d.kind === "project_add") {
             showInfo(/LIMIT/i.test(d.errorTag || "")
-                     ? i18n("Couldn't create “%1”: your Todoist plan's project limit is reached.", d.name)
-                     : i18n("Couldn't create the project “%1”.", d.name), true);
+                     ? Lang.i18n("Couldn't create “%1”: your Todoist plan's project limit is reached.", d.name)
+                     : Lang.i18n("Couldn't create the project “%1”.", d.name), true);
         } else if (d.kind === "update" || d.kind === "move" || d.kind === "delete") {
             var changed = titles[d.itemId] || "";
-            showInfo(changed ? i18n("Couldn't save a change to “%1” — it may have been deleted.", changed)
-                             : i18n("Couldn't save a change to a task — it may have been deleted."), true);
+            showInfo(changed ? Lang.i18n("Couldn't save a change to “%1” — it may have been deleted.", changed)
+                             : Lang.i18n("Couldn't save a change to a task — it may have been deleted."), true);
         } else if (d.kind === "close") {
             var title = titles[d.itemId] || "";
-            showInfo(title ? i18n("Couldn't complete “%1” — it may have been deleted.", title)
-                           : i18n("Couldn't complete a task — it may have been deleted."), true);
+            showInfo(title ? Lang.i18n("Couldn't complete “%1” — it may have been deleted.", title)
+                           : Lang.i18n("Couldn't complete a task — it may have been deleted."), true);
         } else {
-            showInfo(i18n("Couldn't add “%1”.", d.text), true);
+            showInfo(Lang.i18n("Couldn't add “%1”.", d.text), true);
         }
     }
 
@@ -963,6 +963,17 @@ Item {
             dispatch({ type: "TOKEN_CLEARED" });
         } else {
             dispatch({ type: "TOKEN_SET", hasCache: TaskStore.hasData(store) });
+        }
+    }
+
+    // texts computed into the rows (day headers, dates) follow a language change
+    Connections {
+        target: Lang
+        function onEffectiveChanged() {
+            controller.recompute();
+        }
+        function onLocaleChanged() {
+            controller.recompute();
         }
     }
 

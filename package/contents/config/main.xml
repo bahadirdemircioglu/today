@@ -24,6 +24,10 @@
       <default></default>
     </entry>
     <!-- Show the daily goal ring (Todoist productivity stats) -->
+    <!-- Widget language: "" (follow the system) or a language code such as "en", "tr" -->
+    <entry name="language" type="String">
+      <default></default>
+    </entry>
     <entry name="showGoal" type="Bool">
       <default>true</default>
     </entry>

@@ -18,6 +18,7 @@ Your Todoist tasks on the KDE Plasma 6 desktop and panel: **Inbox, Today, Upcomi
 - **Follows your Plasma theme:** light/dark, accent colour, font size and animation speed. No hard-coded colours.
 - **Offline-first:** tasks are cached, and completions/additions made offline are queued. The queue survives Plasma restarts and is sent once you are back online.
 - **Task menu:** right-click a task (or use its ⋯ button) to edit it, reschedule it (quick choices or *Pick date & time…* with a calendar, a time, or Todoist-style text like `next friday 3pm`), change priority, move it to another project, copy its link, show its full description, or delete it. Completing and deleting can be undone for a few seconds.
+- **Language:** English or Turkish, or the system language (Settings → *Language*). The setting is shared by all Todoist for Plasma widgets.
 - **New projects:** *Projects ▸ New project…* in the list title menu creates a project (name, Todoist colour, optional parent) and opens it. It works offline too. Todoist's free plan allows 5 projects; if you hit the limit, the widget says so.
 - **Details at a glance:** labels, deadlines (red when due), the first line of the description (click it for the rest), and sub-tasks you can fold away in projects.
 - **Reminders:** a Plasma notification before a timed task (10 minutes by default), with *Complete* and *Remind me in 10 minutes*.
@@ -162,16 +163,18 @@ npm test                                   # Node ≥ 20, zero dependencies
 npm run check                              # everything CI checks: tests, runner tests, translations up to date
 plasmoidviewer -a package                  # desktop form factor
 plasmoidviewer -a package -l bottomedge -f horizontal   # panel
-LANGUAGE=tr LANG=tr_TR.UTF-8 plasmoidviewer -a package  # Turkish UI (run scripts/i18n-build.sh first)
-scripts/i18n-extract.sh                    # update translations/template.pot and *.po
+scripts/i18n-extract.sh                    # update template.pot, *.po and logic/Catalogs.js
 scripts/i18n-build.sh                      # compile .mo files into package/contents/locale
 scripts/package.sh                         # dist/todoist-plasma-<version>.plasmoid
 ```
+
+**Translating:** copy `translations/template.pot` to `translations/<code>.po`, translate it and run `scripts/i18n-extract.sh`. The UI translates through `Lang.qml` (`Lang.i18n()`, `Lang.i18nc()`, `Lang.i18np()`) rather than KDE's `i18n()`, so users can pick a language other than the system one. A new `.po` file shows up in the language list automatically.
 
 All decision logic is plain JavaScript in `package/contents/ui/logic/` (`.pragma library` files, no QML or network dependencies), unit-tested in Node via `tests/helpers/load-qml-js.mjs`:
 
 | File | Role |
 |---|---|
+| `I18n.js` | language choice and translation (`Lang.qml` uses it with the generated `Catalogs.js`) |
 | `DateUtil.js` | time-zone offsets, day keys, Todoist `due` parsing |
 | `TaskStore.js` | merging `/sync` responses (tasks, projects, sections, labels, filters), the offline overlay, the Today list |
 | `ViewModel.js` | Inbox, Upcoming, project, label and filter lists, list rows and the navigation list |

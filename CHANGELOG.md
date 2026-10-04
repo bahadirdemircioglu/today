@@ -11,6 +11,12 @@ All notable changes to this project are documented here. The format follows
   parent project. The widget switches to the new project right away; offline it is queued
   with a temporary id and gets its real id on the next sync. Hitting the Todoist plan's
   project limit shows a clear message.
+- Language setting (Settings → Language): System default, English or Türkçe. Switching takes
+  effect at once, including day and month names; it applies to all widgets of this kind.
+
+### Changed
+- Translations are now built into the widget (`logic/Catalogs.js`, generated from
+  `translations/*.po`), so they work without compiling `.mo` files.
 
 ## [2.2.0] - 2026-10-04
 

@@ -34,13 +34,13 @@ PlasmaComponents3.AbstractButton {
         for (var i = 0; i < depth; i++) {
             indent += "    ";
         }
-        return count > 0 ? i18nc("view name with task count", "%1%2 (%3)", indent, name, count) : indent + name;
+        return count > 0 ? Lang.i18nc("view name with task count", "%1%2 (%3)", indent, name, count) : indent + name;
     }
 
     hoverEnabled: true
     padding: 0
     text: controller ? controller.viewTitle : ""
-    Accessible.name: i18n("Switch list: %1", text)
+    Accessible.name: Lang.i18n("Switch list: %1", text)
     onClicked: navMenu.popup(selector, 0, selector.height)
 
     contentItem: RowLayout {
@@ -67,21 +67,21 @@ PlasmaComponents3.AbstractButton {
         id: navMenu
 
         PlasmaComponents3.MenuItem {
-            text: selector.entryText(i18n("Inbox"), selector.countOf("inbox"), 0)
+            text: selector.entryText(Lang.i18n("Inbox"), selector.countOf("inbox"), 0)
             icon.name: "mail-folder-inbox"
             checkable: true
             checked: selector.controller && selector.controller.viewKey === "inbox"
             onTriggered: selector.controller.setView("inbox")
         }
         PlasmaComponents3.MenuItem {
-            text: selector.entryText(i18n("Today"), selector.countOf("today"), 0)
+            text: selector.entryText(Lang.i18n("Today"), selector.countOf("today"), 0)
             icon.name: "go-jump-today"
             checkable: true
             checked: selector.controller && selector.controller.viewKey === "today"
             onTriggered: selector.controller.setView("today")
         }
         PlasmaComponents3.MenuItem {
-            text: selector.entryText(i18n("Upcoming"), selector.countOf("upcoming"), 0)
+            text: selector.entryText(Lang.i18n("Upcoming"), selector.countOf("upcoming"), 0)
             icon.name: "view-calendar-upcoming-events"
             checkable: true
             checked: selector.controller && selector.controller.viewKey === "upcoming"
@@ -103,7 +103,7 @@ PlasmaComponents3.AbstractButton {
 
         PlasmaComponents3.Menu {
             id: projectsMenu
-            title: i18n("Projects")
+            title: Lang.i18n("Projects")
 
             Instantiator {
                 model: selector.projectEntries
@@ -120,14 +120,14 @@ PlasmaComponents3.AbstractButton {
 
             PlasmaComponents3.MenuSeparator {}
             PlasmaComponents3.MenuItem {
-                text: i18n("New project…")
+                text: Lang.i18n("New project…")
                 icon.name: "folder-new"
                 onTriggered: selector.newProjectRequested()
             }
         }
         PlasmaComponents3.Menu {
             id: labelsMenu
-            title: i18n("Labels")
+            title: Lang.i18n("Labels")
             enabled: selector.labelEntries.length > 0
 
             Instantiator {
@@ -145,7 +145,7 @@ PlasmaComponents3.AbstractButton {
         }
         PlasmaComponents3.Menu {
             id: filtersMenu
-            title: i18n("Filters")
+            title: Lang.i18n("Filters")
             enabled: selector.filterEntries.length > 0
 
             Instantiator {
@@ -165,7 +165,7 @@ PlasmaComponents3.AbstractButton {
         PlasmaComponents3.MenuSeparator {}
 
         PlasmaComponents3.MenuItem {
-            text: i18n("Start here in this widget")
+            text: Lang.i18n("Start here in this widget")
             icon.name: "window-pin"
             checkable: true
             checked: selector.controller && Plasmoid.configuration.pinnedView === selector.controller.viewKey

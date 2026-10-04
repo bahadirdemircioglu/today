@@ -26,30 +26,55 @@ PlasmoidItem {
         controller: sync
     }
 
-    toolTipMainText: i18n("Todoist for Plasma")
+    toolTipMainText: Lang.i18n("Todoist for Plasma")
     toolTipSubText: {
         switch (sync.phase) {
         case "SETUP":
-            return i18n("Not connected to Todoist");
+            return Lang.i18n("Not connected to Todoist");
         case "AUTH_INVALID":
-            return i18n("Todoist didn't accept your token");
+            return Lang.i18n("Todoist didn't accept your token");
         case "LOADING":
             if (!sync.hasCache) {
-                return i18n("Loading your tasks…");
+                return Lang.i18n("Loading your tasks…");
             }
             break;
         }
         if (sync.todayCount === 0) {
-            return i18n("All done for today");
+            return Lang.i18n("All done for today");
         }
-        var text = i18np("%1 task today", "%1 tasks today", sync.todayCount);
+        var text = Lang.i18np("%1 task today", "%1 tasks today", sync.todayCount);
         var next = sync.todayView.next;
         if (next) {
             var when = sync.timeText(next.minutes);
-            text += " · " + (when ? i18nc("next task: title time", "Next: %1 %2", next.title, when)
-                                  : i18nc("next task: title", "Next: %1", next.title));
+            text += " · " + (when ? Lang.i18nc("next task: title time", "Next: %1 %2", next.title, when)
+                                  : Lang.i18nc("next task: title", "Next: %1", next.title));
         }
         return text;
+    }
+
+    // Language: one Lang object serves every widget in this Plasma session, so the widgets
+    // share the setting. A widget that loads later adopts a language another one already set.
+    function applyLanguage() {
+        var mine = Plasmoid.configuration.language;
+        if (!Lang.configured) {
+            Lang.configured = true;
+            Lang.code = mine;
+        } else if (mine !== "" && Lang.code === "") {
+            Lang.code = mine;
+        } else if (mine !== Lang.code) {
+            Plasmoid.configuration.language = Lang.code;
+        }
+    }
+    readonly property string configuredLanguage: Plasmoid.configuration.language
+    onConfiguredLanguageChanged: Lang.code = configuredLanguage
+    Component.onCompleted: applyLanguage()
+    Connections {
+        target: Lang
+        function onCodeChanged() {
+            if (Plasmoid.configuration.language !== Lang.code) {
+                Plasmoid.configuration.language = Lang.code;
+            }
+        }
     }
 
     // Global shortcut (Configure… → Keyboard Shortcuts): Plasma opens the popup in a panel;
@@ -69,13 +94,13 @@ PlasmoidItem {
 
     Plasmoid.contextualActions: [
         PlasmaCore.Action {
-            text: i18n("Refresh now")
+            text: Lang.i18n("Refresh now")
             icon.name: "view-refresh"
             enabled: sync.phase !== "SETUP"
             onTriggered: sync.requestSync("manual")
         },
         PlasmaCore.Action {
-            text: i18n("Open Todoist")
+            text: Lang.i18n("Open Todoist")
             icon.name: "internet-services"
             onTriggered: Qt.openUrlExternally("https://app.todoist.com/app/today")
         }

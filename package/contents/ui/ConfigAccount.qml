@@ -20,6 +20,8 @@ KCM.SimpleKCM {
     property string cfg_pinnedViewDefault: ""
     property string cfg_badgeSource
     property string cfg_badgeSourceDefault: "today"
+    property string cfg_language
+    property string cfg_languageDefault: ""
     property bool cfg_showGoal
     property bool cfg_showGoalDefault: true
     property int cfg_notifyLeadMinutes
@@ -53,16 +55,16 @@ KCM.SimpleKCM {
             if (res.kind === "ok" && res.json) {
                 page.cfg_accountName = res.json.full_name || res.json.email || "";
                 page.statusIsError = false;
-                page.status = i18n("Token works.");
+                page.status = Lang.i18n("Token works.");
                 return;
             }
             page.statusIsError = true;
             if (res.kind === "auth") {
-                page.status = i18n("This token didn't work. Copy it again from Todoist settings.");
+                page.status = Lang.i18n("This token didn't work. Copy it again from Todoist settings.");
             } else if (res.kind === "network") {
-                page.status = i18n("Can't reach Todoist. Check your connection.");
+                page.status = Lang.i18n("Can't reach Todoist. Check your connection.");
             } else {
-                page.status = i18n("Something went wrong (HTTP %1).", res.status);
+                page.status = Lang.i18n("Something went wrong (HTTP %1).", res.status);
             }
         });
     }
@@ -77,17 +79,17 @@ KCM.SimpleKCM {
 
     Kirigami.FormLayout {
         RowLayout {
-            Kirigami.FormData.label: i18n("Account:")
+            Kirigami.FormData.label: Lang.i18n("Account:")
             spacing: Kirigami.Units.smallSpacing
 
             QQC2.Label {
-                text: page.cfg_apiToken === "" ? i18n("Not connected")
-                    : (page.cfg_accountName !== "" ? i18n("Connected as %1", page.cfg_accountName) : i18n("Connected"))
+                text: page.cfg_apiToken === "" ? Lang.i18n("Not connected")
+                    : (page.cfg_accountName !== "" ? Lang.i18n("Connected as %1", page.cfg_accountName) : Lang.i18n("Connected"))
                 textFormat: Text.PlainText
             }
             QQC2.Button {
                 visible: page.cfg_apiToken !== ""
-                text: i18n("Disconnect")
+                text: Lang.i18n("Disconnect")
                 icon.name: "network-disconnect"
                 onClicked: {
                     tokenField.text = "";
@@ -99,13 +101,13 @@ KCM.SimpleKCM {
         }
 
         RowLayout {
-            Kirigami.FormData.label: i18n("API token:")
+            Kirigami.FormData.label: Lang.i18n("API token:")
             spacing: Kirigami.Units.smallSpacing
 
             QQC2.TextField {
                 id: tokenField
                 Layout.minimumWidth: Kirigami.Units.gridUnit * 16
-                placeholderText: i18n("Paste your API token")
+                placeholderText: Lang.i18n("Paste your API token")
                 echoMode: reveal.checked ? TextInput.Normal : TextInput.Password
                 inputMethodHints: Qt.ImhSensitiveData | Qt.ImhNoPredictiveText
                 onTextEdited: {
@@ -122,7 +124,7 @@ KCM.SimpleKCM {
                 id: reveal
                 checkable: true
                 icon.name: checked ? "password-show-off" : "password-show-on"
-                text: checked ? i18n("Hide token") : i18n("Show token")
+                text: checked ? Lang.i18n("Hide token") : Lang.i18n("Show token")
                 display: QQC2.AbstractButton.IconOnly
                 QQC2.ToolTip.text: text
                 QQC2.ToolTip.visible: hovered
@@ -131,7 +133,7 @@ KCM.SimpleKCM {
 
         QQC2.Button {
             icon.name: "internet-services"
-            text: i18n("Open Todoist settings")
+            text: Lang.i18n("Open Todoist settings")
             onClicked: Qt.openUrlExternally(page.tokenUrl)
         }
 
@@ -146,7 +148,7 @@ KCM.SimpleKCM {
                 implicitHeight: Kirigami.Units.iconSizes.small
             }
             QQC2.Label {
-                text: page.checking ? i18n("Checking…") : page.status
+                text: page.checking ? Lang.i18n("Checking…") : page.status
                 textFormat: Text.PlainText
                 color: page.statusIsError ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.positiveTextColor
             }
@@ -157,7 +159,7 @@ KCM.SimpleKCM {
             wrapMode: Text.Wrap
             font.pointSize: Kirigami.Theme.smallFont.pointSize
             opacity: 0.7
-            text: i18n("Your token is stored unencrypted in your Plasma config file. You can revoke it any time in Todoist's settings.")
+            text: Lang.i18n("Your token is stored unencrypted in your Plasma config file. You can revoke it any time in Todoist's settings.")
         }
 
         Item {
@@ -165,14 +167,35 @@ KCM.SimpleKCM {
         }
 
         QQC2.ComboBox {
+            Kirigami.FormData.label: Lang.i18n("Language:")
+            textRole: "text"
+            valueRole: "value"
+            // every language with a catalog, by its own name, plus English (the source language)
+            model: [{ value: "", text: Lang.i18n("System default") }].concat(
+                ["en"].concat(Lang.available).map(function (code) {
+                    var name = Qt.locale(code).nativeLanguageName || code;
+                    return { value: code, text: name.charAt(0).toUpperCase() + name.slice(1) };
+                }))
+            Component.onCompleted: currentIndex = Math.max(0, indexOfValue(page.cfg_language))
+            onActivated: page.cfg_language = currentValue
+        }
+        QQC2.Label {
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 24
+            wrapMode: Text.Wrap
+            font.pointSize: Kirigami.Theme.smallFont.pointSize
+            opacity: 0.7
+            text: Lang.i18n("Applies to all Todoist for Plasma widgets.")
+        }
+
+        QQC2.ComboBox {
             id: badgeCombo
-            Kirigami.FormData.label: i18n("Panel badge:")
+            Kirigami.FormData.label: Lang.i18n("Panel badge:")
             textRole: "text"
             valueRole: "value"
             model: [
-                { value: "today", text: i18n("Overdue and today's tasks") },
-                { value: "view", text: i18n("Tasks in the current list") },
-                { value: "none", text: i18n("No badge") }
+                { value: "today", text: Lang.i18n("Overdue and today's tasks") },
+                { value: "view", text: Lang.i18n("Tasks in the current list") },
+                { value: "none", text: Lang.i18n("No badge") }
             ]
             Component.onCompleted: currentIndex = Math.max(0, indexOfValue(page.cfg_badgeSource))
             onActivated: page.cfg_badgeSource = currentValue
@@ -180,17 +203,17 @@ KCM.SimpleKCM {
 
         QQC2.TextField {
             id: queryField
-            Kirigami.FormData.label: i18n("Custom filter:")
+            Kirigami.FormData.label: Lang.i18n("Custom filter:")
             Layout.minimumWidth: Kirigami.Units.gridUnit * 16
-            placeholderText: i18n("e.g. today & #Work")
+            placeholderText: Lang.i18n("e.g. today & #Work")
             Component.onCompleted: text = page.cfg_customQuery
             onTextEdited: page.cfg_customQuery = text
         }
         QQC2.TextField {
-            Kirigami.FormData.label: i18n("Shown as:")
+            Kirigami.FormData.label: Lang.i18n("Shown as:")
             Layout.minimumWidth: Kirigami.Units.gridUnit * 16
             enabled: queryField.text.trim() !== ""
-            placeholderText: i18n("Custom filter")
+            placeholderText: Lang.i18n("Custom filter")
             Component.onCompleted: text = page.cfg_customQueryName
             onTextEdited: page.cfg_customQueryName = text
         }
@@ -199,44 +222,44 @@ KCM.SimpleKCM {
             wrapMode: Text.Wrap
             font.pointSize: Kirigami.Theme.smallFont.pointSize
             opacity: 0.7
-            text: i18n("Any Todoist filter query, without saving it in Todoist. It appears in the list menu.")
+            text: Lang.i18n("Any Todoist filter query, without saving it in Todoist. It appears in the list menu.")
         }
 
         QQC2.CheckBox {
-            Kirigami.FormData.label: i18n("Daily goal:")
-            text: i18n("Show progress towards my Todoist daily goal")
+            Kirigami.FormData.label: Lang.i18n("Daily goal:")
+            text: Lang.i18n("Show progress towards my Todoist daily goal")
             checked: page.cfg_showGoal
             onToggled: page.cfg_showGoal = checked
         }
 
         QQC2.ComboBox {
-            Kirigami.FormData.label: i18n("Reminders:")
+            Kirigami.FormData.label: Lang.i18n("Reminders:")
             textRole: "text"
             valueRole: "value"
             model: [
-                { value: -1, text: i18n("Off") },
-                { value: 0, text: i18n("At the task's time") },
-                { value: 5, text: i18n("5 minutes before") },
-                { value: 10, text: i18n("10 minutes before") },
-                { value: 15, text: i18n("15 minutes before") },
-                { value: 30, text: i18n("30 minutes before") },
-                { value: 60, text: i18n("1 hour before") }
+                { value: -1, text: Lang.i18n("Off") },
+                { value: 0, text: Lang.i18n("At the task's time") },
+                { value: 5, text: Lang.i18n("5 minutes before") },
+                { value: 10, text: Lang.i18n("10 minutes before") },
+                { value: 15, text: Lang.i18n("15 minutes before") },
+                { value: 30, text: Lang.i18n("30 minutes before") },
+                { value: 60, text: Lang.i18n("1 hour before") }
             ]
             Component.onCompleted: currentIndex = Math.max(0, indexOfValue(page.cfg_notifyLeadMinutes))
             onActivated: page.cfg_notifyLeadMinutes = currentValue
         }
 
         RowLayout {
-            Kirigami.FormData.label: i18n("Start with:")
+            Kirigami.FormData.label: Lang.i18n("Start with:")
             spacing: Kirigami.Units.smallSpacing
 
             QQC2.Label {
-                text: page.cfg_pinnedView === "" ? i18n("The list you used last")
-                                                 : i18n("A pinned list (set from the list title menu)")
+                text: page.cfg_pinnedView === "" ? Lang.i18n("The list you used last")
+                                                 : Lang.i18n("A pinned list (set from the list title menu)")
             }
             QQC2.Button {
                 visible: page.cfg_pinnedView !== ""
-                text: i18n("Unpin")
+                text: Lang.i18n("Unpin")
                 icon.name: "window-unpin"
                 onClicked: page.cfg_pinnedView = ""
             }

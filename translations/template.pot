@@ -101,6 +101,9 @@ msgid ""
 "list menu."
 msgstr ""
 
+msgid "Applies to all Todoist for Plasma widgets."
+msgstr ""
+
 msgid "At the task's time"
 msgstr ""
 
@@ -243,6 +246,9 @@ msgid "Inside:"
 msgstr ""
 
 msgid "Labels"
+msgstr ""
+
+msgid "Language:"
 msgstr ""
 
 msgid "Link copied"
@@ -426,6 +432,9 @@ msgid "Start with:"
 msgstr ""
 
 msgid "Switch list: %1"
+msgstr ""
+
+msgid "System default"
 msgstr ""
 
 msgid "Tasks in the current list"

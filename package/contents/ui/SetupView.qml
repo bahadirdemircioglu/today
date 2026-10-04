@@ -75,19 +75,19 @@ Item {
                 setup.connected = true;
                 setup.statusIsError = false;
                 setup.status = res.json.full_name && res.json.email
-                    ? i18n("Connected as %1 (%2)", res.json.full_name, res.json.email)
-                    : i18n("Connected as %1", name);
+                    ? Lang.i18n("Connected as %1 (%2)", res.json.full_name, res.json.email)
+                    : Lang.i18n("Connected as %1", name);
                 Plasmoid.configuration.accountName = name;
                 Plasmoid.configuration.apiToken = t;
                 return;
             }
             setup.statusIsError = true;
             if (res.kind === "auth") {
-                setup.status = i18n("This token didn't work. Copy it again from Todoist settings.");
+                setup.status = Lang.i18n("This token didn't work. Copy it again from Todoist settings.");
             } else if (res.kind === "network") {
-                setup.status = i18n("Can't reach Todoist. Check your connection.");
+                setup.status = Lang.i18n("Can't reach Todoist. Check your connection.");
             } else {
-                setup.status = i18n("Something went wrong (HTTP %1).", res.status);
+                setup.status = Lang.i18n("Something went wrong (HTTP %1).", res.status);
             }
         });
     }
@@ -103,7 +103,7 @@ Item {
         anchors.centerIn: parent
         width: Math.min(implicitWidth, parent.width)
         icon.name: "view-calendar-tasks"
-        text: i18n("Connect to Todoist…")
+        text: Lang.i18n("Connect to Todoist…")
         onClicked: Plasmoid.internalAction("configure").trigger()
     }
 
@@ -125,7 +125,7 @@ Item {
             level: 2
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.Wrap
-            text: i18n("Connect to Todoist")
+            text: Lang.i18n("Connect to Todoist")
         }
 
         PlasmaComponents3.Label {
@@ -134,16 +134,16 @@ Item {
             wrapMode: Text.Wrap
             opacity: 0.8
             text: setup.authFailed
-                ? i18n("Todoist didn't accept your token. Paste a new one to reconnect.")
-                : i18n("Paste your personal API token from Todoist's settings to see today's tasks here.")
+                ? Lang.i18n("Todoist didn't accept your token. Paste a new one to reconnect.")
+                : Lang.i18n("Paste your personal API token from Todoist's settings to see today's tasks here.")
         }
 
         PlasmaComponents3.Button {
             Layout.alignment: Qt.AlignHCenter
             visible: setup.sharedAccount !== null
             icon.name: "user-identity"
-            text: setup.sharedAccount ? (setup.sharedAccount.name ? i18n("Use the connected account (%1)", setup.sharedAccount.name)
-                                                                   : i18n("Use the connected account"))
+            text: setup.sharedAccount ? (setup.sharedAccount.name ? Lang.i18n("Use the connected account (%1)", setup.sharedAccount.name)
+                                                                   : Lang.i18n("Use the connected account"))
                                       : ""
             onClicked: setup.useSharedAccount()
         }
@@ -154,13 +154,13 @@ Item {
             horizontalAlignment: Text.AlignHCenter
             font.pointSize: Kirigami.Theme.smallFont.pointSize
             opacity: 0.7
-            text: i18n("or connect a different account:")
+            text: Lang.i18n("or connect a different account:")
         }
 
         PlasmaComponents3.Button {
             Layout.alignment: Qt.AlignHCenter
             icon.name: "internet-services"
-            text: i18n("Open Todoist settings")
+            text: Lang.i18n("Open Todoist settings")
             onClicked: Qt.openUrlExternally(setup.tokenUrl)
         }
 
@@ -171,7 +171,7 @@ Item {
             PlasmaComponents3.TextField {
                 id: tokenField
                 Layout.fillWidth: true
-                placeholderText: i18n("Paste your API token")
+                placeholderText: Lang.i18n("Paste your API token")
                 echoMode: reveal.checked ? TextInput.Normal : TextInput.Password
                 inputMethodHints: Qt.ImhSensitiveData | Qt.ImhNoPredictiveText
                 onTextChanged: setup.tokenEdited()
@@ -181,7 +181,7 @@ Item {
                 id: reveal
                 checkable: true
                 icon.name: checked ? "password-show-off" : "password-show-on"
-                text: checked ? i18n("Hide token") : i18n("Show token")
+                text: checked ? Lang.i18n("Hide token") : Lang.i18n("Show token")
                 display: PlasmaComponents3.AbstractButton.IconOnly
                 PlasmaComponents3.ToolTip.text: text
                 PlasmaComponents3.ToolTip.visible: hovered
@@ -209,7 +209,7 @@ Item {
                 Layout.fillWidth: true
                 wrapMode: Text.Wrap
                 textFormat: Text.PlainText
-                text: setup.checking ? i18n("Checking…") : setup.status
+                text: setup.checking ? Lang.i18n("Checking…") : setup.status
                 color: setup.statusIsError ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.textColor
             }
         }
@@ -220,7 +220,7 @@ Item {
             wrapMode: Text.Wrap
             font.pointSize: Kirigami.Theme.smallFont.pointSize
             opacity: 0.6
-            text: i18n("Your token is stored unencrypted in your Plasma config file.")
+            text: Lang.i18n("Your token is stored unencrypted in your Plasma config file.")
         }
     }
 }

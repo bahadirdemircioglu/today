@@ -38,7 +38,7 @@ jobs:
       - name: Translations are up to date and build
         run: |
           scripts/i18n-extract.sh
-          git diff --exit-code -- translations/ || { echo "::error::run scripts/i18n-extract.sh and commit translations/"; exit 1; }
+          git diff --exit-code -- translations/ package/contents/ui/logic/Catalogs.js || { echo "::error::run scripts/i18n-extract.sh and commit translations/ and Catalogs.js"; exit 1; }
           scripts/i18n-build.sh
       - name: Package smoke test
         run: |

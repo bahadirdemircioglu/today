@@ -146,17 +146,17 @@ ColumnLayout {
         }
         switch (kind) {
         case "today":
-            return Qt.formatDate(new Date(c.nowMs), "dddd, d MMMM");
+            return Lang.formatDate(new Date(c.nowMs), "dddd, d MMMM");
         case "upcoming":
             return "";
         case "filter":
         case "query":
             if (c.view.filterFetchedAt > 0 && (c.phase === "OFFLINE" || filterError !== "")) {
-                return i18n("Results from %1", Qt.formatTime(new Date(c.view.filterFetchedAt), Qt.locale().timeFormat(Locale.ShortFormat)));
+                return Lang.i18n("Results from %1", Lang.formatTime(new Date(c.view.filterFetchedAt)));
             }
-            return c.count > 0 ? i18np("%1 task", "%1 tasks", c.count) : "";
+            return c.count > 0 ? Lang.i18np("%1 task", "%1 tasks", c.count) : "";
         default:
-            return c.count > 0 ? i18np("%1 task", "%1 tasks", c.count) : "";
+            return c.count > 0 ? Lang.i18np("%1 task", "%1 tasks", c.count) : "";
         }
     }
 
@@ -204,10 +204,10 @@ ColumnLayout {
         Layout.fillWidth: true
         visible: listRoot.controller.phase === "AUTH_INVALID"
         type: Kirigami.MessageType.Warning
-        text: i18n("Todoist didn't accept your token.")
+        text: Lang.i18n("Todoist didn't accept your token.")
         actions: [
             Kirigami.Action {
-                text: i18n("Reconnect")
+                text: Lang.i18n("Reconnect")
                 icon.name: "configure"
                 onTriggered: Plasmoid.internalAction("configure").trigger()
             }
@@ -277,22 +277,22 @@ ColumnLayout {
                          : (waitingForFilter ? "view-filter" : "checkmark")
                 text: {
                     if (listRoot.filterError === "client") {
-                        return i18n("Todoist couldn't run this filter");
+                        return Lang.i18n("Todoist couldn't run this filter");
                     }
                     if (waitingForFilter) {
-                        return listRoot.controller.phase === "OFFLINE" ? i18n("Filter results need a connection")
-                                                                        : i18n("Loading…");
+                        return listRoot.controller.phase === "OFFLINE" ? Lang.i18n("Filter results need a connection")
+                                                                        : Lang.i18n("Loading…");
                     }
-                    return listRoot.kind === "today" ? i18n("All done for today") : i18n("No tasks here");
+                    return listRoot.kind === "today" ? Lang.i18n("All done for today") : Lang.i18n("No tasks here");
                 }
                 explanation: {
                     if (listRoot.filterError === "client") {
-                        return i18n("Open it in Todoist to check the query.");
+                        return Lang.i18n("Open it in Todoist to check the query.");
                     }
                     if (waitingForFilter) {
                         return "";
                     }
-                    return listRoot.kind === "today" ? i18n("Enjoy the rest of your day.") : i18n("Add one below.");
+                    return listRoot.kind === "today" ? Lang.i18n("Enjoy the rest of your day.") : Lang.i18n("Add one below.");
                 }
             }
         }

@@ -36,10 +36,10 @@ ColumnLayout {
         text: {
             var title = small.controller ? small.controller.viewTitle : "";
             if (small.count === 0) {
-                return small.controller && small.controller.viewSpec.kind === "today" ? i18n("All done for today") : title;
+                return small.controller && small.controller.viewSpec.kind === "today" ? Lang.i18n("All done for today") : title;
             }
             if (small.overdue > 0) {
-                return i18np("%2 · %1 overdue", "%2 · %1 overdue", small.overdue, title);
+                return Lang.i18np("%2 · %1 overdue", "%2 · %1 overdue", small.overdue, title);
             }
             return title;
         }

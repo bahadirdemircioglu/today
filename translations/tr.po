@@ -99,6 +99,9 @@ msgid ""
 msgstr ""
 "Todoist'te kaydetmeden herhangi bir filtre sorgusu. Liste menüsünde görünür."
 
+msgid "Applies to all Todoist for Plasma widgets."
+msgstr "Tüm Todoist for Plasma widgetlarında geçerlidir."
+
 msgid "At the task's time"
 msgstr "Görevin saatinde"
 
@@ -242,6 +245,9 @@ msgstr "Üst proje:"
 
 msgid "Labels"
 msgstr "Etiketler"
+
+msgid "Language:"
+msgstr "Dil:"
 
 msgid "Link copied"
 msgstr "Bağlantı kopyalandı"
@@ -427,6 +433,9 @@ msgstr "Başlangıç:"
 
 msgid "Switch list: %1"
 msgstr "Liste değiştir: %1"
+
+msgid "System default"
+msgstr "Sistem varsayılanı"
 
 msgid "Tasks in the current list"
 msgstr "Geçerli listedeki görevler"

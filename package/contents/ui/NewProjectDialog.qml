@@ -32,11 +32,11 @@ QQC2.Popup {
         var parentId = parentBox.currentIndex > 0 ? parents[parentBox.currentIndex - 1].id : "";
         var err = controller.createProject(nameField.text, color, parentId);
         if (err === "empty") {
-            error = i18n("Give the project a name.");
+            error = Lang.i18n("Give the project a name.");
             return;
         }
         if (err === "too_long") {
-            error = i18n("That name is too long.");
+            error = Lang.i18n("That name is too long.");
             return;
         }
         close();
@@ -54,19 +54,19 @@ QQC2.Popup {
         Kirigami.Heading {
             Layout.fillWidth: true
             level: 4
-            text: i18n("New project")
+            text: Lang.i18n("New project")
         }
 
         PlasmaComponents3.TextField {
             id: nameField
             Layout.fillWidth: true
-            placeholderText: i18n("Project name")
+            placeholderText: Lang.i18n("Project name")
             onAccepted: dialog.create()
             onTextEdited: dialog.error = ""
         }
 
         PlasmaComponents3.Label {
-            text: i18n("Colour")
+            text: Lang.i18n("Colour")
             font.pointSize: Kirigami.Theme.smallFont.pointSize
             opacity: 0.7
         }
@@ -116,12 +116,12 @@ QQC2.Popup {
             spacing: Kirigami.Units.smallSpacing
 
             PlasmaComponents3.Label {
-                text: i18n("Inside:")
+                text: Lang.i18n("Inside:")
             }
             PlasmaComponents3.ComboBox {
                 id: parentBox
                 Layout.fillWidth: true
-                model: [i18n("No parent project")].concat(dialog.parents.map(function (p) { return p.name; }))
+                model: [Lang.i18n("No parent project")].concat(dialog.parents.map(function (p) { return p.name; }))
             }
         }
 
@@ -138,11 +138,11 @@ QQC2.Popup {
             Layout.topMargin: Kirigami.Units.smallSpacing
             Item { Layout.fillWidth: true }
             PlasmaComponents3.Button {
-                text: i18n("Cancel")
+                text: Lang.i18n("Cancel")
                 onClicked: dialog.close()
             }
             PlasmaComponents3.Button {
-                text: i18n("Create")
+                text: Lang.i18n("Create")
                 icon.name: "list-add"
                 onClicked: dialog.create()
             }

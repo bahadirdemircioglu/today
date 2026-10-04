@@ -25,3 +25,4 @@ for po in translations/*.po; do
     msgmerge --quiet --update --backup=none --no-location --sort-output "$po" translations/template.pot
 done
 echo "Extracted $(grep -c '^msgid ' translations/template.pot) messages into translations/template.pot (domain ${DOMAIN})"
+node scripts/i18n-catalogs.mjs

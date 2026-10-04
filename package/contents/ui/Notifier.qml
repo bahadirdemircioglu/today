@@ -36,11 +36,11 @@ Item {
             autoDelete: true
             actions: [
                 NotificationAction {
-                    label: i18n("Complete")
+                    label: Lang.i18n("Complete")
                     onActivated: notifier.controller.complete(notification.itemId, notification.title)
                 },
                 NotificationAction {
-                    label: i18n("Remind me in 10 minutes")
+                    label: Lang.i18n("Remind me in 10 minutes")
                     onActivated: notifier.controller.snooze(notification.baseKey)
                 }
             ]

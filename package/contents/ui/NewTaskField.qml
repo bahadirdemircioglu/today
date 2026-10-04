@@ -49,7 +49,7 @@ ColumnLayout {
             input.text = "";
             addDate = "";
         } else if (err === "too_long") {
-            controller.showInfo(i18n("That's too long. Keep it under 1000 characters."), true);
+            controller.showInfo(Lang.i18n("That's too long. Keep it under 1000 characters."), true);
         }
     }
 
@@ -59,13 +59,13 @@ ColumnLayout {
         }
         switch (controller.viewSpec.kind) {
         case "project":
-            return i18n("New task in %1", controller.viewTitle);
+            return Lang.i18n("New task in %1", controller.viewTitle);
         case "inbox":
-            return i18n("New task in Inbox");
+            return Lang.i18n("New task in Inbox");
         case "label":
-            return i18n("New task with @%1", controller.viewTitle);
+            return Lang.i18n("New task with @%1", controller.viewTitle);
         default:
-            return i18n("New task, e.g. “Dentist tomorrow 3pm #Personal”");
+            return Lang.i18n("New task, e.g. “Dentist tomorrow 3pm #Personal”");
         }
     }
 
@@ -76,7 +76,7 @@ ColumnLayout {
 
         PlasmaComponents3.Label {
             Layout.fillWidth: true
-            text: field.controller && field.addDate ? i18n("Adding to %1", field.controller.dateText(field.addDate)) : ""
+            text: field.controller && field.addDate ? Lang.i18n("Adding to %1", field.controller.dateText(field.addDate)) : ""
             textFormat: Text.PlainText
             elide: Text.ElideRight
             font.pointSize: Kirigami.Theme.smallFont.pointSize
@@ -84,7 +84,7 @@ ColumnLayout {
         }
         PlasmaComponents3.ToolButton {
             icon.name: "edit-clear"
-            text: i18n("Don't set a date")
+            text: Lang.i18n("Don't set a date")
             display: PlasmaComponents3.AbstractButton.IconOnly
             onClicked: field.addDate = ""
             PlasmaComponents3.ToolTip.text: text
@@ -116,7 +116,7 @@ ColumnLayout {
 
         PlasmaComponents3.ToolButton {
             icon.name: "list-add"
-            text: i18n("Add task")
+            text: Lang.i18n("Add task")
             display: PlasmaComponents3.AbstractButton.IconOnly
             enabled: input.text.trim() !== ""
             onClicked: field.submit()
