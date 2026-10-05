@@ -53,14 +53,39 @@ ColumnLayout {
     readonly property var typedDate: parsed && parsed.date && !keepDateText
                                      && QuickParse.stripSpans(input.text, parsed.date.spans) !== "" ? parsed.date : null
 
+    // #project / @label suggestions for the word at the cursor (Esc hides them until the text changes)
+    property bool completionDismissed: false
+    readonly property var completion: controller && input.activeFocus && !completionDismissed
+                                      ? controller.completeQuickAdd(input.text, input.cursorPosition) : null
+    property int completionIndex: 0
+    onCompletionChanged: completionIndex = 0
+
+    function acceptCompletion(item) {
+        var r = QuickParse.applyCompletion(input.text, completion, item);
+        input.text = r.text;
+        input.cursorPosition = r.cursor;
+        input.forceActiveFocus();
+    }
+
     function submit() {
         var text = input.text;
         var date = addDate;
+        var spans = [];
         if (typedDate) {
-            text = QuickParse.stripSpans(input.text, typedDate.spans);
+            spans = spans.concat(typedDate.spans);
             date = QuickParse.dueValue(typedDate);
         }
-        var err = controller.addTask(text, date);
+        // a known project is applied by id: works for names with spaces or in any language
+        var projectId = "";
+        var p = parsed ? parsed.project : null;
+        if (p && p.known && p.id && QuickParse.stripSpans(input.text, spans.concat([[p.start, p.end]])) !== "") {
+            spans.push([p.start, p.end]);
+            projectId = p.id;
+        }
+        if (spans.length) {
+            text = QuickParse.stripSpans(input.text, spans);
+        }
+        var err = controller.addTask(text, date, projectId);
         if (err === "") {
             input.text = "";
             addDate = "";
@@ -120,17 +145,53 @@ ColumnLayout {
             placeholderText: field.placeholder
             onAccepted: field.submit()
             Keys.onEscapePressed: {
+                if (field.completion) {
+                    field.completionDismissed = true;
+                    return;
+                }
                 text = "";
                 field.addDate = "";
                 field.keepDateText = false;
             }
             onTextChanged: {
+                field.completionDismissed = false;
                 if (text === "") {
                     field.keepDateText = false;
                 }
             }
+            // with suggestions open: ↑/↓ choose, Tab or Enter completes, Esc closes them
+            Keys.onTabPressed: event => {
+                event.accepted = !!field.completion;
+                if (event.accepted) {
+                    field.acceptCompletion(field.completion.items[field.completionIndex]);
+                }
+            }
+            Keys.onReturnPressed: event => {
+                event.accepted = !!field.completion;
+                if (event.accepted) {
+                    field.acceptCompletion(field.completion.items[field.completionIndex]);
+                }
+            }
+            Keys.onEnterPressed: event => {
+                event.accepted = !!field.completion;
+                if (event.accepted) {
+                    field.acceptCompletion(field.completion.items[field.completionIndex]);
+                }
+            }
+            Keys.onDownPressed: event => {
+                event.accepted = !!field.completion;
+                if (event.accepted) {
+                    field.completionIndex = (field.completionIndex + 1) % field.completion.items.length;
+                }
+            }
             // ↑ from an empty field moves into the list
             Keys.onUpPressed: event => {
+                if (field.completion) {
+                    var n = field.completion.items.length;
+                    field.completionIndex = (field.completionIndex + n - 1) % n;
+                    event.accepted = true;
+                    return;
+                }
                 event.accepted = text === "";
                 if (event.accepted) {
                     field.leaveToList();
@@ -147,6 +208,47 @@ ColumnLayout {
             PlasmaComponents3.ToolTip.text: text
             PlasmaComponents3.ToolTip.visible: hovered
             PlasmaComponents3.ToolTip.delay: Kirigami.Units.toolTipDelay
+        }
+    }
+
+    // #project / @label suggestions
+    ColumnLayout {
+        Layout.fillWidth: true
+        visible: !!field.completion
+        spacing: 0
+
+        Repeater {
+            model: field.completion ? field.completion.items : []
+            delegate: PlasmaComponents3.ItemDelegate {
+                required property var modelData
+                required property int index
+                Layout.fillWidth: true
+                highlighted: index === field.completionIndex
+                focusPolicy: Qt.NoFocus
+                topPadding: Kirigami.Units.smallSpacing / 2
+                bottomPadding: Kirigami.Units.smallSpacing / 2
+                onClicked: field.acceptCompletion(modelData)
+                contentItem: RowLayout {
+                    spacing: Kirigami.Units.smallSpacing
+                    PlasmaComponents3.Label {
+                        text: field.completion && field.completion.kind === "project" ? "#" : "@"
+                        color: Colors.hex(modelData.color) || Kirigami.Theme.disabledTextColor
+                        font.weight: Font.DemiBold
+                    }
+                    PlasmaComponents3.Label {
+                        Layout.fillWidth: true
+                        text: modelData.name
+                        textFormat: Text.PlainText
+                        elide: Text.ElideRight
+                    }
+                }
+            }
+        }
+        PlasmaComponents3.Label {
+            Layout.fillWidth: true
+            text: Lang.i18n("Tab or Enter to complete, ↑↓ to choose")
+            font.pointSize: Kirigami.Theme.smallFont.pointSize
+            opacity: 0.6
         }
     }
 
@@ -215,7 +317,8 @@ ColumnLayout {
         }
         Tag {
             readonly property var p: field.parsed ? field.parsed.project : null
-            visible: !!p
+            // while its name is still being typed, the suggestions above show the choices
+            visible: !!p && !(field.completion && field.completion.kind === "project")
             text: p ? (p.known ? "# " + p.name : Lang.i18n("#%1 isn't a project: it stays in the title", p.name)) : ""
             tint: p && p.known ? preview.tintOf(p.color, Kirigami.Theme.textColor) : Kirigami.Theme.neutralTextColor
         }

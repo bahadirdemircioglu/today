@@ -130,7 +130,7 @@ Where a new task lands depends on the list you add it from, like on the web. Any
 | Inbox | stays in the Inbox, undated |
 | A label | gets that label |
 
-While you type, a line under the field shows what the task will get: the date and time, the project (in its colour, or a warning if there is no such project), labels and priority.
+After `#` or `@`, matching projects and labels are suggested as you type: press Tab or Enter (or click) to complete, ↑↓ to choose. While you type, a line under the field shows what the task will get: the date and time, the project (in its colour, or a warning if there is no such project), labels and priority.
 
 The widget itself recognises common English and Turkish dates, whatever language your Todoist account uses: `today`, `tomorrow 3pm`, `friday`, `next week`, `in 3 days`, `12 dec`, `bugün`, `yarın saat 15`, `cuma`, `haftaya salı`, `3 gün sonra`, `5 kasım`, `14:30'da`. The date is taken out of the title and set on the task. If a word was not meant as a date (*Pazar* is also "market"), click the date in the preview to keep the words in the title. Repeating schedules (`every monday`, `her gün`) and anything else are left to Todoist's own parser. `#project`, `@label` and `p1`–`p4` work in any language.
 

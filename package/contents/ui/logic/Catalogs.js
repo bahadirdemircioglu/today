@@ -145,6 +145,7 @@ var CATALOGS = {
             "Start with:": "Başlangıç:",
             "Switch list: %1": "Liste değiştir: %1",
             "System default": "Sistem varsayılanı",
+            "Tab or Enter to complete, ↑↓ to choose": "Tamamlamak için Tab veya Enter, seçmek için ↑↓",
             "Tasks in the current list": "Geçerli listedeki görevler",
             "That list no longer exists in Todoist. Showing Today.": "Bu liste artık Todoist'te yok. Bugün gösteriliyor.",
             "That name is too long.": "Bu ad çok uzun.",

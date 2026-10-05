@@ -234,8 +234,12 @@ Item {
     }
 
     // -> "" on success, otherwise "empty" | "too_long". date: "YYYY-MM-DD" when adding to a day in Upcoming.
-    function addTask(text, date) {
+    // projectId (optional): a project picked with #name in the text (taken out of the text)
+    function addTask(text, date, projectId) {
         var context = ContextRules.contextFor(viewSpec, store, date || "");
+        if (projectId) {
+            context.projectId = projectId;
+        }
         var r = CommandQueue.enqueueQuickAdd(queue, text, Date.now(), newUuid, context);
         if (r.error) {
             return r.error;
@@ -247,8 +251,8 @@ Item {
         return "";
     }
 
-    // What a Quick Add text will do (live preview under "New task"), see QuickParse.parse
-    function parseQuickAdd(text) {
+    // Projects and labels Quick Add can refer to -> { projects: [{ id, name, color }], labels: [{ name, color }] }
+    function quickAddVocabulary() {
         var st = TaskStore.withPendingProjects(store, queue);
         var projects = [];
         for (var pid in st.projects) {
@@ -262,8 +266,20 @@ Item {
                 labels.push({ name: st.labels[lid].name, color: st.labels[lid].color || "" });
             }
         }
+        return { projects: projects, labels: labels };
+    }
+
+    // What a Quick Add text will do (live preview under "New task"), see QuickParse.parse
+    function parseQuickAdd(text) {
+        var v = quickAddVocabulary();
         return QuickParse.parse(text, { todayKey: todayView.todayKey, nowMinutes: todayView.nowMinutes,
-                                        projects: projects, labels: labels });
+                                        projects: v.projects, labels: v.labels });
+    }
+
+    // Suggestions for the #project / @label being typed, see QuickParse.completion
+    function completeQuickAdd(text, cursor) {
+        var v = quickAddVocabulary();
+        return QuickParse.completion(text, cursor, v.projects, v.labels);
     }
 
     function enqueueEdit(newQueue) {

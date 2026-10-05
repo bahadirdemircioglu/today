@@ -6,6 +6,17 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [2.2.1] - 2026-10-05
+
+### Added
+- Quick Add suggests projects after "#" and labels after "@" as you type (also names with
+  spaces, and names that only contain what you typed). Tab or Enter completes, ↑↓ choose,
+  Esc closes the list. The "no such project" warning only shows once nothing matches.
+
+### Changed
+- A project picked with "#name" is applied by its id instead of being left to Todoist's parser,
+  so names with spaces or non-English letters always work. A project name is never read as a date.
+
 ## [2.2.0] - 2026-10-04
 
 ### Added

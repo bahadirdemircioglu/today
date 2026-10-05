@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plasma_applet_io.github.bahadirdemircioglu.todoistplasma "
-"2.2.0\n"
+"2.2.1\n"
 "Report-Msgid-Bugs-To: https://github.com/bahadirdemircioglu/today/issues\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
@@ -472,6 +472,9 @@ msgid "Switch list: %1"
 msgstr ""
 
 msgid "System default"
+msgstr ""
+
+msgid "Tab or Enter to complete, ↑↓ to choose"
 msgstr ""
 
 msgid "Tasks in the current list"

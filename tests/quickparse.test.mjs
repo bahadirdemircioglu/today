@@ -72,7 +72,7 @@ test("recurring schedules are left to Todoist", () => {
 
 test("projects, labels, priority", () => {
   const r = QP.parse("Book hotel #Work Trips @errand @new p2", opts);
-  assert.deepEqual(JSON.parse(JSON.stringify(r.project)), { name: "Work Trips", id: "p2", color: "red", known: true });
+  assert.deepEqual(JSON.parse(JSON.stringify(r.project)), { name: "Work Trips", id: "p2", color: "red", known: true, start: 11, end: 22 });
   assert.deepEqual(JSON.parse(JSON.stringify(r.labels)), [
     { name: "errand", color: "green", known: true },
     { name: "new", color: "", known: false },
@@ -89,4 +89,42 @@ test("stripSpans removes the date and time only", () => {
   assert.equal(QP.stripSpans(text, d.spans), "Diş hekimi #Ev");
   const t2 = "Dentist tomorrow at 3pm p1";
   assert.equal(QP.stripSpans(t2, QP.parse(t2, opts).date.spans), "Dentist p1");
+});
+
+test("completion: projects and labels at the cursor, names with spaces", () => {
+  const P = opts.projects;
+  const L = [{ name: "errand", color: "green" }, { name: "evening", color: "" }];
+  const c1 = QP.completion("Book hotel #wo", 14, P, L);
+  assert.equal(c1.kind, "project");
+  assert.deepEqual(c1.items.map((i) => i.name), ["Work", "Work Trips"]);
+  assert.deepEqual([c1.start, c1.end], [11, 14]);
+  assert.deepEqual(QP.completion("x #Work Tr", 10, P, L).items.map((i) => i.name), ["Work Trips"]);
+  assert.deepEqual(QP.completion("x #", 3, P, L).items.map((i) => i.name), ["Ev", "Work", "Work Trips"]);
+  assert.deepEqual(QP.completion("x @e", 4, P, L).items.map((i) => i.name), ["errand", "evening"]);
+  assert.deepEqual(QP.completion("x #rip", 6, P, L).items.map((i) => i.name), ["Work Trips"]); // contains
+  assert.equal(QP.completion("x #Ev", 5, P, L), null);            // complete, nothing longer
+  assert.equal(QP.completion("x #zz", 5, P, L), null);
+  assert.equal(QP.completion("x #wo then", 10, P, L), null);       // token already ended
+  assert.equal(QP.completion("mail#wo", 7, P, L), null);           // not at a word start
+  assert.equal(QP.completion("x #wo", 4, P, L), null);             // cursor inside the word
+});
+
+test("applyCompletion inserts the full name and a space", () => {
+  const text = "Book hotel #wo tomorrow";
+  const c = QP.completion(text, 14, opts.projects, []);
+  const r = QP.applyCompletion(text, c, c.items[1]);
+  assert.equal(r.text, "Book hotel #Work Trips tomorrow");
+  assert.equal(r.cursor, "Book hotel #Work Trips ".length);
+});
+
+test("project span, and a project name is not read as a date", () => {
+  const P = opts.projects.concat([{ id: "p9", name: "Ev Yarın", color: "" }]);
+  const r = QP.parse("Boya #Ev Yarın", { ...opts, projects: P });
+  assert.equal(r.project.id, "p9");
+  assert.deepEqual([r.project.start, r.project.end], [5, 14]);
+  assert.equal(r.date, null);
+  const r2 = QP.parse("Boya #Ev yarın", opts);
+  assert.equal(r2.project.id, "p3");
+  assert.equal(QP.dueValue(r2.date), "2026-10-05");
+  assert.equal(QP.stripSpans("Boya #Ev yarın", r2.date.spans.concat([[r2.project.start, r2.project.end]])), "Boya");
 });

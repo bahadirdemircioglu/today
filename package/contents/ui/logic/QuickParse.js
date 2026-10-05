@@ -227,9 +227,10 @@ function findProject(text, projects) {
         }
         var word = text.slice(at).split(/\s/)[0];
         if (best) {
-            found = { name: best.name, id: best.id, color: best.color || "", known: true };
+            found = { name: best.name, id: best.id, color: best.color || "", known: true,
+                      start: at - 1, end: at + best.name.length };
         } else if (word) {
-            found = { name: word, id: "", color: "", known: false };
+            found = { name: word, id: "", color: "", known: false, start: at - 1, end: at + word.length };
         }
     }
     return found;
@@ -262,13 +263,73 @@ function findPriority(text) {
     return p;
 }
 
+// Suggestions for the "#project" or "@label" being typed at the cursor (names may contain spaces).
+// -> { kind: "project" | "label", start, end, query, items: [{ id, name, color }] } | null
+// start..end is the text to replace (from the # or @ up to the cursor).
+var MAX_SUGGESTIONS = 6;
+
+function completion(text, cursor, projects, labels) {
+    var s = String(text || "");
+    var c = typeof cursor === "number" ? Math.min(Math.max(cursor, 0), s.length) : s.length;
+    var before = s.slice(0, c);
+    var at = Math.max(before.lastIndexOf("#"), before.lastIndexOf("@"));
+    if (at < 0 || (at > 0 && !/\s/.test(before.charAt(at - 1)))) {
+        return null;
+    }
+    var after = s.charAt(c);
+    if (after !== "" && !/\s/.test(after)) {
+        return null;                                // the cursor is inside a word
+    }
+    var kind = before.charAt(at) === "#" ? "project" : "label";
+    var query = before.slice(at + 1);
+    var q = lower(query);
+    var pool = kind === "project" ? (projects || []) : (labels || []);
+    var starts = [];
+    var contains = [];
+    for (var i = 0; i < pool.length; i++) {
+        var name = String(pool[i].name || "");
+        var n = lower(name);
+        var item = { id: pool[i].id || "", name: name, color: pool[i].color || "" };
+        if (n.indexOf(q) === 0) {
+            starts.push(item);
+        } else if (q !== "" && n.indexOf(q) > 0) {
+            contains.push(item);
+        }
+    }
+    var byName = function (a, b) { return lower(a.name) < lower(b.name) ? -1 : (lower(a.name) > lower(b.name) ? 1 : 0); };
+    var items = starts.sort(byName).concat(contains.sort(byName)).slice(0, MAX_SUGGESTIONS);
+    // a space ends the token unless it continues a longer name ("#Work Tr…" for "Work Trips")
+    if (/\s/.test(query) && !starts.length) {
+        return null;
+    }
+    // already complete and nothing longer to offer
+    if (items.length === 1 && lower(items[0].name) === q) {
+        return null;
+    }
+    return items.length ? { kind: kind, start: at, end: c, query: query, items: items } : null;
+}
+
+// The text with a suggestion accepted -> { text, cursor }
+function applyCompletion(text, comp, item) {
+    var s = String(text || "");
+    var token = (comp.kind === "project" ? "#" : "@") + item.name + " ";
+    var rest = s.slice(comp.end).replace(/^\s+/, "");
+    return { text: s.slice(0, comp.start) + token + rest, cursor: comp.start + token.length };
+}
+
 function parse(text, opts) {
     var s = String(text || "");
     var o = opts || {};
+    var project = findProject(s, o.projects);
+    var date = parseDate(s, o.todayKey, typeof o.nowMinutes === "number" ? o.nowMinutes : 0);
+    // words inside a project's name ("#Ev Yarın") are not a date
+    if (date && project && project.known && date.spans.some(function (sp) { return sp[0] < project.end && project.start < sp[1]; })) {
+        date = null;
+    }
     return {
-        date: parseDate(s, o.todayKey, typeof o.nowMinutes === "number" ? o.nowMinutes : 0),
+        date: date,
         recurring: RECURRING_RE.test(s),
-        project: findProject(s, o.projects),
+        project: project,
         labels: findLabels(s, o.labels),
         priority: findPriority(s)
     };
