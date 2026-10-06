@@ -113,6 +113,9 @@ msgid ""
 msgstr ""
 "Todoist'te kaydetmeden herhangi bir filtre sorgusu. Liste menüsünde görünür."
 
+msgid "Appearance"
+msgstr "Görünüm"
+
 msgid "Applies to all Todoist for Plasma widgets."
 msgstr "Tüm Todoist for Plasma widgetlarında geçerlidir."
 
@@ -142,6 +145,12 @@ msgstr "Bunu tarih olarak kullanmak için tıklayın"
 
 msgid "Colour"
 msgstr "Renk"
+
+msgid "Comfortable"
+msgstr "Rahat"
+
+msgid "Compact: more tasks fit"
+msgstr "Sıkı: daha çok görev sığar"
 
 msgid "Complete"
 msgstr "Tamamla"
@@ -219,6 +228,9 @@ msgstr "Sil"
 msgid "Deleted “%1”"
 msgstr "“%1” silindi"
 
+msgid "Density:"
+msgstr "Yoğunluk:"
+
 msgid "Disconnect"
 msgstr "Bağlantıyı kes"
 
@@ -236,6 +248,9 @@ msgstr "Filtre sonuçları için bağlantı gerekiyor"
 
 msgid "Filters"
 msgstr "Filtreler"
+
+msgid "From the Plasma theme"
+msgstr "Plasma temasından"
 
 msgid "General"
 msgstr "Genel"
@@ -406,6 +421,12 @@ msgstr "Öncelik 3"
 msgid "Priority 4"
 msgstr "Öncelik 4"
 
+msgid "Priority colours:"
+msgstr "Öncelik renkleri:"
+
+msgid "Project colour:"
+msgstr "Proje rengi:"
+
 msgid "Project name"
 msgstr "Proje adı"
 
@@ -446,6 +467,9 @@ msgid "Show %1 sub-task"
 msgid_plural "Show %1 sub-tasks"
 msgstr[0] "%1 alt görevi göster"
 msgstr[1] "%1 alt görevi göster"
+
+msgid "Show a colour strip beside each task"
+msgstr "Her görevin yanında renk şeridi göster"
 
 msgid "Show details"
 msgstr "Ayrıntıları göster"
@@ -547,6 +571,9 @@ msgstr "Todoist'te bir sorun var"
 
 msgid "Todoist is having trouble. Retrying…"
 msgstr "Todoist'te bir sorun var. Yeniden deneniyor…"
+
+msgid "Todoist's red, orange and blue"
+msgstr "Todoist'in kırmızı, turuncu ve mavisi"
 
 msgid "Token works."
 msgstr "Token çalışıyor."

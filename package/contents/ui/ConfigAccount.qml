@@ -22,6 +22,12 @@ KCM.SimpleKCM {
     property string cfg_badgeSourceDefault: "today"
     property string cfg_language
     property string cfg_languageDefault: ""
+    property string cfg_priorityColors
+    property string cfg_priorityColorsDefault: "plasma"
+    property bool cfg_projectStripe
+    property bool cfg_projectStripeDefault: true
+    property string cfg_density
+    property string cfg_densityDefault: "comfortable"
     property bool cfg_showGoal
     property bool cfg_showGoalDefault: true
     property int cfg_notifyLeadMinutes
@@ -185,6 +191,46 @@ KCM.SimpleKCM {
             font.pointSize: Kirigami.Theme.smallFont.pointSize
             opacity: 0.7
             text: Lang.i18n("Applies to all Todoist for Plasma widgets.")
+        }
+
+        Item {
+            Kirigami.FormData.isSection: true
+            Kirigami.FormData.label: Lang.i18n("Appearance")
+        }
+
+        QQC2.ComboBox {
+            Kirigami.FormData.label: Lang.i18n("Priority colours:")
+            textRole: "text"
+            valueRole: "value"
+            model: [
+                { value: "plasma", text: Lang.i18n("From the Plasma theme") },
+                { value: "todoist", text: Lang.i18n("Todoist's red, orange and blue") }
+            ]
+            Component.onCompleted: currentIndex = Math.max(0, indexOfValue(page.cfg_priorityColors))
+            onActivated: page.cfg_priorityColors = currentValue
+        }
+
+        QQC2.CheckBox {
+            Kirigami.FormData.label: Lang.i18n("Project colour:")
+            text: Lang.i18n("Show a colour strip beside each task")
+            checked: page.cfg_projectStripe
+            onToggled: page.cfg_projectStripe = checked
+        }
+
+        QQC2.ComboBox {
+            Kirigami.FormData.label: Lang.i18n("Density:")
+            textRole: "text"
+            valueRole: "value"
+            model: [
+                { value: "comfortable", text: Lang.i18n("Comfortable") },
+                { value: "compact", text: Lang.i18n("Compact: more tasks fit") }
+            ]
+            Component.onCompleted: currentIndex = Math.max(0, indexOfValue(page.cfg_density))
+            onActivated: page.cfg_density = currentValue
+        }
+
+        Item {
+            Kirigami.FormData.isSection: true
         }
 
         QQC2.ComboBox {

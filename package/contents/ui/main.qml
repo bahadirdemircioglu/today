@@ -127,6 +127,9 @@ PlasmoidItem {
         customQueryName: Plasmoid.configuration.customQueryName
         notifyLeadMinutes: Plasmoid.configuration.notifyLeadMinutes
         showGoal: Plasmoid.configuration.showGoal
+        priorityColors: Plasmoid.configuration.priorityColors
+        projectStripe: Plasmoid.configuration.projectStripe
+        density: Plasmoid.configuration.density
         onPinnedViewRemapped: key => {
             Plasmoid.configuration.pinnedView = key;
         }

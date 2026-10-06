@@ -6,6 +6,17 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-10-06
+
+### Added
+- Settings → Appearance:
+  - Priority colours: from the Plasma theme (default) or Todoist's red, orange and blue, for the
+    check circles and the Quick Add preview.
+  - A strip in the project's colour beside each task (on by default; not in a project's own
+    list, where every row would match). Rows keep their alignment with or without a colour.
+  - Density: Comfortable (default) or Compact, with tighter rows, a smaller check circle and the
+    description behind a small note icon.
+
 ## [2.2.2] - 2026-10-06
 
 ### Added

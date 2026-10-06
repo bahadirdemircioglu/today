@@ -19,3 +19,10 @@ function hex(name) {
     }
     return Object.prototype.hasOwnProperty.call(TODOIST, name) ? TODOIST[name] : "";
 }
+
+// Todoist's own priority colours, by API priority (4 = p1 … 1 = p4: no colour) -> "#rrggbb" | ""
+var PRIORITY = { 4: "#d1453b", 3: "#eb8909", 2: "#246fe0" };
+
+function priorityHex(priority) {
+    return Object.prototype.hasOwnProperty.call(PRIORITY, priority) ? PRIORITY[priority] : "";
+}

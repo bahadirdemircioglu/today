@@ -3,14 +3,21 @@ import QtQuick.Templates as T
 
 import org.kde.kirigami as Kirigami
 
+import "logic/Colors.js" as Colors
+
 // Round, priority-coloured completion button with a fill + check animation.
 // Todoist API priority: 4 = p1 (highest) ... 1 = p4.
 T.AbstractButton {
     id: control
 
     property int priority: 1
+    // Todoist's red/orange/blue instead of the Plasma theme's colours
+    property bool todoistColors: false
 
     readonly property color ringColor: {
+        if (todoistColors && Colors.priorityHex(priority) !== "") {
+            return Colors.priorityHex(priority);
+        }
         switch (priority) {
         case 4:
             return Kirigami.Theme.negativeTextColor;

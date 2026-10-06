@@ -28,6 +28,17 @@
     <entry name="language" type="String">
       <default></default>
     </entry>
+    <!-- Appearance: priority colours "plasma" (theme) | "todoist"; a project-colour strip on rows;
+         row density "comfortable" | "compact" -->
+    <entry name="priorityColors" type="String">
+      <default>plasma</default>
+    </entry>
+    <entry name="projectStripe" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="density" type="String">
+      <default>comfortable</default>
+    </entry>
     <entry name="showGoal" type="Bool">
       <default>true</default>
     </entry>

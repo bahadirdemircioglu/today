@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plasma_applet_io.github.bahadirdemircioglu.todoistplasma "
-"2.2.2\n"
+"2.3.0\n"
 "Report-Msgid-Bugs-To: https://github.com/bahadirdemircioglu/today/issues\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
@@ -115,6 +115,9 @@ msgid ""
 "list menu."
 msgstr ""
 
+msgid "Appearance"
+msgstr ""
+
 msgid "Applies to all Todoist for Plasma widgets."
 msgstr ""
 
@@ -143,6 +146,12 @@ msgid "Click to use this as the date"
 msgstr ""
 
 msgid "Colour"
+msgstr ""
+
+msgid "Comfortable"
+msgstr ""
+
+msgid "Compact: more tasks fit"
 msgstr ""
 
 msgid "Complete"
@@ -221,6 +230,9 @@ msgstr ""
 msgid "Deleted “%1”"
 msgstr ""
 
+msgid "Density:"
+msgstr ""
+
 msgid "Disconnect"
 msgstr ""
 
@@ -237,6 +249,9 @@ msgid "Filter results need a connection"
 msgstr ""
 
 msgid "Filters"
+msgstr ""
+
+msgid "From the Plasma theme"
 msgstr ""
 
 msgid "General"
@@ -406,6 +421,12 @@ msgstr ""
 msgid "Priority 4"
 msgstr ""
 
+msgid "Priority colours:"
+msgstr ""
+
+msgid "Project colour:"
+msgstr ""
+
 msgid "Project name"
 msgstr ""
 
@@ -446,6 +467,9 @@ msgid "Show %1 sub-task"
 msgid_plural "Show %1 sub-tasks"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "Show a colour strip beside each task"
+msgstr ""
 
 msgid "Show details"
 msgstr ""
@@ -541,6 +565,9 @@ msgid "Todoist is having trouble"
 msgstr ""
 
 msgid "Todoist is having trouble. Retrying…"
+msgstr ""
+
+msgid "Todoist's red, orange and blue"
 msgstr ""
 
 msgid "Token works."

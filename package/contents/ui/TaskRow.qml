@@ -80,6 +80,11 @@ Item {
     }
 
     readonly property bool redDate: isLate || isOverdue || section === "overdue"
+    readonly property bool compact: !!controller && controller.compact
+    readonly property bool notesHint: compact && hasDetails && !detailsOpen
+    // room for the strip on every row of the list, so rows without a project colour stay aligned
+    readonly property bool stripeSpace: !!controller && controller.projectStripe && controller.viewSpec.kind !== "project"
+    readonly property bool showStripe: stripeSpace && projectColor !== "" && !pending
     readonly property string whenText: {
         if (pending || headerOnly || !controller) {
             return "";
@@ -158,7 +163,7 @@ Item {
         anchors.leftMargin: Kirigami.Units.smallSpacing
         height: row.groupLabel !== "" ? Math.max(headerLabel.implicitHeight, addButton.visible ? addButton.implicitHeight : 0,
                                                  rescheduleButton.visible ? rescheduleButton.implicitHeight : 0)
-                                        + Kirigami.Units.largeSpacing : 0
+                                        + (row.compact ? Kirigami.Units.smallSpacing : Kirigami.Units.largeSpacing) : 0
         visible: row.groupLabel !== ""
         spacing: Kirigami.Units.smallSpacing
 
@@ -242,7 +247,7 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.leftMargin: row.depth * Kirigami.Units.gridUnit
-        height: layout.implicitHeight + Kirigami.Units.smallSpacing * 2
+        height: layout.implicitHeight + (row.compact ? 2 : Kirigami.Units.smallSpacing * 2)
 
         HoverHandler {
             id: rowHover
@@ -269,14 +274,28 @@ Item {
             Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration } }
         }
 
+        // the project's colour along the left edge (not in a project's own list: all rows would match)
+        Rectangle {
+            id: stripe
+            visible: row.showStripe
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.topMargin: row.compact ? 2 : Kirigami.Units.smallSpacing / 2
+            anchors.bottomMargin: anchors.topMargin
+            width: 3
+            radius: 1.5
+            color: row.projectColor !== "" ? row.projectColor : "transparent"
+        }
+
         RowLayout {
             id: layout
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
-            anchors.leftMargin: Kirigami.Units.smallSpacing
+            anchors.leftMargin: Kirigami.Units.smallSpacing + (row.stripeSpace ? stripe.width : 0)
             anchors.rightMargin: Kirigami.Units.smallSpacing
-            spacing: Kirigami.Units.largeSpacing
+            spacing: row.compact ? Kirigami.Units.smallSpacing * 1.5 : Kirigami.Units.largeSpacing
 
             PlasmaComponents3.ToolButton {
                 Layout.alignment: Qt.AlignVCenter
@@ -297,7 +316,10 @@ Item {
 
             RoundCheck {
                 Layout.alignment: Qt.AlignVCenter
+                implicitWidth: row.compact ? Kirigami.Units.iconSizes.small + 2 : Kirigami.Units.iconSizes.smallMedium
+                implicitHeight: implicitWidth
                 priority: row.priority
+                todoistColors: !!row.controller && row.controller.priorityColors === "todoist"
                 checked: row.completing
                 enabled: !row.pending && !row.completing
                 opacity: row.pending ? 0.4 : 1
@@ -350,7 +372,8 @@ Item {
 
                 PlasmaComponents3.Label {
                     Layout.fillWidth: true
-                    visible: row.hasDetails && !row.editing
+                    // compact rows keep the description behind a click on the title row's details
+                    visible: row.hasDetails && !row.editing && (!row.compact || row.detailsOpen)
                     text: row.detailsOpen ? row.descriptionFull : row.description
                     textFormat: Text.PlainText
                     wrapMode: row.detailsOpen ? Text.Wrap : Text.NoWrap
@@ -376,8 +399,23 @@ Item {
 
                 RowLayout {
                     Layout.fillWidth: true
-                    visible: row.whenText !== "" || row.detailText !== "" || row.deadlineKey !== ""
+                    visible: row.whenText !== "" || row.detailText !== "" || row.deadlineKey !== "" || row.notesHint
                     spacing: Kirigami.Units.smallSpacing
+
+                    // compact rows hide the description: a small note icon opens it
+                    Kirigami.Icon {
+                        visible: row.notesHint
+                        source: "view-list-text"
+                        implicitWidth: Kirigami.Units.iconSizes.small
+                        implicitHeight: implicitWidth
+                        opacity: 0.6
+                        HoverHandler {
+                            cursorShape: Qt.PointingHandCursor
+                        }
+                        TapHandler {
+                            onTapped: row.detailsOpen = true
+                        }
+                    }
 
                     PlasmaComponents3.Label {
                         visible: row.whenText !== ""

@@ -31,6 +31,11 @@ Item {
         ? { name: customQueryName.trim() || Lang.i18n("Custom filter"), query: customQuery.trim() } : null
     // daily goal ring (config) and its data
     property bool showGoal: true
+    // appearance (Settings → Appearance)
+    property string priorityColors: "plasma"   // "plasma" | "todoist"
+    property bool projectStripe: true
+    property string density: "comfortable"     // "comfortable" | "compact"
+    readonly property bool compact: density === "compact"
     property var goalStats: null
     property double goalFetchedAt: 0
     property int completedSinceStats: 0

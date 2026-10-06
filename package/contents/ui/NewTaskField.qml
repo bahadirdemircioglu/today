@@ -335,7 +335,10 @@ ColumnLayout {
             visible: p > 0
             iconName: "flag"
             text: Lang.i18n("Priority %1", p)
-            tint: p === 1 ? Kirigami.Theme.negativeTextColor : p === 2 ? Kirigami.Theme.neutralTextColor
+            // p1 … p4 as typed = API priority 4 … 1
+            readonly property bool todoist: !!field.controller && field.controller.priorityColors === "todoist"
+            tint: todoist && Colors.priorityHex(5 - p) !== "" ? Colors.priorityHex(5 - p)
+                : p === 1 ? Kirigami.Theme.negativeTextColor : p === 2 ? Kirigami.Theme.neutralTextColor
                 : p === 3 ? Kirigami.Theme.linkColor : Kirigami.Theme.textColor
         }
     }
