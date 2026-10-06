@@ -272,8 +272,10 @@ Item {
     // What a Quick Add text will do (live preview under "New task"), see QuickParse.parse
     function parseQuickAdd(text) {
         var v = quickAddVocabulary();
+        // numeric dates are day/month unless the system writes month/day (en_US)
+        var monthFirst = /^\s*M/.test(Qt.locale().dateFormat(Locale.ShortFormat));
         return QuickParse.parse(text, { todayKey: todayView.todayKey, nowMinutes: todayView.nowMinutes,
-                                        projects: v.projects, labels: v.labels });
+                                        projects: v.projects, labels: v.labels, monthFirst: monthFirst });
     }
 
     // Suggestions for the #project / @label being typed, see QuickParse.completion

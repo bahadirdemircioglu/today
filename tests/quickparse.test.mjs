@@ -128,3 +128,23 @@ test("project span, and a project name is not read as a date", () => {
   assert.equal(QP.dueValue(r2.date), "2026-10-05");
   assert.equal(QP.stripSpans("Boya #Ev yarın", r2.date.spans.concat([[r2.project.start, r2.project.end]])), "Boya");
 });
+
+test("numeric dates, with a time glued on", () => {
+  assert.equal(date("Toplantı 12/10/2026-15:00"), "2026-10-12T15:00:00");
+  assert.equal(date("Toplantı 12.10.2026 15:00"), "2026-10-12T15:00:00");
+  assert.equal(date("Toplantı 12-15:00"), "2026-10-12T15:00:00");
+  assert.equal(date("Toplantı 3-09:30"), "2026-11-03T09:30:00");     // the 3rd has passed: next month
+  assert.equal(date("Fatura 12.10"), "2026-10-12");
+  assert.equal(date("Fatura 1/2"), "2027-02-01");                      // past this year: next year
+  assert.equal(date("Fatura 12.10.26 14.30"), "2026-10-12T14:30:00");
+  assert.equal(date("Fatura 2026-10-12T09:00"), "2026-10-12T09:00:00");
+  assert.equal(date("Oku 12/10 15:00"), "2026-10-12T15:00:00");
+  assert.equal(date("Ara saat 12.10"), "2026-10-04T12:10:00");         // "saat" makes it a time
+  assert.equal(date("x 31/02"), null);
+  assert.equal(date("x 12/10-25:00"), null);
+  assert.equal(date("v1.2 sürümü"), null);
+  const us = QP.parse("x 10/12", { ...opts, monthFirst: true }).date;
+  assert.equal(QP.dueValue(us), "2026-10-12");
+  const t = "Toplantı 12/10/2026-15:00 #Ev";
+  assert.equal(QP.stripSpans(t, QP.parse(t, opts).date.spans), "Toplantı #Ev");
+});

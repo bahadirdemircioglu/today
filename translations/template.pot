@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plasma_applet_io.github.bahadirdemircioglu.todoistplasma "
-"2.2.1\n"
+"2.2.2\n"
 "Report-Msgid-Bugs-To: https://github.com/bahadirdemircioglu/today/issues\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"

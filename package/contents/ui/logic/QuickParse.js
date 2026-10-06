@@ -82,6 +82,9 @@ function pad2(n) {
 function explicitDate(todayKey, day, month, yearText) {
     var t = DateUtil.splitDateKey(todayKey);
     var y = yearText ? parseInt(yearText, 10) : t.y;
+    if (yearText && String(yearText).length === 2) {
+        y += 2000;
+    }
     var d = parseInt(day, 10);
     var probe = new Date(Date.UTC(y, month, d));
     if (d < 1 || probe.getUTCMonth() !== month) {
@@ -94,7 +97,41 @@ function explicitDate(todayKey, day, month, yearText) {
     return key;
 }
 
-// Date rules: [regex source (after the leading boundary), (match, todayKey) -> day key | null]
+// The next day-of-month `day` from today (this month, else the following months) -> day key | null
+function dayOfMonth(todayKey, day) {
+    var t = DateUtil.splitDateKey(todayKey);
+    var d = parseInt(day, 10);
+    if (d < 1 || d > 31) {
+        return null;
+    }
+    for (var i = 0; i < 12; i++) {
+        var y = t.y + Math.floor((t.m - 1 + i) / 12);
+        var mo = (t.m - 1 + i) % 12;
+        var probe = new Date(Date.UTC(y, mo, d));
+        var key = y + "-" + pad2(mo + 1) + "-" + pad2(d);
+        if (probe.getUTCMonth() === mo && key >= todayKey) {
+            return key;
+        }
+    }
+    return null;
+}
+
+// optional time glued to a numeric date: "12/10/2026-15:00", "12.10 15.30", "2026-10-12T09:00"
+var TIME_SUFFIX = "(?:(?:-|T|\\s|,\\s?)(?:saat\\s|at\\s)?(\\d{1,2})[:.](\\d{2}))?";
+
+function withTime(key, h, mi) {
+    if (!key) {
+        return null;
+    }
+    if (h === undefined || h === null || h === "") {
+        return key;
+    }
+    var minutes = hm(h, mi);
+    return minutes === null ? null : { key: key, minutes: minutes };
+}
+
+// Date rules: [regex source (after the leading boundary), (match, todayKey, ctx) -> day key | { key, minutes } | null]
+// ctx: { monthFirst } (numeric dates are day/month unless the system writes month/day)
 var DATE_RULES = [
     ["(day after tomorrow|öbür gün|yarından sonra)", function (m, today) { return DateUtil.addDaysKey(today, 2); }],
     ["(today|tonight|bugün|bu akşam)", function (m, today) { return today; }],
@@ -131,6 +168,23 @@ var DATE_RULES = [
     }],
     ["(?:on )?(" + MONTH_RE + ") (\\d{1,2})(?:st|nd|rd|th)?(?:,? (\\d{4}))?", function (m, today) {
         return explicitDate(today, m[2], monthIndex(m[1]), m[3]);
+    }],
+    // 2026-10-12, 2026-10-12T15:00
+    ["(\\d{4})-(\\d{1,2})-(\\d{1,2})" + TIME_SUFFIX, function (m, today) {
+        return withTime(explicitDate(today, m[3], parseInt(m[2], 10) - 1, m[1]), m[4], m[5]);
+    }],
+    // 12/10, 12.10.2026, 12/10/26-15:00 (day first unless ctx.monthFirst)
+    ["(\\d{1,2})[./](\\d{1,2})(?:[./](\\d{4}|\\d{2}))?" + TIME_SUFFIX, function (m, today, ctx) {
+        var day = ctx && ctx.monthFirst ? m[2] : m[1];
+        var month = parseInt(ctx && ctx.monthFirst ? m[1] : m[2], 10) - 1;
+        if (month < 0 || month > 11) {
+            return null;
+        }
+        return withTime(explicitDate(today, day, month, m[3]), m[4], m[5]);
+    }],
+    // 12-15:00: the 12th (this month, or the next one if it has passed) at 15:00
+    ["(\\d{1,2})-(\\d{1,2}):(\\d{2})", function (m, today) {
+        return withTime(dayOfMonth(today, m[1]), m[2], m[3]);
     }]
 ];
 
@@ -164,7 +218,7 @@ var RECURRING_RE = new RegExp("(^|\\s)(every|everyday|daily|weekly|monthly|yearl
 
 // earliest, then longest match of any rule -> { value, start, end } | null
 // A rule gets m.slice(1): [0] is the leading boundary, [1]… its own groups.
-function firstMatch(text, rules, today) {
+function firstMatch(text, rules, today, ctx) {
     var best = null;
     for (var r = 0; r < rules.length; r++) {
         var re = new RegExp("(^|\\s)" + rules[r][0] + END, "gi");
@@ -172,7 +226,7 @@ function firstMatch(text, rules, today) {
         while ((m = re.exec(text)) !== null) {
             var start = m.index + m[1].length;
             var end = m.index + m[0].length;
-            var value = rules[r][1](m.slice(1), today);
+            var value = rules[r][1](m.slice(1), today, ctx);
             if (value !== null && value !== undefined
                     && (!best || start < best.start || (start === best.start && end > best.end))) {
                 best = { value: value, start: start, end: end };
@@ -185,14 +239,23 @@ function firstMatch(text, rules, today) {
     return best;
 }
 
-function parseDate(text, todayKey, nowMinutes) {
+function parseDate(text, todayKey, nowMinutes, ctx) {
     if (!DateUtil.splitDateKey(todayKey) || RECURRING_RE.test(text)) {
         return null;
     }
-    var d = firstMatch(text, DATE_RULES, todayKey);
-    var t = firstMatch(text, TIME_RULES, todayKey);
+    var d = firstMatch(text, DATE_RULES, todayKey, ctx);
+    var t = firstMatch(text, TIME_RULES, todayKey, ctx);
     if (t && d && t.start < d.end && d.start < t.end) {
-        t = null;                                  // overlapping: the date wins
+        // overlapping: the one that starts first wins ("saat 12.10" is a time, "12.10 15:00" a date)
+        if (t.start < d.start) {
+            d = null;
+        } else {
+            t = null;
+        }
+    }
+    // a date that came with its own time ("12/10-15:00")
+    if (d && typeof d.value === "object") {
+        return { key: d.value.key, minutes: d.value.minutes, spans: [[d.start, d.end]] };
     }
     if (!d && !t) {
         return null;
@@ -321,7 +384,7 @@ function parse(text, opts) {
     var s = String(text || "");
     var o = opts || {};
     var project = findProject(s, o.projects);
-    var date = parseDate(s, o.todayKey, typeof o.nowMinutes === "number" ? o.nowMinutes : 0);
+    var date = parseDate(s, o.todayKey, typeof o.nowMinutes === "number" ? o.nowMinutes : 0, { monthFirst: !!o.monthFirst });
     // words inside a project's name ("#Ev Yarın") are not a date
     if (date && project && project.known && date.spans.some(function (sp) { return sp[0] < project.end && project.start < sp[1]; })) {
         date = null;

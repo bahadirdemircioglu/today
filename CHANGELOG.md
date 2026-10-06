@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [2.2.2] - 2026-10-06
+
+### Added
+- Numeric dates in Quick Add, with an optional time glued on: "12/10/2026-15:00",
+  "12.10.2026 15:00", "12.10", "2026-10-12T09:00", and the short "12-15:00" (the 12th of this
+  month, or of the next month if it has passed). Day/month order unless the system writes
+  month/day; "saat 12.10" is still a time.
+
 ## [2.2.1] - 2026-10-05
 
 ### Added
