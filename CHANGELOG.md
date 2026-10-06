@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [2.4.0] - 2026-10-06
+
+### Added
+- Settings → Appearance → Desktop background: Standard (as before, can still be switched off in
+  edit mode), Translucent, or None. Without a background the text gets a soft shadow (a light
+  glow for dark text) so it reads over any wallpaper; this needs a GPU renderer and is skipped
+  with Qt's software renderer.
+
 ## [2.3.0] - 2026-10-06
 
 ### Added

@@ -231,6 +231,9 @@ msgstr "“%1” silindi"
 msgid "Density:"
 msgstr "Yoğunluk:"
 
+msgid "Desktop background:"
+msgstr "Masaüstü arka planı:"
+
 msgid "Disconnect"
 msgstr "Bağlantıyı kes"
 
@@ -347,6 +350,9 @@ msgstr "Üst proje yok"
 
 msgid "No tasks here"
 msgstr "Burada görev yok"
+
+msgid "None (text gets a soft shadow)"
+msgstr "Yok (yazılara hafif gölge eklenir)"
 
 msgid "Not connected"
 msgstr "Bağlı değil"
@@ -486,6 +492,9 @@ msgstr "Görünen ad:"
 msgid "Something went wrong (HTTP %1)."
 msgstr "Bir şeyler ters gitti (HTTP %1)."
 
+msgid "Standard"
+msgstr "Normal"
+
 msgid "Start here in this widget"
 msgstr "Bu widget burada başlasın"
 
@@ -584,6 +593,9 @@ msgstr "Yarın"
 msgctxt "day header: Tomorrow · weekday date"
 msgid "Tomorrow · %1"
 msgstr "Yarın · %1"
+
+msgid "Translucent"
+msgstr "Yarı saydam"
 
 msgid "Try again"
 msgstr "Tekrar dene"

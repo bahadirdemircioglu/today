@@ -1,7 +1,9 @@
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Effects
 
 import org.kde.plasma.plasmoid
+import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.components as PlasmaComponents3
 import org.kde.kirigami as Kirigami
 
@@ -16,6 +18,20 @@ Item {
     readonly property string phase: controller ? controller.phase : "SETUP"
     readonly property bool small: !inPopup
         && (width < Kirigami.Units.gridUnit * 14 || height < Kirigami.Units.gridUnit * 12)
+
+    // On the desktop without a background, a soft shadow (or glow, for dark text) keeps the
+    // text readable over any wallpaper.
+    // (shader effects need a GPU renderer: with Qt's software renderer the item would vanish)
+    readonly property bool bare: !inPopup && Plasmoid.effectiveBackgroundHints === PlasmaCore.Types.NoBackground
+    readonly property bool gpu: GraphicsInfo.api !== GraphicsInfo.Software && GraphicsInfo.api !== GraphicsInfo.Unknown
+    layer.enabled: bare && gpu
+    layer.effect: MultiEffect {
+        shadowEnabled: true
+        shadowBlur: 0.35
+        shadowHorizontalOffset: 0
+        shadowVerticalOffset: 1
+        shadowColor: Kirigami.Theme.textColor.hslLightness > 0.5 ? Qt.rgba(0, 0, 0, 0.9) : Qt.rgba(1, 1, 1, 0.9)
+    }
 
     Layout.preferredWidth: Kirigami.Units.gridUnit * 22
     Layout.preferredHeight: Kirigami.Units.gridUnit * 26

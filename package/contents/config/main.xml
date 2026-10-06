@@ -39,6 +39,11 @@
     <entry name="density" type="String">
       <default>comfortable</default>
     </entry>
+    <!-- Desktop widget background: "standard" (Plasma's, can be switched off in edit mode) |
+         "translucent" | "none" (text gets a soft shadow so it reads over the wallpaper) -->
+    <entry name="desktopBackground" type="String">
+      <default>standard</default>
+    </entry>
     <entry name="showGoal" type="Bool">
       <default>true</default>
     </entry>

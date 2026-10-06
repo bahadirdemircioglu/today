@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: plasma_applet_io.github.bahadirdemircioglu.todoistplasma "
-"2.3.0\n"
+"2.4.0\n"
 "Report-Msgid-Bugs-To: https://github.com/bahadirdemircioglu/today/issues\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
@@ -233,6 +233,9 @@ msgstr ""
 msgid "Density:"
 msgstr ""
 
+msgid "Desktop background:"
+msgstr ""
+
 msgid "Disconnect"
 msgstr ""
 
@@ -348,6 +351,9 @@ msgid "No parent project"
 msgstr ""
 
 msgid "No tasks here"
+msgstr ""
+
+msgid "None (text gets a soft shadow)"
 msgstr ""
 
 msgid "Not connected"
@@ -486,6 +492,9 @@ msgstr ""
 msgid "Something went wrong (HTTP %1)."
 msgstr ""
 
+msgid "Standard"
+msgstr ""
+
 msgid "Start here in this widget"
 msgstr ""
 
@@ -578,6 +587,9 @@ msgstr ""
 
 msgctxt "day header: Tomorrow · weekday date"
 msgid "Tomorrow · %1"
+msgstr ""
+
+msgid "Translucent"
 msgstr ""
 
 msgid "Try again"

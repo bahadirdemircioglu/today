@@ -11,8 +11,11 @@ PlasmoidItem {
                                     || Plasmoid.formFactor === PlasmaCore.Types.Vertical
 
     preferredRepresentation: inPanel ? compactRepresentation : fullRepresentation
-    // the user can switch the background off (or make it translucent) in edit mode
-    Plasmoid.backgroundHints: PlasmaCore.Types.DefaultBackground | PlasmaCore.Types.ConfigurableBackground
+    // Settings → Appearance → Desktop background; "standard" can still be switched off in edit mode
+    readonly property string desktopBackground: Plasmoid.configuration.desktopBackground
+    Plasmoid.backgroundHints: desktopBackground === "translucent" ? PlasmaCore.Types.TranslucentBackground
+        : desktopBackground === "none" ? PlasmaCore.Types.NoBackground
+        : PlasmaCore.Types.DefaultBackground | PlasmaCore.Types.ConfigurableBackground
     // below this size on the desktop Plasma falls back to the compact (icon) form
     switchWidth: Kirigami.Units.gridUnit * 8
     switchHeight: Kirigami.Units.gridUnit * 6

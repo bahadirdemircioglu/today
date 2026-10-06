@@ -26,6 +26,8 @@ KCM.SimpleKCM {
     property string cfg_priorityColorsDefault: "plasma"
     property bool cfg_projectStripe
     property bool cfg_projectStripeDefault: true
+    property string cfg_desktopBackground
+    property string cfg_desktopBackgroundDefault: "standard"
     property string cfg_density
     property string cfg_densityDefault: "comfortable"
     property bool cfg_showGoal
@@ -215,6 +217,19 @@ KCM.SimpleKCM {
             text: Lang.i18n("Show a colour strip beside each task")
             checked: page.cfg_projectStripe
             onToggled: page.cfg_projectStripe = checked
+        }
+
+        QQC2.ComboBox {
+            Kirigami.FormData.label: Lang.i18n("Desktop background:")
+            textRole: "text"
+            valueRole: "value"
+            model: [
+                { value: "standard", text: Lang.i18n("Standard") },
+                { value: "translucent", text: Lang.i18n("Translucent") },
+                { value: "none", text: Lang.i18n("None (text gets a soft shadow)") }
+            ]
+            Component.onCompleted: currentIndex = Math.max(0, indexOfValue(page.cfg_desktopBackground))
+            onActivated: page.cfg_desktopBackground = currentValue
         }
 
         QQC2.ComboBox {
