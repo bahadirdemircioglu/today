@@ -58,6 +58,8 @@ Get New Widgets can install and update it.
 
 ## Screenshots
 
+Store logo: `docs/logo/logo-512.png` (source: `docs/logo/logo.svg`, an original design, not Todoist's logo).
+
 Use **real** screenshots of the widget (Spectacle, `Meta+Shift+Print` for a region), not the
 design mock-ups in `docs/screenshots/`. A good set:
 
