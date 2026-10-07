@@ -198,6 +198,18 @@ ColumnLayout {
             visible: listRoot.controller.syncing
             running: visible
         }
+
+        // Settings (language, colours, background …) without hunting for the right-click menu
+        PlasmaComponents3.ToolButton {
+            Layout.alignment: Qt.AlignTop
+            icon.name: "configure"
+            text: Lang.i18n("Settings")
+            display: PlasmaComponents3.AbstractButton.IconOnly
+            onClicked: Plasmoid.internalAction("configure").trigger()
+            PlasmaComponents3.ToolTip.text: text
+            PlasmaComponents3.ToolTip.visible: hovered
+            PlasmaComponents3.ToolTip.delay: Kirigami.Units.toolTipDelay
+        }
     }
 
     Kirigami.InlineMessage {

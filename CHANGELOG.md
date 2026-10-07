@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [2.4.1] - 2026-10-07
+
+### Changed
+- A ⚙ Settings button at the top of the list opens the widget's settings directly.
+- Settings are split into two pages: General (account, badge, goal, reminders, custom filter,
+  start list) and Appearance (language, priority colours, project strip, density, desktop
+  background).
+
 ## [2.4.0] - 2026-10-06
 
 ### Added

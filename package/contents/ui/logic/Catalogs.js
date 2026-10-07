@@ -144,6 +144,7 @@ var CATALOGS = {
             "Reschedule all overdue tasks": "Tüm gecikmiş görevleri yeniden planla",
             "Results from %1": "%1 itibarıyla sonuçlar",
             "Save": "Kaydet",
+            "Settings": "Ayarlar",
             "Show %1 sub-task": ["%1 alt görevi göster","%1 alt görevi göster"],
             "Show a colour strip beside each task": "Her görevin yanında renk şeridi göster",
             "Show details": "Ayrıntıları göster",

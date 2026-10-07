@@ -469,6 +469,9 @@ msgstr "%1 itibarıyla sonuçlar"
 msgid "Save"
 msgstr "Kaydet"
 
+msgid "Settings"
+msgstr "Ayarlar"
+
 msgid "Show %1 sub-task"
 msgid_plural "Show %1 sub-tasks"
 msgstr[0] "%1 alt görevi göster"
