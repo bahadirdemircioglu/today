@@ -198,6 +198,8 @@ All decision logic is plain JavaScript in `package/contents/ui/logic/` (`.pragma
 
 Releases: bump `Version` in `package/metadata.json` and `package.json`, add a CHANGELOG section, then push a `vX.Y.Z` tag. CI builds the `.plasmoid` and attaches it to a GitHub Release.
 
+Publishing on the KDE Store (so it appears in *Get New Widgets*): see [docs/kde-store.md](docs/kde-store.md).
+
 ## License
 
 GPL-3.0-or-later. See [LICENSE](LICENSE).
