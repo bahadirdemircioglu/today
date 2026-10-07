@@ -281,6 +281,12 @@ msgstr "Gelen Kutusu"
 msgid "Inside:"
 msgstr "Üst proje:"
 
+msgid "Keep it in this project"
+msgstr "Bu projede kalsın"
+
+msgid "Keep the date"
+msgstr "Tarihi koru"
+
 msgid "Labels"
 msgstr "Etiketler"
 
@@ -298,6 +304,9 @@ msgstr "Yükleniyor…"
 
 msgid "More actions"
 msgstr "Diğer eylemler"
+
+msgid "Move it to the Inbox"
+msgstr "Gelen Kutusu'na taşı"
 
 msgid "Move to"
 msgstr "Taşı"
@@ -453,6 +462,9 @@ msgstr "10 dakika sonra hatırlat"
 
 msgid "Reminders:"
 msgstr "Hatırlatmalar:"
+
+msgid "Remove the date"
+msgstr "Tarihi kaldır"
 
 msgid "Repeats (Todoist reads the schedule)"
 msgstr "Tekrarlanır (zamanlamayı Todoist okur)"

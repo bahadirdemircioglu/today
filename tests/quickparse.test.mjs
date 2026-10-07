@@ -74,9 +74,10 @@ test("projects, labels, priority", () => {
   const r = QP.parse("Book hotel #Work Trips @errand @new p2", opts);
   assert.deepEqual(JSON.parse(JSON.stringify(r.project)), { name: "Work Trips", id: "p2", color: "red", known: true, start: 11, end: 22 });
   assert.deepEqual(JSON.parse(JSON.stringify(r.labels)), [
-    { name: "errand", color: "green", known: true },
-    { name: "new", color: "", known: false },
+    { name: "errand", color: "green", known: true, start: 23, end: 30 },
+    { name: "new", color: "", known: false, start: 31, end: 35 },
   ]);
+  assert.deepEqual(JSON.parse(JSON.stringify(r.prioritySpans)), [[36, 38]]);
   assert.equal(r.priority, 2);
   assert.equal(QP.parse("x #work", opts).project.id, "p1");
   assert.equal(QP.parse("x #Nope", opts).project.known, false);
@@ -147,4 +148,29 @@ test("numeric dates, with a time glued on", () => {
   assert.equal(QP.dueValue(us), "2026-10-12");
   const t = "Toplantı 12/10/2026-15:00 #Ev";
   assert.equal(QP.stripSpans(t, QP.parse(t, opts).date.spans), "Toplantı #Ev");
+});
+
+test("composeEdit: typed date, project, labels and priority are applied, not kept in the title", () => {
+  const text = "Pay rent yarın 10:00 #Work @errand p2";
+  const cur = { content: "Pay rent", projectId: "p3", inboxProjectId: "inbox", labels: ["home"] };
+  const r = QP.composeEdit(text, QP.parse(text, { ...opts, labels: [{ name: "errand" }] }), cur);
+  assert.deepEqual(JSON.parse(JSON.stringify(r)), {
+    error: "",
+    args: { due: { date: "2026-10-05T10:00:00" }, labels: ["home", "errand"], priority: 3 },
+    moveTo: "p1",
+  });
+});
+
+test("composeEdit: removing the date or project, renaming, and an empty title", () => {
+  const cur = { content: "Pay rent", projectId: "p3", inboxProjectId: "inbox", labels: [] };
+  const clear = QP.composeEdit("Pay the rent", QP.parse("Pay the rent", opts), { ...cur, clearDate: true, clearProject: true });
+  assert.deepEqual(JSON.parse(JSON.stringify(clear)), { error: "", args: { due: null, content: "Pay the rent" }, moveTo: "inbox" });
+  const same = QP.composeEdit("Pay rent", QP.parse("Pay rent", opts), cur);
+  assert.deepEqual(JSON.parse(JSON.stringify(same)), { error: "", args: {}, moveTo: "" });
+  // the typed date wins over "remove date"; kept words stay in the title
+  const kept = QP.composeEdit("Pay rent friday", QP.parse("Pay rent friday", opts), { ...cur, keepDateText: true, clearDate: true });
+  assert.deepEqual(JSON.parse(JSON.stringify(kept.args)), { due: null, content: "Pay rent friday" });
+  assert.equal(QP.composeEdit("yarın", QP.parse("yarın", opts), cur).error, "empty");
+  // already in the typed project: no move
+  assert.equal(QP.composeEdit("Pay rent #Ev", QP.parse("Pay rent #Ev", opts), cur).moveTo, "");
 });

@@ -311,19 +311,25 @@ function findLabels(text, labels) {
                 known = labels[i];
             }
         }
-        out.push(known ? { name: known.name, color: known.color || "", known: true } : { name: name, color: "", known: false });
+        var at = m.index + m[1].length;
+        var span = { start: at, end: at + 1 + name.length };
+        out.push(known ? { name: known.name, color: known.color || "", known: true, start: span.start, end: span.end }
+                       : { name: name, color: "", known: false, start: span.start, end: span.end });
     }
     return out;
 }
 
+// -> { value: 1..4 as typed (the last one wins), spans: [[start, end]] for every pN }
 function findPriority(text) {
     var re = new RegExp("(^|\\s)p([1-4])" + END, "gi");
     var m;
     var p = 0;
+    var spans = [];
     while ((m = re.exec(text)) !== null) {
         p = parseInt(m[2], 10);
+        spans.push([m.index + m[1].length, m.index + m[0].length]);
     }
-    return p;
+    return { value: p, spans: spans };
 }
 
 // Suggestions for the "#project" or "@label" being typed at the cursor (names may contain spaces).
@@ -389,12 +395,14 @@ function parse(text, opts) {
     if (date && project && project.known && date.spans.some(function (sp) { return sp[0] < project.end && project.start < sp[1]; })) {
         date = null;
     }
+    var pr = findPriority(s);
     return {
         date: date,
         recurring: RECURRING_RE.test(s),
         project: project,
         labels: findLabels(s, o.labels),
-        priority: findPriority(s)
+        priority: pr.value,
+        prioritySpans: pr.spans
     };
 }
 
@@ -414,4 +422,53 @@ function dueValue(date) {
         return "";
     }
     return date.minutes === null ? date.key : date.key + "T" + DateUtil.minutesToHHMM(date.minutes) + ":00";
+}
+
+// What saving an edited task should change. Like Quick Add, but for an existing task: a typed
+// date, #project, @label or pN is taken out of the title and applied; the current date or
+// project can also be removed (clearDate / clearProject, from the editor's chips).
+// current: { content, projectId, inboxProjectId, labels: [names], clearDate, clearProject, keepDateText }
+// -> { error: "" | "empty", args: { content?, due?, labels?, priority? } (item_update), moveTo: "" | projectId }
+function composeEdit(text, parsed, current) {
+    var c = current || {};
+    var p = parsed || {};
+    var spans = [];
+    var args = {};
+    var moveTo = "";
+    if (p.date && !c.keepDateText) {
+        spans = spans.concat(p.date.spans);
+        args.due = { date: dueValue(p.date) };
+    } else if (c.clearDate) {
+        args.due = null;
+    }
+    if (p.project && p.project.known && p.project.id) {
+        spans.push([p.project.start, p.project.end]);
+        if (p.project.id !== c.projectId) {
+            moveTo = p.project.id;
+        }
+    } else if (c.clearProject && c.inboxProjectId && c.projectId !== c.inboxProjectId) {
+        moveTo = c.inboxProjectId;
+    }
+    var labels = (c.labels || []).slice();
+    for (var i = 0; i < (p.labels || []).length; i++) {
+        spans.push([p.labels[i].start, p.labels[i].end]);
+        if (labels.indexOf(p.labels[i].name) === -1) {
+            labels.push(p.labels[i].name);
+        }
+    }
+    if (labels.length !== (c.labels || []).length) {
+        args.labels = labels;
+    }
+    if (p.priority > 0) {
+        spans = spans.concat(p.prioritySpans || []);
+        args.priority = 5 - p.priority;        // p1 = API 4
+    }
+    var content = stripSpans(text, spans);
+    if (content === "") {
+        return { error: "empty", args: {}, moveTo: "" };
+    }
+    if (content !== String(c.content || "").trim()) {
+        args.content = content;
+    }
+    return { error: "", args: args, moveTo: moveTo };
 }

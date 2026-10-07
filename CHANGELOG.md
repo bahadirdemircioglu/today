@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [2.4.2] - 2026-10-07
+
+### Fixed
+- Editing a task couldn't add or remove its date or project: typed dates and "#Project" stayed in
+  the title. Editing now works like Quick Add (date and time, #project with suggestions, @labels,
+  pN are applied and taken out of the title), and chips under the field show the current date and
+  project with a click to remove them. Saved as one update (plus a move when the project changes).
+- Starting an edit from the task menu could lose the focus as the menu closed.
+
 ## [2.4.1] - 2026-10-07
 
 ### Changed

@@ -334,6 +334,29 @@ Item {
         return "";
     }
 
+    // Saves an edited task in one go (see QuickParse.composeEdit): one item_update for the title,
+    // date, labels and priority, and an item_move when the project changes. -> "" | "too_long"
+    function applyEdit(itemId, plan) {
+        if (!TaskStore.isValidId(itemId) || !plan) {
+            return "";
+        }
+        var args = plan.args || {};
+        if (args.content !== undefined && args.content.length > CommandQueue.MAX_QUICK_ADD_LENGTH) {
+            return "too_long";
+        }
+        var q = queue;
+        if (Object.keys(args).length) {
+            q = CommandQueue.enqueueUpdate(q, itemId, args, Date.now(), newUuid);
+        }
+        if (plan.moveTo && TaskStore.isValidId(String(plan.moveTo))) {
+            q = CommandQueue.enqueueMove(q, itemId, plan.moveTo, Date.now(), newUuid);
+        }
+        if (q !== queue) {
+            enqueueEdit(q);
+        }
+        return "";
+    }
+
     // Creates a project (offline-capable: queued with a temporary id) and switches to it.
     // -> "" | "empty" | "too_long"
     function createProject(name, color, parentId) {

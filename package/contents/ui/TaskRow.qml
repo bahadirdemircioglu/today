@@ -5,6 +5,7 @@ import org.kde.plasma.components as PlasmaComponents3
 import org.kde.kirigami as Kirigami
 
 import "logic/TaskStore.js" as TaskStore
+import "logic/QuickParse.js" as QuickParse
 
 // One list row: an optional group label (Overdue / section / day …) above a task with its round
 // check, title, date · project · labels and the first line of its description. Rows of kind
@@ -137,21 +138,39 @@ Item {
             return;
         }
         editing = true;
+        editField.reset();
         editField.text = content;
-        editField.forceActiveFocus();
-        editField.selectAll();
+        editStartedAt = Date.now();
+        // after a menu closes it hands the focus back: take it once that has happened
+        Qt.callLater(function () {
+            editField.forceInputFocus();
+            editField.selectAll();
+        });
     }
+    property double editStartedAt: 0
 
+    // Like Quick Add: a typed date, #project, @label or pN is applied (not kept in the title),
+    // and the current date or project can be removed from the chips under the field.
     function commitEdit() {
         if (!editing) {
             return;
         }
-        if (editField.text.trim() !== content) {
-            var err = controller.rename(itemId, editField.text);
-            if (err === "too_long") {
-                controller.showInfo(Lang.i18n("That's too long. Keep it under 1000 characters."), true);
-                return;
-            }
+        var plan = QuickParse.composeEdit(editField.text, editField.parsed, {
+            content: content,
+            projectId: projectId,
+            inboxProjectId: controller.store ? controller.store.inboxProjectId || "" : "",
+            labels: labelsText === "" ? [] : labelsText.split(", "),
+            clearDate: editField.clearDate,
+            clearProject: editField.clearProject,
+            keepDateText: editField.keepDateText
+        });
+        if (plan.error === "empty") {
+            return;
+        }
+        var err = controller.applyEdit(itemId, plan);
+        if (err === "too_long") {
+            controller.showInfo(Lang.i18n("That's too long. Keep it under 1000 characters."), true);
+            return;
         }
         editing = false;
     }
@@ -331,14 +350,19 @@ Item {
                 Layout.fillWidth: true
                 spacing: 0
 
-                PlasmaComponents3.TextField {
+                QuickTextField {
                     id: editField
                     Layout.fillWidth: true
                     visible: row.editing
-                    onAccepted: row.commitEdit()
-                    Keys.onEscapePressed: row.editing = false
-                    onActiveFocusChanged: {
-                        if (!activeFocus) {
+                    controller: row.controller
+                    currentDate: row.dateKey !== "" ? row.whenText : ""
+                    currentProject: row.projectName
+                    currentProjectColor: row.projectColor
+                    onSubmitted: row.commitEdit()
+                    onCancelled: row.editing = false
+                    // clicking elsewhere cancels; ignore the focus shuffle right after starting
+                    onFocusLost: {
+                        if (Date.now() - row.editStartedAt > 300) {
                             row.editing = false;
                         }
                     }
@@ -399,7 +423,8 @@ Item {
 
                 RowLayout {
                     Layout.fillWidth: true
-                    visible: row.whenText !== "" || row.detailText !== "" || row.deadlineKey !== "" || row.notesHint
+                    // while editing, the chips under the field show the date and project
+                    visible: !row.editing && (row.whenText !== "" || row.detailText !== "" || row.deadlineKey !== "" || row.notesHint)
                     spacing: Kirigami.Units.smallSpacing
 
                     // compact rows hide the description: a small note icon opens it

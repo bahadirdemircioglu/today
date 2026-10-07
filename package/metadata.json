@@ -17,7 +17,7 @@
         "Id": "io.github.bahadirdemircioglu.todoistplasma",
         "License": "GPL-3.0-or-later",
         "Name": "Todoist for Plasma",
-        "Version": "2.4.1",
+        "Version": "2.4.2",
         "Website": "https://github.com/bahadirdemircioglu/today"
     },
     "KPackageStructure": "Plasma/Applet",
