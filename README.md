@@ -1,3 +1,5 @@
+<img src="docs/logo/logo-128.png" width="72" align="right" alt="Todoist for Plasma logo">
+
 # Todoist for Plasma
 
 Your Todoist tasks on the KDE Plasma 6 desktop and panel: **Inbox, Today, Upcoming, projects, labels and filters**, like the lists in Todoist's sidebar. Complete tasks with one click, add new ones with Todoist's natural language, and edit, reschedule, move or delete them from a task menu. Works offline.
@@ -5,9 +7,9 @@ Your Todoist tasks on the KDE Plasma 6 desktop and panel: **Inbox, Today, Upcomi
 > Unofficial. Not created by, affiliated with, or supported by Doist.
 
 <p align="center">
-  <img src="docs/screenshots/today.png" width="260" alt="Today list in Breeze light: overdue and today's tasks with priority-coloured circles">
+  <img src="docs/screenshots/today.png" width="260" alt="Today list in Breeze light: overdue and today's tasks with priority-coloured circles and project colour strips">
   <img src="docs/screenshots/today-dark.png" width="260" alt="The same Today list in Breeze Dark">
-  <img src="docs/screenshots/upcoming.png" width="260" alt="Upcoming list grouped by day, with a + button on each day">
+  <img src="docs/screenshots/quick-add.png" width="260" alt="Quick Add with #project suggestions and a preview of the date, label and priority">
 </p>
 
 - **Lists:** click the list title ("Today ▾") to switch between Inbox, Today, Upcoming (the next 7 days, day by day), your projects (with sections and indented sub-tasks), labels and saved filters. Each entry shows its task count.
@@ -15,7 +17,7 @@ Your Todoist tasks on the KDE Plasma 6 desktop and panel: **Inbox, Today, Upcomi
 - **Panel:** an icon with a count badge for Today (red when something is overdue). Click it to open the list. The badge can instead count the current list, or be turned off, in the settings.
 - **Desktop, small:** a big count and the next task of the list.
 - **Desktop, large / popup:** the full list with round, priority-coloured check circles, a completion animation, a "New task" field and an "All done" state.
-- **Follows your Plasma theme:** light/dark, accent colour, font size and animation speed. No hard-coded colours.
+- **Follows your Plasma theme:** light/dark, accent colour, font size and animation speed. Project and label colours come from Todoist; priority colours follow the theme unless you pick Todoist's own.
 - **Offline-first:** tasks are cached, and completions/additions made offline are queued. The queue survives Plasma restarts and is sent once you are back online.
 - **Overdue in one go:** *Reschedule* on the Overdue header moves every overdue task to today, tomorrow, the weekend or next week (keeping their times), with undo. Recurring tasks are left alone.
 - **Editing a task** (E, F2 or *Edit* in the menu) works like Quick Add: type `yarın 15:00`, `#Project`, `@label` or `p1` and it is applied instead of staying in the title. Under the field, click the current date or project to remove it (the project then goes back to the Inbox).
@@ -33,10 +35,22 @@ Your Todoist tasks on the KDE Plasma 6 desktop and panel: **Inbox, Today, Upcomi
 
 | | | |
 |:---:|:---:|:---:|
-| <img src="docs/screenshots/switcher.png" width="250" alt="List switcher open on Projects, showing task counts"> | <img src="docs/screenshots/project.png" width="250" alt="A project with sections and an indented sub-task"> | <img src="docs/screenshots/task-menu.png" width="250" alt="Task menu with reschedule, priority, move, copy link and delete"> |
-| Switch lists from the title | Projects: sections and sub-tasks | Task menu, delete with undo |
-| <img src="docs/screenshots/offline.png" width="250" alt="Offline: saved tasks with a waiting-to-sync task and a status line"> | <img src="docs/screenshots/setup.png" width="250" alt="Setup screen: open Todoist settings and paste the API token"> | <img src="docs/screenshots/desktop-small.png" width="250" alt="Small desktop widget: big task count and the next task"> |
-| Offline, changes waiting | One-screen setup | Small desktop size |
+| <img src="docs/screenshots/overdue.png" width="250" alt="Reschedule on the Overdue header: Today, Tomorrow, This weekend, Next week"> | <img src="docs/screenshots/edit.png" width="250" alt="Editing a task: the date is being removed, the project and a new label are shown under the field"> | <img src="docs/screenshots/compact-dark.png" width="250" alt="Compact rows in Breeze Dark with Todoist's priority colours"> |
+| Reschedule all overdue tasks | Edit: add or remove date, project, labels | Compact, dark, Todoist colours |
+| <img src="docs/screenshots/upcoming.png" width="250" alt="Upcoming list grouped by day, with a + button on each day"> | <img src="docs/screenshots/project.png" width="250" alt="A project with sections and an indented sub-task"> | <img src="docs/screenshots/switcher.png" width="250" alt="List switcher open on Projects, showing task counts"> |
+| Upcoming, day by day | Projects: sections and sub-tasks | Switch lists from the title |
+| <img src="docs/screenshots/task-menu.png" width="250" alt="Task menu with reschedule, priority, move, copy link and delete"> | <img src="docs/screenshots/offline.png" width="250" alt="Offline: saved tasks with a waiting-to-sync task and a status line"> | <img src="docs/screenshots/setup.png" width="250" alt="Setup screen: open Todoist settings and paste the API token"> |
+| Task menu, delete with undo | Offline, changes waiting | One-screen setup |
+
+<p align="center">
+  <img src="docs/screenshots/desktop.png" width="560" alt="The widget on the desktop with a translucent background over the wallpaper"><br>
+  <sub>On the desktop with a translucent background</sub>
+</p>
+
+| | |
+|:---:|:---:|
+| <img src="docs/screenshots/appearance.png" width="420" alt="Settings, Appearance page: language, priority colours, project colour strip, desktop background, density"> | <img src="docs/screenshots/settings.png" width="330" alt="Settings, General page: account, badge, daily goal, reminders, custom filter, start list"> |
+| Settings → Appearance | Settings → General |
 
 <p align="center">
   <img src="docs/screenshots/panel.png" width="640" alt="Panel icon with a count badge, a red badge when something is overdue, and a warning when not connected">
@@ -44,8 +58,8 @@ Your Todoist tasks on the KDE Plasma 6 desktop and panel: **Inbox, Today, Upcomi
 
 | | |
 |:---:|:---:|
-| <img src="docs/screenshots/today-v21.png" width="250" alt="Today with the daily goal ring, a deadline, the keyboard-selected row and the Undo bar"> | <img src="docs/screenshots/settings.png" width="375" alt="Settings, General page: account, badge, daily goal, reminders, custom filter, start list"> |
-| Daily goal, deadline, keyboard selection, undo | Settings → General |
+| <img src="docs/screenshots/today-v21.png" width="250" alt="Today with the daily goal ring, a deadline, the keyboard-selected row and the Undo bar"> | <img src="docs/screenshots/desktop-small.png" width="250" alt="Small desktop widget: big task count and the next task"> |
+| Daily goal, deadline, keyboard selection, undo | Small desktop size |
 
 <p align="center">
   <img src="docs/screenshots/reminder.png" width="400" alt="Reminder notification: Dentist in 10 minutes, with Complete and Remind me in 10 minutes buttons"><br>
@@ -56,7 +70,7 @@ Your Todoist tasks on the KDE Plasma 6 desktop and panel: **Inbox, Today, Upcomi
   <sub>Optional KRunner plugin</sub>
 </p>
 
-<sub>Rendered from the design mockups. On your desktop the widget uses your Plasma theme, fonts and icons.</sub>
+<sub>Rendered from design mockups of the current version. On your desktop the widget uses your Plasma theme, fonts and icons.</sub>
 
 ## Keyboard
 
@@ -87,6 +101,8 @@ It uses the token of your Todoist for Plasma widget (or `TODOIST_TOKEN`, or `tok
 
 ## Install
 
+**From the KDE Store:** right-click the desktop → *Enter Edit Mode* → *Add Widgets…* → *Get New Widgets* → *Download New Plasma Widgets*, search for **Todoist for Plasma** and install it. Updates show up in the same dialog.
+
 **From a release:** download `todoist-plasma-<version>.plasmoid` from [Releases](https://github.com/bahadirdemircioglu/today/releases), then either
 
 - right-click the desktop → *Enter Edit Mode* → *Add Widgets…* → *Get New Widgets* → *Install Widget From Local File…*, or
@@ -113,7 +129,7 @@ You can also connect, or disconnect, from the widget's *Configure…* window. If
 
 ## Adding tasks
 
-Whatever you type goes to Todoist's [Quick Add](https://todoist.com/help/articles/use-task-quick-add-in-todoist-va4Lhpzz), so the usual syntax works:
+New tasks use Todoist's [Quick Add](https://todoist.com/help/articles/use-task-quick-add-in-todoist-va4Lhpzz) syntax, with a live preview under the field:
 
 | You type | Result |
 |---|---|
@@ -121,6 +137,8 @@ Whatever you type goes to Todoist's [Quick Add](https://todoist.com/help/article
 | `Dentist tomorrow 3pm #Personal` | due tomorrow 15:00 in *Personal* (you'll see "Added to Personal · tomorrow 3pm") |
 | `Pay rent every 1st @home` | recurring, labelled |
 | `Buy milk // two litres` | due today (no date given), with a description |
+| `Toplantı 12-15:00 #Work` | the 12th at 15:00 in *Work* |
+| `Diş hekimi yarın saat 15` | tomorrow 15:00 (Turkish dates work with any Todoist language) |
 
 Where a new task lands depends on the list you add it from, like on the web. Anything you type yourself (a date, `#project`, `@label`) always wins:
 
